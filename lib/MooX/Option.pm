@@ -30,31 +30,27 @@ You will have "new_with_options" to instanciate new object for command line.
 
 use strict;
 use warnings;
+use Carp;
 # VERSION
 
 sub import {
     my $caller = caller;
-    my $current = __PACKAGE__;
+    my $caller_new = $caller->can('new');
+    my $caller_has = $caller->can('has');
+    croak "No method new for $caller" unless $caller_new;
+    croak "No method has for $caller" unless $caller_has;
+
     no strict 'refs';
-    for my $method(qw/option new_with_options/) {
-        *{"${caller}::${method}"} = *{"${current}::${method}"};
-    }
+    *{"${caller}::option"} = sub {
+        #todo capture option;
+        goto &$caller_has;
+    };
+
+    *{"${caller}::new_with_options"} = sub {
+        #todo capture option;
+        goto &$caller_new;
+    };
 }
 
-sub option {
-    my ($name, %options) = @_;
-
-    {
-        #call has method
-        no strict 'refs';
-        my $caller = caller;
-        my $sub = *{"${caller}::has"}{CODE};
-        goto &$sub;
-    }
-}
-
-sub new_with_options {
-    my ($class, %options) = @_;
-}
 
 1;
