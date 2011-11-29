@@ -1,0 +1,9 @@
+*.swp
+.DS_Store
+*.old
+*.bak
+*.tdy
+.build
+.includepath
+.project
+MooX-Option-*
