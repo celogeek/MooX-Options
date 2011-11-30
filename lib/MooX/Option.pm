@@ -89,8 +89,8 @@ Filter for specific object model : (Mo and Moo don t need any filter, you can ob
 	
 =cut
 sub import {
-	my $class = shift;
-	my (%options) = (%_default_options, @_);
+	my (undef, @_params) = @_;
+	my (%options) = (%_default_options, @_params);
     my $caller = caller;
 
     my @_options = ('USAGE: %c %o');
