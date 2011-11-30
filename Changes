@@ -1,0 +1,5 @@
+0.1 - 2011-11-30 18:30
+===
+
+    * First release of MooX::Getopt
+    Fully compatible with Mo/Moo/Mouse/Moose and more
