@@ -31,25 +31,69 @@ You will have "new_with_options" to instanciate new object for command line.
 use strict;
 use warnings;
 use Carp;
+use Data::Dumper;
 # VERSION
 
+my %_default_options = (
+	'creation_method' => 'new',
+	'chain_method' => 'has',
+    'option_method_name' => 'option',
+    'creation_method_name' => 'new_with_options',
+);
+
+=head1 METHOD
+
+=head2 IMPORT
+
+The import method take option :
+
+=over
+
+=item %options
+
+creation_method : call this method after parsing option, default : new
+
+chain_method : call this method to create the attribute, default : has
+
+option_method_name : name of keyword you want to use to create your option, default : option
+
+creation_method_name : name of new method to handle option, default : new_with_options
+
+=back
+	
+=cut
 sub import {
+	my $class = shift;
+	my (%options) = (%_default_options, @_);
     my $caller = caller;
-    my $caller_new = $caller->can('new');
-    my $caller_has = $caller->can('has');
-    croak "No method new for $caller" unless $caller_new;
-    croak "No method has for $caller" unless $caller_has;
 
-    no strict 'refs';
-    *{"${caller}::option"} = sub {
-        #todo capture option;
-        goto &$caller_has;
-    };
+    {
+        #keyword option
+        my $chain_method = $caller->can($options{chain_method});
+        croak "No method ",$options{chain_method}, " found" unless $chain_method;
+        croak "No method name for option" unless $options{option_method_name};
+        croak "Method ",$options{option_method_name}, " already defined !" if $caller->can($options{option_method_name});
+        
+        no strict 'refs';
+        *{"${caller}::$options{option_method_name}"} = sub {
+            #todo capture option;
+            goto &$chain_method;
+        };
+    }
 
-    *{"${caller}::new_with_options"} = sub {
-        #todo capture option;
-        goto &$caller_new;
-    };
+    {
+    	#keyword new_with_options
+        my $creation_method = $caller->can($options{creation_method});
+        croak "No method ",$options{creation_method}, " found" unless $creation_method;
+    	croak "No method name for creation" unless $options{creation_method_name};
+        croak "Method ",$options{creation_method_name}, " already defined !" if $caller->can($options{creation_method_name});
+    	
+	    no strict 'refs';
+	    *{"${caller}::$options{creation_method_name}"} = sub {
+	        #todo capture option;
+	        goto &$creation_method;
+        };
+    }
 }
 
 
