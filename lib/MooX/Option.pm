@@ -287,4 +287,19 @@ Ex :
     t->verbose # 3
 
 =back 
-   
+
+=head1 THANKS
+
+=over
+
+=item Matt S. Trout (mst) <mst@shadowcat.co.uk>
+
+For his patience and advice.
+
+=back
+    
+=head1 BUGS
+
+Any bugs or evolution can be submit here :
+
+L<Github|https://github.com/geistteufel/MooX-Option>
