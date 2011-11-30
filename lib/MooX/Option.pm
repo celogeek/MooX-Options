@@ -160,7 +160,7 @@ sub import {
 
             #call describe_options
             my ($opt, $usage) = describe_options(@_options,["help|h", "show this help message"]);
-            print $usage->text, exit if $opt->help;
+            print($usage->text), exit if $opt->help;
 
             #replace command line attribute in params if params not defined
             my @_existing_attributes = grep { $opt->can($_) && defined $opt->$_ && !exists $params{$_}} @_attributes;
