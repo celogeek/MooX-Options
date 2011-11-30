@@ -67,6 +67,16 @@ subtest "test required" => sub {
 	}
 };
 
+subtest "test help" => sub {
+	note "test help";
+    {
+        @ARGV=('--help');
+        my @r = trap {r->new_with_options};
+        is($trap->exit, 0, "help, exit 0");
+        ok($trap->stdout !~ /^str_req is missing/, "str_reg is missing");
+    }
+};
+
 subtest "value override" => sub {
     note "value override";
 	{
