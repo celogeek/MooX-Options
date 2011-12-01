@@ -19,8 +19,15 @@ You will have "new_with_options" to instanciate new object for command line.
             is => 'ro',
             required => '1',
             doc => "My String Option",
-            format => 'Bool',
+            format => 's',
         );
+
+        option "arr" => (
+            is => 'ro',
+            doc => "My array",
+            format => 'i@',
+            autosplit => ',',
+        )
         1;
     }
 
@@ -30,10 +37,12 @@ You will have "new_with_options" to instanciate new object for command line.
 
 use strict;
 use warnings;
+# VERSION
 use Carp;
 use Data::Dumper;
 use Getopt::Long::Descriptive;
-# VERSION
+use Regexp::Common;
+use Data::Record;
 
 my %_default_options = (
 	'creation_method' => 'new',
@@ -96,7 +105,7 @@ sub import {
     my @_options = ('USAGE: %c %o');
     my @_attributes = ();
     my @_required_attributes = ();
-    my @_autosplit_attributes = ();
+    my %_autosplit_attributes = ();
     
     my @_filter_chain_key;
     @_filter_chain_key = @{$_filter_chain{$options{filter}}} if $options{filter} && defined $_filter_chain{$options{filter}};
@@ -111,22 +120,42 @@ sub import {
         no strict 'refs';
         *{"${caller}::$options{option_method_name}"} = sub {
             my ($name, %options) = @_;
+            croak "Negativable params is not usable with non boolean value, don't pass format to use it !" if $options{negativable} && $options{format};
+
+            #fix missing option, autosplit implie repeatable
+            $options{repeatable} = 1 if $options{autosplit};
+
             #help is use for help message only
             if ($name ne 'help') {
             	my $name_long_and_short = join "|", grep { defined $_ } $name, $options{short}; 
-                $name_long_and_short .= "+" if $options{repeatable};
+                #fix format for negativable or add + if it is a boolean
+                if ($options{repeatable}) {
+                    if ($options{format}) {
+                        $options{format} .= "@" unless substr($options{format}, -1) eq '@';
+                    } else {
+                        $name_long_and_short .= "+";
+                    }
+                }
+                #negativable for boolean value
                 $name_long_and_short .= "!" if $options{negativable};
+
+                #format the name
                 my $name_format = join "=", grep { defined $_ } $name_long_and_short, $options{format};
-                push @_options, [ $name_format, $options{doc} // "no doc for $name" ];
-                push @_attributes, $name;
-                push @_required_attributes, $name if $options{required};
-                push @_autosplit_attributes, $name if $options{autosplit} && $options{format} && substr($options{format},-1) eq '@';
+
+                push @_options, [ $name_format, $options{doc} // "no doc for $name" ];              # prepare option for getopt
+                push @_attributes, $name;                                                           # save the attribute for later use
+                push @_required_attributes, $name if $options{required};                            # save the required attribute
+                $_autosplit_attributes{$name} = Data::Record->new( {split => $options{autosplit}, unless => $RE{quoted}} ) if $options{autosplit};    # save autosplit value
             }
 
+            #remove bad key for passing to chain_method(has), avoid warnings with Moo/Moose
+            #by defaut, keep all key
             if (@_filter_chain_key) {
 	            delete $options{$_} for @_filter_chain_key;
                 @_ = ($name, %options);
 	        }
+
+            #chain to chain_method (has)
             goto &$chain_method;
         };
     }
@@ -144,17 +173,22 @@ sub import {
 
             #if autosplit attributes is present, search and replace in ARGV with full version
             #ex --test=1,2,3 become --test=1 --test=2 --test=3
-            if (@_autosplit_attributes) {
-	            my $_autosplit_regex_str = '^--?('.(join('|',@_autosplit_attributes)).')=([^,]+,[^$]+)';
-	            my $_autosplit_regex = qr{$_autosplit_regex_str};
+            if (%_autosplit_attributes) {
 	            my @_ARGV;
-	            for my $arg (@ARGV) {
-	            	if (my ($name, $values_str) = ($arg =~ $_autosplit_regex)) {
-	                   push @ARGV, "--$name=$_" for split(/,/,$values_str);
-	            	} else {
-	            		push @_ARGV, $arg;
-	            	}
-	            }
+                #parse all argv
+                for my $arg (@ARGV) {
+                    my ($arg_name, $arg_values) = split(/=/, $arg, 2);
+                    $arg_name =~ s/^--?//;
+                    if (my $rec = $_autosplit_attributes{$arg_name}) {
+                        foreach my $record($rec->records($arg_values)) {
+                            #remove the quoted if exist to chain
+                            $record =~ s/^['"]|['"]$//g;
+                            push @_ARGV, "--$arg_name=$record";
+                        }
+                    } else {
+                        push @_ARGV, $arg;
+                    }
+                }
                 @ARGV = @_ARGV;
 	        }
 
