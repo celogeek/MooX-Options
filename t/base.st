@@ -104,7 +104,7 @@ subtest "split_complexe_str" => sub {
     {
         @ARGV=('--split_str=a,"b,c",d');
 		my $t = sp_str->new_with_options();
-        is_deeply($t->split_str, [qw/a b,c d/],'str req is ok');
+        is_deeply($t->split_str, ['a', 'b,c', 'd'],'str req is ok');
     }
 }
 
