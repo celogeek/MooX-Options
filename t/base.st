@@ -13,6 +13,9 @@ subtest "args value" => sub {
     note "args value with repeatable";
     @ARGV=('--bool','--counter','--counter','--counter', '--empty');
     my $t = t->new_with_options();
+    note "bool ",$t->bool;
+    note "counter ",$t->counter;
+    note "empty ",$t->empty;
     ok($t->$_, "$_ values is defined") for @params;
     is($t->bool,1,"bool is well defined");
     is($t->counter, 3,"counter is well defined");
@@ -90,4 +93,18 @@ subtest "value override" => sub {
         is($t->str_req, 'ok','str req is override with ok');
 	}
 };
+
+subtest "split_complexe_str" => sub {
+    note "split on complexe str";
+    {
+        @ARGV=("--split_str=a,b,c");
+		my $t = sp_str->new_with_options();
+        is_deeply($t->split_str, [qw/a b c/],'str req is ok');
+    }
+    {
+        @ARGV=('--split_str=a,"b,c",d');
+		my $t = sp_str->new_with_options();
+        is_deeply($t->split_str, [qw/a b,c d/],'str req is ok');
+    }
+}
 
