@@ -25,7 +25,7 @@ my %_default_options = (
     'option_method_name' => 'option',
 );
 
-my @_filter = qw/format short repeatable negativable autosplit/;
+my @_filter = qw/format short repeatable negativable autosplit doc/;
 
 sub import {
 	my (undef, @_params) = @_;
@@ -53,32 +53,31 @@ sub import {
         *{"${caller}::$import_options{option_method_name}"} = sub {
             my ($name, %options) = @_;
             croak "Negativable params is not usable with non boolean value, don't pass format to use it !" if $options{negativable} && $options{format};
+            croak "Can't use option with help, it is implied by MooX::Option" if $name eq 'help';
 
             #fix missing option, autosplit implie repeatable
             $options{repeatable} = 1 if $options{autosplit};
 
             #help is use for help message only
-            if ($name ne 'help') {
-            	my $name_long_and_short = join "|", grep { defined $_ } $name, $options{short}; 
-                #fix format for negativable or add + if it is a boolean
-                if ($options{repeatable}) {
-                    if ($options{format}) {
-                        $options{format} .= "@" unless substr($options{format}, -1) eq '@';
-                    } else {
-                        $name_long_and_short .= "+";
-                    }
+          	my $name_long_and_short = join "|", grep { defined $_ } $name, $options{short}; 
+            #fix format for negativable or add + if it is a boolean
+            if ($options{repeatable}) {
+                if ($options{format}) {
+                    $options{format} .= "@" unless substr($options{format}, -1) eq '@';
+                } else {
+                    $name_long_and_short .= "+";
                 }
-                #negativable for boolean value
-                $name_long_and_short .= "!" if $options{negativable};
-
-                #format the name
-                my $name_format = join "=", grep { defined $_ } $name_long_and_short, $options{format};
-
-                push @_options, [ $name_format, $options{doc} // "no doc for $name" ];              # prepare option for getopt
-                push @_attributes, $name;                                                           # save the attribute for later use
-                push @_required_attributes, $name if $options{required};                            # save the required attribute
-                $_autosplit_attributes{$name} = Data::Record->new( {split => $options{autosplit}, unless => $RE{quoted}} ) if $options{autosplit};    # save autosplit value
             }
+            #negativable for boolean value
+            $name_long_and_short .= "!" if $options{negativable};
+
+            #format the name
+            my $name_format = join "=", grep { defined $_ } $name_long_and_short, $options{format};
+
+            push @_options, [ $name_format, $options{doc} // "no doc for $name" ];              # prepare option for getopt
+            push @_attributes, $name;                                                           # save the attribute for later use
+            push @_required_attributes, $name if $options{required};                            # save the required attribute
+            $_autosplit_attributes{$name} = Data::Record->new( {split => $options{autosplit}, unless => $RE{quoted}} ) if $options{autosplit};    # save autosplit value
 
             #remove bad key for passing to chain_method(has), avoid warnings with Moo/Moose
             #by defaut, keep all key
