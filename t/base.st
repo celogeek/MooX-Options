@@ -1,5 +1,4 @@
 
-
 my @params = qw/bool counter empty/;
 subtest "no args" => sub {
 	note "no args";
@@ -7,6 +6,7 @@ subtest "no args" => sub {
 	my $t = t->new_with_options();
 	ok($t->can($_), "$_ defined") for @params;
 	is($t->$_, undef, "$_ values is undef") for @params;
+	done_testing();
 };
 
 subtest "args value" => sub {
@@ -20,6 +20,7 @@ subtest "args value" => sub {
     is($t->bool,1,"bool is well defined");
     is($t->counter, 3,"counter is well defined");
     is($t->empty, 1, "empty is well defined");
+    done_testing();
 };
 
 subtest "negativable" => sub {
@@ -27,6 +28,7 @@ subtest "negativable" => sub {
     @ARGV=('--empty', '--no-empty');
     my $t = t->new_with_options();
     is($t->empty, 0, "empty is well defined");
+    done_testing();
 };
 
 subtest "split" => sub {
@@ -52,6 +54,7 @@ subtest "split" => sub {
         my $t = t->new_with_options();
         is_deeply($t->split, [1,2,3,4], "split three arg with autosplit");
     }
+    done_testing();
 };
 
 subtest "test required" => sub {
@@ -68,6 +71,7 @@ subtest "test required" => sub {
         my $t = r->new_with_options;
         is($t->str_req, 'ok','str req is ok');
 	}
+    done_testing();
 };
 
 subtest "test help" => sub {
@@ -78,6 +82,7 @@ subtest "test help" => sub {
         is($trap->exit, 0, "help, exit 0");
         ok($trap->stdout !~ /^str_req is missing/, "str_reg is missing");
     }
+    done_testing();
 };
 
 subtest "value override" => sub {
@@ -92,6 +97,7 @@ subtest "value override" => sub {
         my $t = r->new_with_options(str_req => "ok");
         is($t->str_req, 'ok','str req is override with ok');
 	}
+    done_testing();
 };
 
 subtest "split_complexe_str" => sub {
@@ -106,5 +112,7 @@ subtest "split_complexe_str" => sub {
 		my $t = sp_str->new_with_options();
         is_deeply($t->split_str, ['a', 'b,c', 'd'],'str req is ok');
     }
-}
+    done_testing();
+};
 
+1;
