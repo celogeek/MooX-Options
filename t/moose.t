@@ -6,6 +6,7 @@ use Test::More;
 use Test::Trap;
 use Carp;
 use FindBin qw/$RealBin/;
+use Try::Tiny;
 
 BEGIN {
 	use Module::Load::Conditional qw/check_install/;
@@ -42,6 +43,14 @@ BEGIN {
 
     option 'split_str' => (is => 'ro', format => 's', autosplit => ",");
 
+    1;
+}
+
+{
+    package d;
+    use Moose;
+    use MooX::Option;
+    option 'should_die_ok' => (is => 'ro', trigger => sub { die "ok"});
     1;
 }
 
