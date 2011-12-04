@@ -132,4 +132,17 @@ subtest "should_die_ok" => sub {
     };
 };
 
+subtest "test usage" => sub {
+    note "test usage method";
+    my $s = sp_str->new_with_options();
+    my $usage = $s->can('option_usage');
+    ok($usage, "usage method exists");
+    my @r = trap {$usage->(127, 'usage work', 'usage really work')};
+    is($trap->exit, 127, 'exit code is correct');
+    ok($trap->stdout =~ /usage work/, 'custom message is present');
+    ok($trap->stdout =~ /usage really work/, 'custom message is really present');
+    ok($trap->stdout =~ /help.*show this help message/, 'help is present');
+    ok($trap->stdout =~ /split_str.*no doc for split_str/, 'attr no doc is present');
+};
+
 1;
