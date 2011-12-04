@@ -47,8 +47,6 @@ sub import {
     
     {
         #keyword option
-        my $chain_method = $caller->can($import_options{option_chain_method});
-        
         no strict 'refs';
         *{"${caller}::$import_options{option_method_name}"} = sub {
             my ($name, %options) = @_;
@@ -87,14 +85,13 @@ sub import {
 	        }
 
             #chain to chain_method (has)
+            my $chain_method = $caller->can($import_options{option_chain_method});
             goto &$chain_method;
         };
     }
 
     {
     	#keyword new_with_options
-        my $creation_method = $caller->can($import_options{creation_chain_method});
-    	
 	    no strict 'refs';
 	    *{"${caller}::$import_options{creation_method_name}"} = sub {
             my ($self, %params) = @_;
@@ -134,6 +131,8 @@ sub import {
             
             #call creation_method
             @_ = ($self, %params);
+
+            my $creation_method = $caller->can($import_options{creation_chain_method});
 	        goto &$creation_method;
         };
     }
