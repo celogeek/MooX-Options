@@ -71,6 +71,13 @@ subtest "test required" => sub {
         my $t = r->new_with_options;
         is($t->str_req, 'ok','str req is ok');
 	}
+	{
+	   @ARGV=();
+	   my @r = trap {multi_req->new_with_options};
+	   is($trap->exit, 1, "missing args exit 1");
+       my @missing = $trap->stdout =~ /(multi_\d is missing)\n/g;
+       is(scalar @missing, 3, "multi is missing");
+	}
     done_testing();
 };
 
