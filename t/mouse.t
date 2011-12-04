@@ -53,6 +53,16 @@ BEGIN {
     1;
 }
 
+{
+    package multi_req;
+    use Mouse;
+    use MooX::Option;
+    option 'multi_1' => (is => 'ro', required => 1);
+    option 'multi_2' => (is => 'ro', required => 1);
+    option 'multi_3' => (is => 'ro', required => 1);
+}
+
+
 subtest "Mouse" => sub {
     note "Test Mouse";
     require $RealBin.'/base.st';

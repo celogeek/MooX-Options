@@ -54,6 +54,15 @@ BEGIN {
 	1;
 }
 
+{
+	package multi_req;
+	use Moo;
+	use MooX::Option;
+    option 'multi_1' => (is => 'ro', required => 1);
+    option 'multi_2' => (is => 'ro', required => 1);
+    option 'multi_3' => (is => 'ro', required => 1);
+}
+
 subtest "Moo" => sub {
     note "Test Moo";
     require $RealBin.'/base.st';
