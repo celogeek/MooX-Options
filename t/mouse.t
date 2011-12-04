@@ -6,6 +6,7 @@ use Test::More;
 use Test::Trap;
 use Carp;
 use FindBin qw/$RealBin/;
+use Try::Tiny;
 
 BEGIN {
 	use Module::Load::Conditional qw/check_install/;
@@ -43,6 +44,15 @@ BEGIN {
 
     1;
 }
+
+{
+    package d;
+    use Mouse;
+    use MooX::Option;
+    option 'should_die_ok' => (is => 'ro', trigger => sub { die "ok"});
+    1;
+}
+
 subtest "Mouse" => sub {
     note "Test Mouse";
     require $RealBin.'/base.st';

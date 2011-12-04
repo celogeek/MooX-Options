@@ -115,4 +115,14 @@ subtest "split_complexe_str" => sub {
     done_testing();
 };
 
+
+subtest "should_die_ok" => sub {
+    note "Test chain method";
+    try {
+        d->new_with_options(should_die_ok => 1);
+    } catch {
+        ok(/^ok /, 'should die ok');
+    };
+};
+
 1;
