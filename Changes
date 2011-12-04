@@ -1,3 +1,9 @@
+0.4 - 2011-12-04 12:00
+===
+
+    * fix call chain method (don't call properly because new method was not already generated at the call)
+      add test for chain_method (should_die_ok)
+
 0.3 - 2011-12-03 13:00
 ===
 
