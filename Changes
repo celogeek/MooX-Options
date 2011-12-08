@@ -1,3 +1,11 @@
+0.7 - 2011-12-09 00:10
+===
+
+    * change name to MooX::Options
+    * fix Global name (UPPERCASE)
+    * fix Global name (Camel_Case)
+    * fix private name (no more "_")
+
 0.6 - 2011-12-04 13:00
 ===
 
