@@ -40,11 +40,11 @@ sub import {
     }
 
 
-    my @_options = ('USAGE: %c %o');
-    my @_attributes = ();
-    my @_required_attributes = ();
-    my %_autosplit_attributes = ();
-    my $_usage="";
+    my @Options = ('USAGE: %c %o');
+    my @Attributes = ();
+    my @Required_Attributes = ();
+    my %Autosplit_Attributes = ();
+    my $Usage="";
     
     {
         #keyword option
@@ -73,10 +73,10 @@ sub import {
             #format the name
             my $name_format = join "=", grep { defined $_ } $name_long_and_short, $options{format};
 
-            push @_options, [ $name_format, $options{doc} // "no doc for $name" ];              # prepare option for getopt
-            push @_attributes, $name;                                                           # save the attribute for later use
-            push @_required_attributes, $name if $options{required};                            # save the required attribute
-            $_autosplit_attributes{$name} = Data::Record->new( {split => $options{autosplit}, unless => $RE{quoted}} ) if $options{autosplit};    # save autosplit value
+            push @Options, [ $name_format, $options{doc} // "no doc for $name" ];              # prepare option for getopt
+            push @Attributes, $name;                                                           # save the attribute for later use
+            push @Required_Attributes, $name if $options{required};                            # save the required attribute
+            $Autosplit_Attributes{$name} = Data::Record->new( {split => $options{autosplit}, unless => $RE{quoted}} ) if $options{autosplit};    # save autosplit value
 
             #remove bad key for passing to chain_method(has), avoid warnings with Moo/Moose
             #by defaut, keep all key
@@ -96,7 +96,7 @@ sub import {
         no strict 'refs';
         *{"${caller}::$import_options{option_method_name}_usage"} = sub {
             my ($code, @messages) = @_;
-            print(join("\n",@messages, $_usage)), exit($code);
+            print(join("\n",@messages, $Usage)), exit($code);
         }
     }
 
@@ -108,38 +108,38 @@ sub import {
 
             #if autosplit attributes is present, search and replace in ARGV with full version
             #ex --test=1,2,3 become --test=1 --test=2 --test=3
-            if (%_autosplit_attributes) {
-	            my @_ARGV;
+            if (%Autosplit_Attributes) {
+	            my @new_argv;
                 #parse all argv
                 for my $arg (@ARGV) {
                     my ($arg_name, $arg_values) = split(/=/, $arg, 2);
                     $arg_name =~ s/^--?//;
-                    if (my $rec = $_autosplit_attributes{$arg_name}) {
+                    if (my $rec = $Autosplit_Attributes{$arg_name}) {
                         foreach my $record($rec->records($arg_values)) {
                             #remove the quoted if exist to chain
                             $record =~ s/^['"]|['"]$//g;
-                            push @_ARGV, "--$arg_name=$record";
+                            push @new_argv, "--$arg_name=$record";
                         }
                     } else {
-                        push @_ARGV, $arg;
+                        push @new_argv, $arg;
                     }
                 }
-                @ARGV = @_ARGV;
+                @ARGV = @new_argv;
 	        }
 
             #call describe_options
             my $usage_method = $self->can("$import_options{option_method_name}_usage");
-            my ($opt, $usage) = describe_options(@_options,["help|h", "show this help message"]);
-            $_usage = $usage->text;
+            my ($opt, $usage) = describe_options(@Options,["help|h", "show this help message"]);
+            $Usage = $usage->text;
             $usage_method->(0) if $opt->help;
 
             #replace command line attribute in params if params not defined
-            my @_existing_attributes = grep { $opt->can($_) && defined $opt->$_ && !exists $params{$_}} @_attributes;
-            @params{@_existing_attributes} = @$opt{@_existing_attributes};
+            my @existing_attributes = grep { $opt->can($_) && defined $opt->$_ && !exists $params{$_}} @Attributes;
+            @params{@existing_attributes} = @$opt{@existing_attributes};
 
             #check required params, if anything missing, display help
-            my @_missing_params = grep { !defined $params{$_} } @_required_attributes;            
-            $usage_method->(1, map { "$_ is missing"} @_missing_params) if @_missing_params;
+            my @missing_params = grep { !defined $params{$_} } @Required_Attributes;            
+            $usage_method->(1, map { "$_ is missing"} @missing_params) if @missing_params;
             
             #call creation_method
             @_ = ($self, %params);
@@ -361,4 +361,4 @@ Ex :
 
 Any bugs or evolution can be submit here :
 
-L<Github|https://github.com/geistteufel/MooX-Option>
+L<Github|https://github.com/geistteufel/MooX-Options>
