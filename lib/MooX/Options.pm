@@ -18,22 +18,22 @@ use Getopt::Long::Descriptive;
 use Regexp::Common;
 use Data::Record;
 
-my %_default_options = (
+my %DEFAULT_OPTIONS = (
 	'creation_chain_method' => 'new',
     'creation_method_name' => 'new_with_options',
 	'option_chain_method' => 'has',
     'option_method_name' => 'option',
 );
 
-my @_filter = qw/format short repeatable negativable autosplit doc/;
+my @FILTER = qw/format short repeatable negativable autosplit doc/;
 
 sub import {
-	my (undef, @_params) = @_;
-	my (%import_options) = (%_default_options, @_params);
+	my (undef, %import_params) = @_;
+	my (%import_options) = (%DEFAULT_OPTIONS, %import_params);
     my $caller = caller;
     
     #check options and definition
-    while(my ($key, $method) = each %_default_options) {
+    while(my ($key, $method) = each %DEFAULT_OPTIONS) {
     	croak "missing option $key, check doc to define one" unless $method;
         croak "method $method is not defined, check doc to use another name" if $key =~ /_chain_method$/ && !$caller->can($method);
         croak "method $method already defined, check doc to use another name" if $key =~ /_method_name$/ && $caller->can($method);
@@ -81,7 +81,7 @@ sub import {
             #remove bad key for passing to chain_method(has), avoid warnings with Moo/Moose
             #by defaut, keep all key
             unless ($options{nofilter}) {
-	            delete $options{$_} for @_filter;
+	            delete $options{$_} for @FILTER;
                 @_ = ($name, %options);
 	        }
 
