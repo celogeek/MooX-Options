@@ -1,6 +1,6 @@
-package MooX::Option;
+package MooX::Options;
 # ABSTRACT: add option keywords to your Moo object
-=head1 MooX::Option
+=head1 MooX::Options
 
 Use Getopt::Long::Descritive to provide command line option for your Mo/Moo/Mouse/Moose Object.
     
@@ -52,7 +52,7 @@ sub import {
         *{"${caller}::$import_options{option_method_name}"} = sub {
             my ($name, %options) = @_;
             croak "Negativable params is not usable with non boolean value, don't pass format to use it !" if $options{negativable} && $options{format};
-            croak "Can't use option with help, it is implied by MooX::Option" if $name eq 'help';
+            croak "Can't use option with help, it is implied by MooX::Options" if $name eq 'help';
 
             #fix missing option, autosplit implie repeatable
             $options{repeatable} = 1 if $options{autosplit};
@@ -187,7 +187,7 @@ it will create ${option_method_name}_usage too, ex: option_usage($exit_code, @{a
 
 =item nofilter
 
-don't filter extra params for MooX::Option before calling chain_method 
+don't filter extra params for MooX::Options before calling chain_method 
 
 it is usefull if you want to use this params for something else
 
@@ -201,7 +201,7 @@ First of all, I use L<Getopt::Long::Descriptive>. Everything will be pass to the
 
     package t;
     use Moo;
-    use MooX::Option;
+    use MooX::Options;
     
     option 'test' => (is => 'ro');
     
@@ -307,7 +307,7 @@ Ex :
 
     package t;
     use Moo;
-    use MooX::Option;
+    use MooX::Options;
     
     option test => (is => 'ro', format => 'i@', autosplit => ',');
     #same as : option test => (is => 'ro', format => 'i', autosplit => ',');
@@ -322,7 +322,7 @@ I automatically take the quoted as a group separator value
 
     package str;
     use Moo;
-    use MooX::Option;
+    use MooX::Options;
     option test => (is => 'ro', format => 's', repeatable => 1, autosplit => ',');
     1;
     
@@ -338,7 +338,7 @@ Ex :
 
     package t;
     use Moo;
-    use MooX::Option;
+    use MooX::Options;
     
     option 'verbose' => (is => 'ro', repeatable => 1, short => 'v');
     
