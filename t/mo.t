@@ -16,7 +16,7 @@ BEGIN {
 {
     package t;
     use Mo;
-    use MooX::Option filter => 'Mo';
+    use MooX::Options filter => 'Mo';
 
     option 'bool' => (is => 'ro' );
     option 'counter' => (is => 'ro', repeatable => 1);
@@ -29,7 +29,7 @@ BEGIN {
 {
     package r;
     use Mo;
-    use MooX::Option filter => 'Mo';
+    use MooX::Options filter => 'Mo';
     
     option 'str_req' => (is => 'ro', format => 's', required => 1);
     
@@ -39,7 +39,7 @@ BEGIN {
 { 
     package sp_str;
     use Mo;
-    use MooX::Option;
+    use MooX::Options;
 
     option 'split_str' => (is => 'ro', format => 's', autosplit => ",");
 
@@ -49,7 +49,7 @@ BEGIN {
 {
     package d;
     use Mo 'coerce';
-    use MooX::Option;
+    use MooX::Options;
     option 'should_die_ok' => (is => 'ro', coerce => sub { die "ok"});
     1;
 }
@@ -57,7 +57,7 @@ BEGIN {
 {
     package multi_req;
     use Mo;
-    use MooX::Option;
+    use MooX::Options;
     option 'multi_1' => (is => 'ro', required => 1);
     option 'multi_2' => (is => 'ro', required => 1);
     option 'multi_3' => (is => 'ro', required => 1);

@@ -16,7 +16,7 @@ BEGIN {
 {
     package t;
     use Mouse;
-    use MooX::Option filter => 'Mouse';
+    use MooX::Options filter => 'Mouse';
 
     option 'bool' => (is => 'ro' );
     option 'counter' => (is => 'ro', repeatable => 1);
@@ -29,7 +29,7 @@ BEGIN {
 {
     package r;
     use Mouse;
-    use MooX::Option filter => 'Mouse';
+    use MooX::Options filter => 'Mouse';
     
     option 'str_req' => (is => 'ro', format => 's', required => 1);
     
@@ -38,7 +38,7 @@ BEGIN {
 { 
     package sp_str;
     use Mouse;
-    use MooX::Option filter => 'Mouse';
+    use MooX::Options filter => 'Mouse';
 
     option 'split_str' => (is => 'ro', format => 's', autosplit => ",");
 
@@ -48,7 +48,7 @@ BEGIN {
 {
     package d;
     use Mouse;
-    use MooX::Option;
+    use MooX::Options;
     option 'should_die_ok' => (is => 'ro', trigger => sub { die "ok"});
     1;
 }
@@ -56,7 +56,7 @@ BEGIN {
 {
     package multi_req;
     use Mouse;
-    use MooX::Option;
+    use MooX::Options;
     option 'multi_1' => (is => 'ro', required => 1);
     option 'multi_2' => (is => 'ro', required => 1);
     option 'multi_3' => (is => 'ro', required => 1);
