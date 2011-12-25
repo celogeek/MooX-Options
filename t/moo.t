@@ -15,7 +15,7 @@ BEGIN {
 
 {
     package t;
-    use Moo;
+    use Moo 0.009013;
     use MooX::Options;
 
     option 'bool' => (is => 'ro' );
@@ -28,7 +28,7 @@ BEGIN {
 
 {
     package r;
-    use Moo;
+    use Moo 0.009013;
     use MooX::Options;
     
     option 'str_req' => (is => 'ro', format => 's', required => 1);
@@ -38,7 +38,7 @@ BEGIN {
 
 { 
     package sp_str;
-    use Moo;
+    use Moo 0.009013;
     use MooX::Options;
 
     option 'split_str' => (is => 'ro', format => 's', autosplit => ",");
@@ -48,7 +48,7 @@ BEGIN {
 
 {
 	package d;
-	use Moo;
+	use Moo 0.009013;
 	use MooX::Options;
 	option 'should_die_ok' => (is => 'ro', isa => sub { die "ok"});
 	1;
@@ -56,7 +56,7 @@ BEGIN {
 
 {
 	package multi_req;
-	use Moo;
+	use Moo 0.009013;
 	use MooX::Options;
     option 'multi_1' => (is => 'ro', required => 1);
     option 'multi_2' => (is => 'ro', required => 1);
