@@ -129,7 +129,7 @@ sub import {
 
             #call describe_options
             my $usage_method = $self->can("$import_options{option_method_name}_usage");
-            my ($opt, $usage) = describe_options(@Options,["help|h", "show this help message"]);
+            my ($opt, $usage) = describe_options(@Options,["help|h", "show this help message"], $import_options{gld_conf} ? $import_options{gld_conf} : ());
             $Usage = $usage->text;
             $usage_method->(0) if $opt->help;
 
@@ -190,6 +190,13 @@ it will create ${option_method_name}_usage too, ex: option_usage($exit_code, @{a
 don't filter extra params for MooX::Options before calling chain_method 
 
 it is usefull if you want to use this params for something else
+
+=item gld_conf
+
+pass extra arguments for Getopt::Long::Descriptive.  it is usefull if you
+want to configure Getopt::Long.
+
+    use MooX::Options gld_conf => { getopt_conf => [qw( pass_through )] };
 
 =back
 
