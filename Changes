@@ -1,3 +1,8 @@
+0.9 - 2012-02-14 21:40
+===
+
+    * Add flavour to pass options to GetOpt::Long (zengargoyle)
+
 0.8 - 2011-12-25 14:30
 ===
 
