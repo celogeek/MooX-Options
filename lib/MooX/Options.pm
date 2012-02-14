@@ -23,6 +23,7 @@ my %DEFAULT_OPTIONS = (
     'creation_method_name' => 'new_with_options',
 	'option_chain_method' => 'has',
     'option_method_name' => 'option',
+    'flavour' => [],
 );
 
 my @FILTER = qw/format short repeatable negativable autosplit doc/;
@@ -129,7 +130,7 @@ sub import {
 
             #call describe_options
             my $usage_method = $self->can("$import_options{option_method_name}_usage");
-            my ($opt, $usage) = describe_options(@Options,["help|h", "show this help message"], $import_options{gld_conf} ? $import_options{gld_conf} : ());
+            my ($opt, $usage) = describe_options(@Options,["help|h", "show this help message"], { getopt_conf => $import_options{flavour} });
             $Usage = $usage->text;
             $usage_method->(0) if $opt->help;
 
@@ -191,12 +192,14 @@ don't filter extra params for MooX::Options before calling chain_method
 
 it is usefull if you want to use this params for something else
 
-=item gld_conf
+=item flavour
 
 pass extra arguments for Getopt::Long::Descriptive.  it is usefull if you
 want to configure Getopt::Long.
 
-    use MooX::Options gld_conf => { getopt_conf => [qw( pass_through )] };
+    use MooX::Options flavour => [qw( pass_through )];
+
+Any flavour is pass to L<Getopt::Long> as a configuration, check the doc to see what is possible.
 
 =back
 

@@ -24,10 +24,10 @@ BEGIN {
 }
 
 {
-    package gld_conf;
+    package FlavourTest;
     use Moo 0.009013;
     use MooX::Options
-        gld_conf => { getopt_conf => [qw(pass_through)] }; 
+        flavour => [qw(pass_through)]; 
 
     option 'bool' => (is => 'ro' );
 
@@ -35,7 +35,7 @@ BEGIN {
 }
 
 subtest "unknown option" => sub {
-    note "Without gld_conf";
+    note "Without flavour";
     {
         @ARGV=('anarg');
         my $plain = plain->new_with_options();
@@ -56,23 +56,23 @@ subtest "unknown option" => sub {
     }
 };
 
-subtest "gld_conf" => sub {
-    note "With gld_conf";
+subtest "flavour" => sub {
+    note "With flavour";
     {
         @ARGV=('anarg');
-        my $gld_conf = gld_conf->new_with_options();
+        my $flavour_test = FlavourTest->new_with_options();
         is_deeply([@ARGV], ['anarg'], "anarg is left");
     }
     {
         @ARGV=('--bool', 'anarg');
-        my $gld_conf = gld_conf->new_with_options();
-        is($gld_conf->bool, 1, "bool was set");
+        my $flavour_test = FlavourTest->new_with_options();
+        is($flavour_test->bool, 1, "bool was set");
         is_deeply([@ARGV], ['anarg'], "anarg is left");
     }
     {
         @ARGV=('--bool', 'anarg', '--unknown_option');
-        my $gld_conf = gld_conf->new_with_options();
-        is($gld_conf->bool, 1, "bool was set");
+        my $flavour_test = FlavourTest->new_with_options();
+        is($flavour_test->bool, 1, "bool was set");
         is_deeply([@ARGV], ['anarg', '--unknown_option'],
             "anarg and unknown_option are left");
     }
