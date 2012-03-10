@@ -74,9 +74,12 @@ sub import {
             #format the name
             my $name_format = join "=", grep { defined $_ } $name_long_and_short, $options{format};
 
-            push @Options, [ $name_format, $options{doc} // "no doc for $name" ];              # prepare option for getopt
-            push @Attributes, $name;                                                           # save the attribute for later use
-            push @Required_Attributes, $name if $options{required};                            # save the required attribute
+            #doc
+            my $doc = defined $options{doc} ? $options{doc} : "no doc for $name";
+
+            push @Options, [ $name_format, $doc ];                   # prepare option for getopt
+            push @Attributes, $name;                                 # save the attribute for later use
+            push @Required_Attributes, $name if $options{required};  # save the required attribute
             $Autosplit_Attributes{$name} = Data::Record->new( {split => $options{autosplit}, unless => $RE{quoted}} ) if $options{autosplit};    # save autosplit value
 
             #remove bad key for passing to chain_method(has), avoid warnings with Moo/Moose
