@@ -15,7 +15,7 @@ BEGIN {
 
 {
     package plain;
-    use Moo 0.009013;
+    use Moo;
     use MooX::Options;
 
     option 'bool' => (is => 'ro' );
@@ -25,7 +25,7 @@ BEGIN {
 
 {
     package FlavourTest;
-    use Moo 0.009013;
+    use Moo;
     use MooX::Options
         flavour => [qw(pass_through)]; 
 
