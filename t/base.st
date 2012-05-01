@@ -145,4 +145,14 @@ subtest "test usage" => sub {
     ok($trap->stdout =~ /split_str.*no doc for split_str/, 'attr no doc is present');
 };
 
+subtest "doc usage" => sub {
+    note "doc usage";
+    my $s = t_doc->new_with_options();
+    my $usage = $s->can('option_usage');
+    ok($usage, "usage method exists");
+    my @r = trap {$usage->(127)};
+    is($trap->exit, 127, 'exit code is correct');
+    ok($trap->stdout =~ /t.*this is a test/, 'doc on attribute');
+};
+
 1;

@@ -60,8 +60,16 @@ BEGIN {
     option 'multi_1' => (is => 'ro', required => 1);
     option 'multi_2' => (is => 'ro', required => 1);
     option 'multi_3' => (is => 'ro', required => 1);
+    1;
 }
 
+{
+    package t_doc;
+    use Moose;
+    use MooX::Options;
+    option 't' => (is =>'ro', doc => 'this is a test');
+    1;
+}
 
 subtest "Mouse" => sub {
     note "Test Mouse";
