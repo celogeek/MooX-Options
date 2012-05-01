@@ -85,7 +85,7 @@ sub import {
 
             #remove bad key for passing to chain_method(has), avoid warnings with Moo/Moose
             #by defaut, keep all key
-            unless ($options{nofilter}) {
+            unless ($import_options{nofilter}) {
 	            delete $options{$_} for @FILTER;
                 @_ = ($name, %options);
 	        }
