@@ -311,6 +311,25 @@ Ex :
   test --verbose --verbose
   => verbose = 2
 
+it is advisable to use a "default" option on the attribute for repeatable
+params so that they behave as arrays "out of the box" when used outside of
+command line context.
+
+Ex:
+    package t;
+    use Moo;
+    use MooX::Options;
+
+    option foo => (is => 'rw', format => 's@', default => sub { [] });
+    option bar => (is => 'rw', format => 'i@', default => sub { [] });
+
+    # this now works as expected and you will no longer see
+    # "Can't use an undefined value as an ARRAY reference"
+    my $t = t->new;
+    push @{ $t->foo }, 'abc123';
+
+    1;
+
 =item autosplit
 
 auto split args to generate multiple value. It implie "repeatable".
