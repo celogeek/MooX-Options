@@ -34,12 +34,11 @@ sub import {
     my $caller = caller;
     
     #check options and definition
-    while(my ($key, $method) = each %DEFAULT_OPTIONS) {
+    while(my ($key, $method) = each %import_options) {
     	croak "missing option $key, check doc to define one" unless $method;
         croak "method $method is not defined, check doc to use another name" if $key =~ /_chain_method$/ && !$caller->can($method);
         croak "method $method already defined, check doc to use another name" if $key =~ /_method_name$/ && $caller->can($method);
     }
-
 
     my @Options = ('USAGE: %c %o');
     my @Attributes = ();
@@ -54,6 +53,8 @@ sub import {
             my ($name, %options) = @_;
             croak "Negativable params is not usable with non boolean value, don't pass format to use it !" if $options{negativable} && $options{format};
             croak "Can't use option with help, it is implied by MooX::Options" if $name eq 'help';
+            croak "Can't use option with ".$import_options{option_method_name}."_usage, it is implied by MooX::Options" if $name eq $import_options{option_method_name}."_usage";
+
 
             #fix missing option, autosplit implie repeatable
             $options{repeatable} = 1 if $options{autosplit};
