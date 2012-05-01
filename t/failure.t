@@ -3,6 +3,11 @@ use strict;
 use warnings;
 use Test::More;
 
+BEGIN {
+	use Module::Load::Conditional qw/check_install/;
+    plan skip_all => 'Need Moo for this test' unless check_install(module => 'Moo');
+}
+
 for my $meth(qw/creation_chain_method creation_method_name option_chain_method option_method_name/) {
 eval <<EOF
     package FailureUndefOption;
