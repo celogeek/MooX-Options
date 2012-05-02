@@ -1,6 +1,9 @@
-NEXT
+1.2 - 2012-05-02 02:20
+===
 
     * add advice on repeatable option (Alex Howarth)
+    * full test and 100% coverage
+    * fix import_options and add protection.
 
 1.1 - 2012-03-13 23:20
 ===
