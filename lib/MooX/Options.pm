@@ -111,6 +111,12 @@ sub import {
 	    *{"${caller}::$import_options{creation_method_name}"} = sub {
             my ($self, %params) = @_;
 
+            #ensure all method will be call properly
+            for my $attr(@Attributes) {
+                croak "attribute ".$attr." isn't defined. You have something wrong in your option_chain_method '".$import_options{option_chain_method}."'." unless $self->can($attr);
+            }
+
+
             #if autosplit attributes is present, search and replace in ARGV with full version
             #ex --test=1,2,3 become --test=1 --test=2 --test=3
             if (%Autosplit_Attributes) {
@@ -139,7 +145,7 @@ sub import {
             $usage_method->(0) if $opt->help;
 
             #replace command line attribute in params if params not defined
-            my @existing_attributes = grep { $opt->can($_) && defined $opt->$_ && !exists $params{$_}} @Attributes;
+            my @existing_attributes = grep { my $attr = $_; my $attr_val = $opt->$attr; defined $attr_val && !exists $params{$attr}} @Attributes;
             @params{@existing_attributes} = @$opt{@existing_attributes};
 
             #check required params, if anything missing, display help
