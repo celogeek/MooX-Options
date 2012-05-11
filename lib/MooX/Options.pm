@@ -17,6 +17,7 @@ use Data::Dumper;
 use Getopt::Long::Descriptive;
 use Regexp::Common;
 use Data::Record;
+use 5.8.9;
 
 my %DEFAULT_OPTIONS = (
 	'creation_chain_method' => 'new',
