@@ -51,7 +51,8 @@ sub import {
         #keyword option
         no strict 'refs';
         *{"${caller}::$import_options{option_method_name}"} = sub {
-            my ($name, %options) = @_;
+            my ($name, %orig_options) = @_;
+	    my %options = %orig_options;
             croak "Negativable params is not usable with non boolean value, don't pass format to use it !" if $options{negativable} && $options{format};
             croak "Can't use option with help, it is implied by MooX::Options" if $name eq 'help';
             croak "Can't use option with ".$import_options{option_method_name}."_usage, it is implied by MooX::Options" if $name eq $import_options{option_method_name}."_usage";
@@ -86,14 +87,13 @@ sub import {
 
             #remove bad key for passing to chain_method(has), avoid warnings with Moo/Moose
             #by defaut, keep all key
-            unless ($import_options{nofilter}) {
-	            delete $options{$_} for @FILTER;
-                @_ = ($name, %options);
-	        }
+	    unless ($import_options{nofilter}) {
+		    delete $orig_options{$_} for @FILTER;
+	    }
 
             #chain to chain_method (has)
             my $chain_method = $caller->can($import_options{option_chain_method});
-            goto &$chain_method;
+            $chain_method->($name, %orig_options);
         };
     }
 
@@ -153,11 +153,8 @@ sub import {
             my @missing_params = grep { !defined $params{$_} } @Required_Attributes;            
             $usage_method->(1, map { "$_ is missing"} @missing_params) if @missing_params;
             
-            #call creation_method
-            @_ = ($self, %params);
-
             my $creation_method = $caller->can($import_options{creation_chain_method});
-	        goto &$creation_method;
+	    $creation_method->($self,%params);
         };
     }
 }

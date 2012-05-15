@@ -18,7 +18,7 @@ BEGIN {
         is_deeply(\%options, {
             is => 'rw',
         }, 'test with Moo filter');
-        goto &has;
+        has($name,%options);
     }
 
     use MooX::Options option_chain_method => 'test_filter';
@@ -53,7 +53,7 @@ TestFilter->new_with_options;
             autosplit => 1,
             doc => 't is t',
         }, 'test with no Moo filter');
-        goto &has;
+        has($name, %options);
     }
 
     use MooX::Options option_chain_method => 'test_filter', nofilter => 1;
