@@ -14,10 +14,10 @@ use warnings;
 # VERSION
 use Carp;
 use Data::Dumper;
-use Getopt::Long::Descriptive;
+use Getopt::Long 2.38;
+use Getopt::Long::Descriptive 0.091;
 use Regexp::Common;
 use Data::Record;
-use 5.8.9;
 
 my %DEFAULT_OPTIONS = (
 	'creation_chain_method' => 'new',
