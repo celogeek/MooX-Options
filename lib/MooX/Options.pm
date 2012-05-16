@@ -115,8 +115,9 @@ sub import {
             }
 
             #chain to chain_method (has)
+            my $chain_method_name = $import_options{option_chain_method};
             my $chain_method
-                = $caller->can( $import_options{option_chain_method} );
+                = eval "package ${caller}; sub {${chain_method_name}(\@_)}";
             $chain_method->( $name, %orig_options );
         };
     }
@@ -196,8 +197,8 @@ sub import {
             $usage_method->( 1, map {"$_ is missing"} @missing_params )
                 if @missing_params;
 
-            my $creation_method
-                = $caller->can( $import_options{creation_chain_method} );
+            my $creation_method_name = $import_options{creation_chain_method};
+            my $creation_method      = $caller->can($creation_method_name);
             $creation_method->( $self, %params );
         };
     }
