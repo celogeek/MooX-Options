@@ -72,7 +72,7 @@ BEGIN {
 {
 
     package t_doc;
-    use Moose;
+    use Mouse;
     use MooX::Options;
     option 't' => ( is => 'ro', doc => 'this is a test' );
     1;
