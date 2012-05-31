@@ -1,0 +1,247 @@
+# NAME
+
+MooX::Options - add option keywords to your Moo object
+
+# VERSION
+
+version 1.4
+
+# MooX::Options
+
+Use Getopt::Long::Descritive to provide command line option for your Mo/Moo/Mouse/Moose Object.
+
+This module will add "option" which act as "has" but support additional feature for getopt.
+
+You will have "new\_with\_options" to instanciate new object for command line.
+
+# METHOD
+
+## IMPORT
+
+The import method can take option :
+
+    - %options
+    - creation\_chain\_method
+
+    call this method after parsing option, default : new
+
+    - creation\_method\_name
+
+    name of new method to handle option, default : new\_with\_options
+
+    - option\_chain\_method
+
+    call this method to create the attribute, default : has
+
+    - option\_method\_name
+
+    name of keyword you want to use to create your option, default : option
+
+    it will create ${option\_method\_name}\_usage too, ex: option\_usage($exit\_code, @{additional messages})
+
+    - nofilter
+
+    don't filter extra params for MooX::Options before calling chain\_method 
+
+    it is usefull if you want to use this params for something else
+
+    - flavour
+
+    pass extra arguments for Getopt::Long::Descriptive.  it is usefull if you
+    want to configure Getopt::Long.
+
+        use MooX::Options flavour => [qw( pass_through )];
+
+    Any flavour is pass to [Getopt::Long](http://search.cpan.org/perldoc?Getopt::Long) as a configuration, check the doc to see what is possible.
+
+# USAGE
+
+First of all, I use [Getopt::Long::Descriptive](http://search.cpan.org/perldoc?Getopt::Long::Descriptive). Everything will be pass to the programs, more specially the format.
+
+    package t;
+    use Moo;
+    use MooX::Options;
+    
+
+    option 'test' => (is => 'ro');
+    
+
+    1;
+
+    my $t = t->new_with_options(); #parse @ARGV
+    my $o = t->new_with_options(test => 'override'); #parse ARGV and override any value with the params here
+
+The keyword "option" work exactly like the keyword "has" and take extra argument of Getopt.
+
+## Keyword 'option\_usage'
+
+It display the usage message and return the exit code
+
+    option_usage(1, "str is not valid");
+
+Params :
+
+- $exit\_code
+
+Exit code after displaying the usage message
+
+- @messages
+
+Additional message to display before the usage message
+
+Ex: str is not valid
+
+## Keyword 'new\_with\_options'
+
+It will parse your command line params and your inline params, validate and call the 'new' method.
+
+You can override the command line params :
+
+Ex:
+
+    @ARGV=('--str=ko');
+    t->new_with_options(str => 'ok');
+    t->str; #ok
+
+## Keyword 'option' : EXTRA ARGS
+
+- doc
+
+Specified the documentation for the attribute
+
+- required
+
+Specified if the attribute is needed
+
+- format
+
+Format of the params. It is the same as [Getopt::Long::Descriptive](http://search.cpan.org/perldoc?Getopt::Long::Descriptive).
+
+Example :
+
+    i : integer
+    i@: array of integer
+    s : string
+    s@: array of string
+    f : float value
+
+by default, it's a boolean value.
+
+Take a look of available format with [Getopt::Long::Descriptive](http://search.cpan.org/perldoc?Getopt::Long::Descriptive).
+
+- negativable
+
+add the attribute "!" to the name. It will allow negative params.
+
+Ex :
+
+    test --quiet
+    => quiet = 1
+
+    test --quiet --no-quiet
+    => quiet = 0
+
+- repeatable
+
+add the attribute "@" to the name. It will allow repeatable params.
+
+Ex :
+
+    test --verbose
+    => verbose = 1
+
+    test --verbose --verbose
+    => verbose = 2
+
+it is advisable to use a "default" option on the attribute for repeatable
+params so that they behave as arrays "out of the box" when used outside of
+command line context.
+
+Ex:
+    package t;
+    use Moo;
+    use MooX::Options;
+
+    option foo => (is => 'rw', format => 's@', default => sub { [] });
+    option bar => (is => 'rw', format => 'i@', default => sub { [] });
+
+    # this now works as expected and you will no longer see
+    # "Can't use an undefined value as an ARRAY reference"
+    my $t = t->new;
+    push @{ $t->foo }, 'abc123';
+
+    1;
+
+- autosplit
+
+auto split args to generate multiple value. It implie "repeatable".
+autosplit take the separator value, ex: ",".
+
+Ex :
+
+    package t;
+    use Moo;
+    use MooX::Options;
+    
+
+    option test => (is => 'ro', format => 'i@', autosplit => ',');
+    #same as : option test => (is => 'ro', format => 'i', autosplit => ',');
+    1;
+    
+
+    @ARGV=('--test=1,2,3,4');
+    my $t = t->new_with_options;
+    t->test # [1,2,3,4]
+
+I automatically take the quoted as a group separator value
+
+    package str;
+    use Moo;
+    use MooX::Options;
+    option test => (is => 'ro', format => 's', repeatable => 1, autosplit => ',');
+    1;
+    
+
+    @ARGV=('--test=a,b,"c,d",e');
+    my $t = str->new_with_options;
+    t->test # ['a','b','c,d','e']
+
+- short
+
+give short name of an attribute.
+
+Ex :
+
+    package t;
+    use Moo;
+    use MooX::Options;
+    
+
+    option 'verbose' => (is => 'ro', repeatable => 1, short => 'v');
+    
+
+    1;
+    @ARGV=('-vvv');
+    my $t = t->new_with_options;
+    t->verbose # 3
+
+# THANKS
+
+- Matt S. Trout (mst) <mst@shadowcat.co.uk> : For his patience and advice.
+
+# BUGS
+
+Any bugs or evolution can be submit here :
+
+[Github](https://github.com/geistteufel/MooX-Options)
+
+# AUTHOR
+
+Geistteufel <geistteufel@celogeek.fr>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Geistteufel <geistteufel@celogeek.fr>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
