@@ -4,7 +4,7 @@ MooX::Options - add option keywords to your Moo object
 
 # VERSION
 
-version 1.5
+version 1.6
 
 # MooX::Options
 
@@ -233,15 +233,15 @@ Ex :
 
 Any bugs or evolution can be submit here :
 
-[Github](https://github.com/geistteufel/MooX-Options)
+[Github](https://github.com/celogeek/MooX-Options)
 
 # AUTHOR
 
-Geistteufel <geistteufel@celogeek.fr>
+celogeek <me@celogeek.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Geistteufel <geistteufel@celogeek.fr>.
+This software is copyright (c) 2011 by celogeek <me@celogeek.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
