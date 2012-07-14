@@ -202,6 +202,8 @@ sub import {
             $creation_method->( $self, %params );
         };
     }
+
+    return;
 }
 
 1;

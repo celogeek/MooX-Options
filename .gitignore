@@ -7,3 +7,5 @@
 .includepath
 .project
 MooX-Options-*
+xt/perlcritic.rc
+xt/perltidy.rc
