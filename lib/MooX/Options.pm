@@ -33,6 +33,7 @@ my %DEFAULT_OPTIONS = (
 
 my @FILTER = qw/format short repeatable negativable autosplit doc/;
 
+## no critic qw(ProhibitExcessComplexity)
 sub import {
     my ( undef, %import_params ) = @_;
     my (%import_options) = ( %DEFAULT_OPTIONS, %import_params );
@@ -42,9 +43,9 @@ sub import {
     while ( my ( $key, $method ) = each %import_options ) {
         croak "missing option $key, check doc to define one" unless defined $method;
         croak "method $method is not defined, check doc to use another name"
-            if $key =~ /_chain_method$/ && !$caller->can($method);
+            if $key =~ /_chain_method$/x && !$caller->can($method);
         croak "method $method already defined, check doc to use another name"
-            if $key =~ /_method_name$/ && $caller->can($method);
+            if $key =~ /_method_name$/x && $caller->can($method);
     }
 
     my @Options              = ('USAGE: %c %o');
@@ -116,8 +117,10 @@ sub import {
 
         #chain to chain_method (has)
         my $chain_method_name = $import_options{option_chain_method};
+        ## no critic qw(ProhibitStringyEval)
         my $chain_method
             = eval "package ${caller}; sub {${chain_method_name}(\@_)}";
+        ## use critic
         $chain_method->( $name, %orig_options );
     };
 
@@ -143,19 +146,20 @@ sub import {
 
 #if autosplit attributes is present, search and replace in ARGV with full version
 #ex --test=1,2,3 become --test=1 --test=2 --test=3
+        ## no critic qw(RequireLocalizedPunctuationVars)
         local @ARGV = @ARGV if $import_options{protect_argv};
         if (%Autosplit_Attributes) {
             my @new_argv;
 
             #parse all argv
             for my $arg (@ARGV) {
-                my ( $arg_name, $arg_values ) = split( /=/, $arg, 2 );
-                $arg_name =~ s/^--?//;
+                my ( $arg_name, $arg_values ) = split( /=/x, $arg, 2 );
+                $arg_name =~ s/^--?//x;
                 if ( my $rec = $Autosplit_Attributes{$arg_name} ) {
                     foreach my $record ( $rec->records($arg_values) ) {
 
                         #remove the quoted if exist to chain
-                        $record =~ s/^['"]|['"]$//g;
+                        $record =~ s/^['"]|['"]$//gx;
                         push @new_argv, "--$arg_name=$record";
                     }
                 }
@@ -165,6 +169,7 @@ sub import {
             }
             @ARGV = @new_argv;
         }
+        ## use critic
 
         #call describe_options
         my $usage_method
@@ -198,10 +203,12 @@ sub import {
 
     #inject method
     {
+        ## no critic qw(ProhibitNoStrict)
         no strict qw/refs/;
         for my $meth(keys %$sub_ref) {
             *{"${caller}::$meth"} = $sub_ref->{$meth};
         }
+        ## use critic
     }
 
     return;
