@@ -28,6 +28,7 @@ my %DEFAULT_OPTIONS = (
     'option_chain_method'   => 'has',
     'option_method_name'    => 'option',
     'flavour'               => [],
+    'protect_argv'          => 1,
 );
 
 my @FILTER = qw/format short repeatable negativable autosplit doc/;
@@ -39,7 +40,7 @@ sub import {
 
     #check options and definition
     while ( my ( $key, $method ) = each %import_options ) {
-        croak "missing option $key, check doc to define one" unless $method;
+        croak "missing option $key, check doc to define one" unless defined $method;
         croak "method $method is not defined, check doc to use another name"
             if $key =~ /_chain_method$/ && !$caller->can($method);
         croak "method $method already defined, check doc to use another name"
@@ -123,7 +124,8 @@ sub import {
     #keyword option_usage
     $sub_ref->{$import_options{option_method_name}."_usage"} = sub {
         my ( $code, @messages ) = @_;
-        print( join( "\n", @messages, $Usage ) ), exit($code);
+        print join( "\n", @messages, $Usage );
+        exit($code);
     };
 
     #keyword new_with_options
@@ -141,6 +143,7 @@ sub import {
 
 #if autosplit attributes is present, search and replace in ARGV with full version
 #ex --test=1,2,3 become --test=1 --test=2 --test=3
+        local @ARGV = @ARGV if $import_options{protect_argv};
         if (%Autosplit_Attributes) {
             my @new_argv;
 
@@ -252,6 +255,12 @@ want to configure Getopt::Long.
     use MooX::Options flavour => [qw( pass_through )];
 
 Any flavour is pass to L<Getopt::Long> as a configuration, check the doc to see what is possible.
+
+=item protect_argv
+
+by default, argv is protected. if you want to do something else on it, use this option and it will change the real argv.
+
+    use MooX::Options protect_argv => 0;
 
 =back
 

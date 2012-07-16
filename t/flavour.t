@@ -18,7 +18,7 @@ BEGIN {
 
     package plain;
     use Moo;
-    use MooX::Options;
+    use MooX::Options protect_argv => 0;
 
     option 'bool' => ( is => 'ro' );
 
@@ -29,7 +29,7 @@ BEGIN {
 
     package FlavourTest;
     use Moo;
-    use MooX::Options flavour => [qw(pass_through)];
+    use MooX::Options flavour => [qw(pass_through)], protect_argv => 0;
 
     option 'bool' => ( is => 'ro' );
 
@@ -39,18 +39,18 @@ BEGIN {
 subtest "unknown option" => sub {
     note "Without flavour";
     {
-        @ARGV = ('anarg');
+        local @ARGV = ('anarg');
         my $plain = plain->new_with_options();
         is_deeply( [@ARGV], ['anarg'], "anarg is left" );
     }
     {
-        @ARGV = ( '--bool', 'anarg' );
+        local @ARGV = ( '--bool', 'anarg' );
         my $plain = plain->new_with_options();
         is( $plain->bool, 1, "bool was set" );
         is_deeply( [@ARGV], ['anarg'], "anarg is left" );
     }
     {
-        @ARGV = ( '--bool', 'anarg', '--unknown_option' );
+        local @ARGV = ( '--bool', 'anarg', '--unknown_option' );
         my @r = trap { plain->new_with_options() };
         like( $trap->die, qr/USAGE:/, "died with usage message" );
         like(
@@ -64,18 +64,18 @@ subtest "unknown option" => sub {
 subtest "flavour" => sub {
     note "With flavour";
     {
-        @ARGV = ('anarg');
+        local @ARGV = ('anarg');
         my $flavour_test = FlavourTest->new_with_options();
         is_deeply( [@ARGV], ['anarg'], "anarg is left" );
     }
     {
-        @ARGV = ( '--bool', 'anarg' );
+        local @ARGV = ( '--bool', 'anarg' );
         my $flavour_test = FlavourTest->new_with_options();
         is( $flavour_test->bool, 1, "bool was set" );
         is_deeply( [@ARGV], ['anarg'], "anarg is left" );
     }
     {
-        @ARGV = ( '--bool', 'anarg', '--unknown_option' );
+        local @ARGV = ( '--bool', 'anarg', '--unknown_option' );
         my $flavour_test = FlavourTest->new_with_options();
         is( $flavour_test->bool, 1, "bool was set" );
         is_deeply(
