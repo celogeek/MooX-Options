@@ -4,7 +4,7 @@ MooX::Options - add option keywords to your Moo object
 
 # VERSION
 
-version 1.6
+version 1.7
 
 # MooX::Options
 
@@ -53,6 +53,12 @@ The import method can take option :
         use MooX::Options flavour => [qw( pass_through )];
 
     Any flavour is pass to [Getopt::Long](http://search.cpan.org/perldoc?Getopt::Long) as a configuration, check the doc to see what is possible.
+
+    - protect\_argv
+
+    by default, argv is protected. if you want to do something else on it, use this option and it will change the real argv.
+
+        use MooX::Options protect_argv => 0;
 
 # USAGE
 
@@ -234,6 +240,15 @@ Ex :
 Any bugs or evolution can be submit here :
 
 [Github](https://github.com/celogeek/MooX-Options)
+
+# BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+https://github.com/celogeek/MooX-Options/issues
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 # AUTHOR
 
