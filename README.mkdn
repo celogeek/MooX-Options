@@ -4,7 +4,7 @@ MooX::Options - add option keywords to your Moo object
 
 # VERSION
 
-version 1.7
+version 1.8
 
 # MooX::Options
 

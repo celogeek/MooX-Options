@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+1.8       2012-07-16 16:51:44 Europe/Paris
+
     use Dist::Zilla::PluginBundle::Author::Celogeek v0.7
 
 1.7       2012-07-16 14:55:02 Europe/Paris
