@@ -52,155 +52,153 @@ sub import {
     my %Autosplit_Attributes = ();
     my $Usage                = "";
 
-    {
+    my $sub_ref = {};
+    
+    #keywords option
+    $sub_ref->{$import_options{option_method_name}} = sub {
+        my ( $name, %orig_options ) = @_;
+        my %options = %orig_options;
+        croak
+            "Negativable params is not usable with non boolean value, don't pass format to use it !"
+            if $options{negativable} && $options{format};
+        croak "Can't use option with help, it is implied by MooX::Options"
+            if $name eq 'help';
+        croak "Can't use option with "
+            . $import_options{option_method_name}
+            . "_usage, it is implied by MooX::Options"
+            if $name eq $import_options{option_method_name} 
+                . "_usage";
 
-        #keyword option
-        no strict 'refs';
-        *{"${caller}::$import_options{option_method_name}"} = sub {
-            my ( $name, %orig_options ) = @_;
-            my %options = %orig_options;
-            croak
-                "Negativable params is not usable with non boolean value, don't pass format to use it !"
-                if $options{negativable} && $options{format};
-            croak "Can't use option with help, it is implied by MooX::Options"
-                if $name eq 'help';
-            croak "Can't use option with "
-                . $import_options{option_method_name}
-                . "_usage, it is implied by MooX::Options"
-                if $name eq $import_options{option_method_name} 
-                    . "_usage";
+        #fix missing option, autosplit implie repeatable
+        $options{repeatable} = 1 if $options{autosplit};
 
-            #fix missing option, autosplit implie repeatable
-            $options{repeatable} = 1 if $options{autosplit};
+        #help is use for help message only
+        my $name_long_and_short = join "|", grep { defined $_ } $name,
+            $options{short};
 
-            #help is use for help message only
-            my $name_long_and_short = join "|", grep { defined $_ } $name,
-                $options{short};
-
-            #fix format for negativable or add + if it is a boolean
-            if ( $options{repeatable} ) {
-                if ( $options{format} ) {
-                    $options{format} .= "@"
-                        unless substr( $options{format}, -1 ) eq '@';
-                }
-                else {
-                    $name_long_and_short .= "+";
-                }
+        #fix format for negativable or add + if it is a boolean
+        if ( $options{repeatable} ) {
+            if ( $options{format} ) {
+                $options{format} .= "@"
+                    unless substr( $options{format}, -1 ) eq '@';
             }
-
-            #negativable for boolean value
-            $name_long_and_short .= "!" if $options{negativable};
-
-            #format the name
-            my $name_format = join "=",
-                grep { defined $_ } $name_long_and_short, $options{format};
-
-            #doc
-            my $doc
-                = defined $options{doc} ? $options{doc} : "no doc for $name";
-
-            push @Options, [ $name_format, $doc ]; # prepare option for getopt
-            push @Attributes, $name;    # save the attribute for later use
-            push @Required_Attributes, $name
-                if $options{required};    # save the required attribute
-            $Autosplit_Attributes{$name}
-                = Data::Record->new(
-                { split => $options{autosplit}, unless => $RE{quoted} } )
-                if $options{autosplit};    # save autosplit value
-
-#remove bad key for passing to chain_method(has), avoid warnings with Moo/Moose
-#by defaut, keep all key
-            unless ( $import_options{nofilter} ) {
-                delete $orig_options{$_} for @FILTER;
+            else {
+                $name_long_and_short .= "+";
             }
+        }
 
-            #chain to chain_method (has)
-            my $chain_method_name = $import_options{option_chain_method};
-            my $chain_method
-                = eval "package ${caller}; sub {${chain_method_name}(\@_)}";
-            $chain_method->( $name, %orig_options );
-        };
-    }
+        #negativable for boolean value
+        $name_long_and_short .= "!" if $options{negativable};
 
-    {
+        #format the name
+        my $name_format = join "=",
+            grep { defined $_ } $name_long_and_short, $options{format};
 
-        #keyword option
-        no strict 'refs';
-        *{"${caller}::$import_options{option_method_name}_usage"} = sub {
-            my ( $code, @messages ) = @_;
-            print( join( "\n", @messages, $Usage ) ), exit($code);
-            }
-    }
+        #doc
+        my $doc
+            = defined $options{doc} ? $options{doc} : "no doc for $name";
 
-    {
+        push @Options, [ $name_format, $doc ]; # prepare option for getopt
+        push @Attributes, $name;    # save the attribute for later use
+        push @Required_Attributes, $name
+            if $options{required};    # save the required attribute
+        $Autosplit_Attributes{$name}
+            = Data::Record->new(
+            { split => $options{autosplit}, unless => $RE{quoted} } )
+            if $options{autosplit};    # save autosplit value
 
-        #keyword new_with_options
-        no strict 'refs';
-        *{"${caller}::$import_options{creation_method_name}"} = sub {
-            my ( $self, %params ) = @_;
+        #remove bad key for passing to chain_method(has), avoid warnings with Moo/Moose
+        #by defaut, keep all key
+        unless ( $import_options{nofilter} ) {
+            delete $orig_options{$_} for @FILTER;
+        }
 
-            #ensure all method will be call properly
-            for my $attr (@Attributes) {
-                croak "attribute " 
-                    . $attr
-                    . " isn't defined. You have something wrong in your option_chain_method '"
-                    . $import_options{option_chain_method} . "'."
-                    unless $self->can($attr);
-            }
+        #chain to chain_method (has)
+        my $chain_method_name = $import_options{option_chain_method};
+        my $chain_method
+            = eval "package ${caller}; sub {${chain_method_name}(\@_)}";
+        $chain_method->( $name, %orig_options );
+    };
+
+    #keyword option_usage
+    $sub_ref->{$import_options{option_method_name}."_usage"} = sub {
+        my ( $code, @messages ) = @_;
+        print( join( "\n", @messages, $Usage ) ), exit($code);
+    };
+
+    #keyword new_with_options
+    $sub_ref->{$import_options{creation_method_name}} = sub {
+        my ( $self, %params ) = @_;
+
+        #ensure all method will be call properly
+        for my $attr (@Attributes) {
+            croak "attribute " 
+            . $attr
+            . " isn't defined. You have something wrong in your option_chain_method '"
+            . $import_options{option_chain_method} . "'."
+            unless $self->can($attr);
+        }
 
 #if autosplit attributes is present, search and replace in ARGV with full version
 #ex --test=1,2,3 become --test=1 --test=2 --test=3
-            if (%Autosplit_Attributes) {
-                my @new_argv;
+        if (%Autosplit_Attributes) {
+            my @new_argv;
 
-                #parse all argv
-                for my $arg (@ARGV) {
-                    my ( $arg_name, $arg_values ) = split( /=/, $arg, 2 );
-                    $arg_name =~ s/^--?//;
-                    if ( my $rec = $Autosplit_Attributes{$arg_name} ) {
-                        foreach my $record ( $rec->records($arg_values) ) {
+            #parse all argv
+            for my $arg (@ARGV) {
+                my ( $arg_name, $arg_values ) = split( /=/, $arg, 2 );
+                $arg_name =~ s/^--?//;
+                if ( my $rec = $Autosplit_Attributes{$arg_name} ) {
+                    foreach my $record ( $rec->records($arg_values) ) {
 
-                            #remove the quoted if exist to chain
-                            $record =~ s/^['"]|['"]$//g;
-                            push @new_argv, "--$arg_name=$record";
-                        }
-                    }
-                    else {
-                        push @new_argv, $arg;
+                        #remove the quoted if exist to chain
+                        $record =~ s/^['"]|['"]$//g;
+                        push @new_argv, "--$arg_name=$record";
                     }
                 }
-                @ARGV = @new_argv;
+                else {
+                    push @new_argv, $arg;
+                }
             }
+            @ARGV = @new_argv;
+        }
 
-            #call describe_options
-            my $usage_method
-                = $self->can("$import_options{option_method_name}_usage");
-            my ( $opt, $usage ) = describe_options(
-                @Options,
-                [ "help|h", "show this help message" ],
-                { getopt_conf => $import_options{flavour} }
-            );
-            $Usage = $usage->text;
-            $usage_method->(0) if $opt->help;
+        #call describe_options
+        my $usage_method
+        = $self->can("$import_options{option_method_name}_usage");
+        my ( $opt, $usage ) = describe_options(
+            @Options,
+            [ "help|h", "show this help message" ],
+            { getopt_conf => $import_options{flavour} }
+        );
+        $Usage = $usage->text;
+        $usage_method->(0) if $opt->help;
 
-            #replace command line attribute in params if params not defined
-            my @existing_attributes = grep {
-                my $attr     = $_;
-                my $attr_val = $opt->$attr;
-                defined $attr_val && !exists $params{$attr}
-            } @Attributes;
-            @params{@existing_attributes} = @$opt{@existing_attributes};
+        #replace command line attribute in params if params not defined
+        my @existing_attributes = grep {
+        my $attr     = $_;
+        my $attr_val = $opt->$attr;
+        defined $attr_val && !exists $params{$attr}
+        } @Attributes;
+        @params{@existing_attributes} = @$opt{@existing_attributes};
 
-            #check required params, if anything missing, display help
-            my @missing_params
-                = grep { !defined $params{$_} } @Required_Attributes;
-            $usage_method->( 1, map {"$_ is missing"} @missing_params )
-                if @missing_params;
+        #check required params, if anything missing, display help
+        my @missing_params
+        = grep { !defined $params{$_} } @Required_Attributes;
+        $usage_method->( 1, map {"$_ is missing"} @missing_params )
+        if @missing_params;
 
-            my $creation_method_name = $import_options{creation_chain_method};
-            my $creation_method      = $caller->can($creation_method_name);
-            $creation_method->( $self, %params );
-        };
+        my $creation_method_name = $import_options{creation_chain_method};
+        my $creation_method      = $caller->can($creation_method_name);
+        $creation_method->( $self, %params );
+    };
+
+    #inject method
+    {
+        no strict qw/refs/;
+        for my $meth(keys %$sub_ref) {
+            *{"${caller}::$meth"} = $sub_ref->{$meth};
+        }
     }
 
     return;
