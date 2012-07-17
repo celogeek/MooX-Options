@@ -1,10 +1,10 @@
 # NAME
 
-MooX::Options - add option keywords to your Moo object
+MooX::Options - add option keywords to your object (Mo/Moo/Mouse/Moose and any others)
 
 # VERSION
 
-version 2.0
+version 2.1
 
 # MooX::Options
 
