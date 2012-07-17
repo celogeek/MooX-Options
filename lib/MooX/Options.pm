@@ -98,7 +98,7 @@ sub import {
 
         #doc
         my $doc
-            = defined $options{doc} ? $options{doc} : "no doc for $name";
+            = defined $options{doc} ? $options{doc} : defined $options{documentation} ? $options{documentation} : "no doc for $name";
 
         push @Options, [ $name_format, $doc ]; # prepare option for getopt
         push @Attributes, $name;    # save the attribute for later use
@@ -331,6 +331,12 @@ Ex:
 =item doc
 
 Specified the documentation for the attribute
+
+=item documentation
+
+Specified the documentation for the attribute. It is usefull if you chain with other module like L<MooseX::App::Cmd> that use this attribute.
+
+If doc attribute is defined, this one will be ignored.
 
 =item required
 
