@@ -1,6 +1,6 @@
 package MooX::Options;
 
-# ABSTRACT: add option keywords to your Moo object
+# ABSTRACT: add option keywords to your object (Mo/Moo/Mouse/Moose and any others)
 
 =head1 MooX::Options
 
