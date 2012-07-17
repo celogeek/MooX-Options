@@ -4,7 +4,7 @@ MooX::Options - add option keywords to your Moo object
 
 # VERSION
 
-version 1.9
+version 2.0
 
 # MooX::Options
 
@@ -114,6 +114,12 @@ Ex:
 - doc
 
 Specified the documentation for the attribute
+
+- documentation
+
+Specified the documentation for the attribute. It is usefull if you chain with other module like [MooseX::App::Cmd](http://search.cpan.org/perldoc?MooseX::App::Cmd) that use this attribute.
+
+If doc attribute is defined, this one will be ignored.
 
 - required
 
