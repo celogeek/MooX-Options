@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+    Remove bugs section (duplicate)
+
+
 1.8       2012-07-16 16:51:44 Europe/Paris
 
     use Dist::Zilla::PluginBundle::Author::Celogeek v0.7

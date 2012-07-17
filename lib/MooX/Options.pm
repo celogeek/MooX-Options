@@ -454,8 +454,3 @@ Ex :
 
 =back
     
-=head1 BUGS
-
-Any bugs or evolution can be submit here :
-
-L<Github|https://github.com/celogeek/MooX-Options>
