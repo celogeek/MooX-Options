@@ -4,7 +4,7 @@ MooX::Options - add option keywords to your Moo object
 
 # VERSION
 
-version 1.8
+version 1.9
 
 # MooX::Options
 
@@ -234,12 +234,6 @@ Ex :
 # THANKS
 
 - Matt S. Trout (mst) <mst@shadowcat.co.uk> : For his patience and advice.
-
-# BUGS
-
-Any bugs or evolution can be submit here :
-
-[Github](https://github.com/celogeek/MooX-Options)
 
 # BUGS
 
