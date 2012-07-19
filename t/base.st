@@ -128,7 +128,7 @@ subtest "should_die_ok" => sub {
     try {
         d->new_with_options(should_die_ok => 1);
     } catch {
-        ok(/^ok /, 'should die ok');
+        ok(/this\s\will\sdie\sok/, 'should die ok');
     };
 };
 

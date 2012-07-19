@@ -55,7 +55,7 @@ BEGIN {
     package d;
     use Moose;
     use MooX::Options;
-    option 'should_die_ok' => ( is => 'ro', trigger => sub { die "ok" } );
+    option 'should_die_ok' => ( is => 'ro', trigger => sub { die "this will die ok" } );
     1;
 }
 

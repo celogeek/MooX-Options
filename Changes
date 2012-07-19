@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+    Fix test for Moo 1.0
+
 2.1       2012-07-17 18:11:38 Europe/Paris
 
     Fix pod
