@@ -209,6 +209,11 @@ sub import {
             *{"${caller}::$meth"} = $sub_ref->{$meth};
         }
         ## use critic
+
+        #Save option name for MooX::Options::Role
+        ## no critic qw(ProhibitPackageVars)
+        $caller::MooX_Options_Option_Name = $import_options{option_method_name};
+        ## use critic
     }
 
     return;
