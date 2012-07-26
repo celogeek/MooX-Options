@@ -5,7 +5,7 @@ package MooX::Options;
 =head1 MooX::Options
 
 Use Getopt::Long::Descritive to provide command line option for your Mo/Moo/Mouse/Moose Object.
-    
+
 This module will add "option" which act as "has" but support additional feature for getopt.
 
 You will have "new_with_options" to instanciate new object for command line.
@@ -55,7 +55,7 @@ sub import {
     my $Usage                = "";
 
     my $sub_ref = {};
-    
+
     #keywords option
     $sub_ref->{$import_options{option_method_name}} = sub {
         my ( $name, %orig_options ) = @_;
@@ -137,7 +137,7 @@ sub import {
 
         #ensure all method will be call properly
         for my $attr (@Attributes) {
-            croak "attribute " 
+            croak "attribute "
             . $attr
             . " isn't defined. You have something wrong in your option_chain_method '"
             . $import_options{option_chain_method} . "'."
@@ -285,14 +285,14 @@ First of all, I use L<Getopt::Long::Descriptive>. Everything will be pass to the
     package t;
     use Moo;
     use MooX::Options;
-    
+
     option 'test' => (is => 'ro');
-    
+
     1;
 
     my $t = t->new_with_options(); #parse @ARGV
     my $o = t->new_with_options(test => 'override'); #parse ARGV and override any value with the params here
-    
+
 The keyword "option" work exactly like the keyword "has" and take extra argument of Getopt.
 
 =head2 Keyword 'option_usage'
@@ -352,13 +352,13 @@ Specified if the attribute is needed
 Format of the params. It is the same as L<Getopt::Long::Descriptive>.
 
 Example :
-   
+
    i : integer
    i@: array of integer
    s : string
    s@: array of string
    f : float value
-   
+
 by default, it's a boolean value.
 
 Take a look of available format with L<Getopt::Long::Descriptive>.
@@ -416,11 +416,11 @@ Ex :
     package t;
     use Moo;
     use MooX::Options;
-    
+
     option test => (is => 'ro', format => 'i@', autosplit => ',');
     #same as : option test => (is => 'ro', format => 'i', autosplit => ',');
     1;
-    
+
     @ARGV=('--test=1,2,3,4');
     my $t = t->new_with_options;
     t->test # [1,2,3,4]
@@ -433,7 +433,7 @@ I automatically take the quoted as a group separator value
     use MooX::Options;
     option test => (is => 'ro', format => 's', repeatable => 1, autosplit => ',');
     1;
-    
+
     @ARGV=('--test=a,b,"c,d",e');
     my $t = str->new_with_options;
     t->test # ['a','b','c,d','e']
@@ -447,15 +447,15 @@ Ex :
     package t;
     use Moo;
     use MooX::Options;
-    
+
     option 'verbose' => (is => 'ro', repeatable => 1, short => 'v');
-    
+
     1;
     @ARGV=('-vvv');
     my $t = t->new_with_options;
     t->verbose # 3
 
-=back 
+=back
 
 =head1 THANKS
 
@@ -464,4 +464,4 @@ Ex :
 =item Matt S. Trout (mst) <mst@shadowcat.co.uk> : For his patience and advice.
 
 =back
-    
+
