@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+    Fix: Role, wasn't working very well
+
 2.3       2012-07-25 18:48:47 Europe/Paris
 
     Add MooX::Options::Role 

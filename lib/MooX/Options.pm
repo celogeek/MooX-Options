@@ -37,15 +37,15 @@ my @FILTER = qw/format short repeatable negativable autosplit doc/;
 sub import {
     my ( undef, %import_params ) = @_;
     my (%import_options) = ( %DEFAULT_OPTIONS, %import_params );
-    my $caller = caller;
+    my $package = caller;
 
     #check options and definition
     while ( my ( $key, $method ) = each %import_options ) {
         croak "missing option $key, check doc to define one" unless defined $method;
         croak "method $method is not defined, check doc to use another name"
-            if $key =~ /_chain_method$/x && !$caller->can($method);
+            if $key =~ /_chain_method$/x && !$package->can($method);
         croak "method $method already defined, check doc to use another name"
-            if $key =~ /_method_name$/x && $caller->can($method);
+            if $key =~ /_method_name$/x && $package->can($method);
     }
 
     my @Options              = ('USAGE: %c %o');
@@ -119,7 +119,7 @@ sub import {
         my $chain_method_name = $import_options{option_chain_method};
         ## no critic qw(ProhibitStringyEval)
         my $chain_method
-            = eval "package ${caller}; sub {${chain_method_name}(\@_)}";
+            = eval "package ${package}; sub {${chain_method_name}(\@_)}";
         ## use critic
         $chain_method->( $name, %orig_options );
     };
@@ -197,7 +197,7 @@ sub import {
         if @missing_params;
 
         my $creation_method_name = $import_options{creation_chain_method};
-        my $creation_method      = $caller->can($creation_method_name);
+        my $creation_method      = $package->can($creation_method_name);
         $creation_method->( $self, %params );
     };
 
@@ -206,13 +206,13 @@ sub import {
         ## no critic qw(ProhibitNoStrict)
         no strict qw/refs/;
         for my $meth(keys %$sub_ref) {
-            *{"${caller}::$meth"} = $sub_ref->{$meth};
+            *{"${package}::$meth"} = $sub_ref->{$meth};
         }
         ## use critic
 
         #Save option name for MooX::Options::Role
         ## no critic qw(ProhibitPackageVars)
-        $caller::MooX_Options_Option_Name = $import_options{option_method_name};
+        ${"${package}::_MooX_Options_Option_Name"} = $import_options{option_method_name};
         ## use critic
     }
 

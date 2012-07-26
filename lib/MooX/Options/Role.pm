@@ -30,38 +30,45 @@ You take a look at t/role.t for more example.
 
 =cut
 
-my %Options;
 =method import
 Import method "option" that will be transmit to L<MooX::Options> when the role is used.
 
 If you decide to change the "option" key in the import of L<MooX::Options>, L<MooX::Options::Role> will know and call the appropriate method.
 =cut
 sub import {
+    ## no critic qw(ProhibitPackageVars)
+    my $package_role = caller;
+    my $package_role_options = do { 
+        ## no critic qw(ProhibitNoStrict)
+        no strict qw/refs/;
+        ${"${package_role}::_MooX_Options_Option_Spec"} //= {};
+    };
+
     my $option_role_meth = sub {
         my ($name, %options) = @_;
-        $Options{$name} = \%options;
+        $package_role_options->{$name} = \%options;
     };
 
     my $import_meth = sub {
-        my $caller = caller;
-        ## no critic qw(ProhibitPackageVars)
-        my $option_meth_name = $caller::MooX_Options_Option_Name;
-        ## use critic
-        croak "MooX::Options should be import before using this role" unless defined $option_meth_name;
-        my $option_meth = $caller->can($option_meth_name);
-        for my $name(keys %Options) {
-            my %option = %{$Options{$name}};
+        my $package = caller;
+        my $option_meth_name = do { 
+            ## no critic qw(ProhibitNoStrict)
+            no strict qw/refs/;
+            ${"${package}::_MooX_Options_Option_Name"};
+        };
+        croak "MooX::Options should be import before using this role." unless defined $option_meth_name;
+        my $option_meth = $package->can($option_meth_name);
+        for my $name(keys %$package_role_options) {
+            my %option = %{$package_role_options->{$name}};
             $option_meth->($name, %option);
         }
     };
 
-    my $caller = caller;
     {
         ## no critic qw(ProhibitNoStrict)
         no strict qw/refs/;
-        *{"${caller}::option"} = $option_role_meth;
-        *{"${caller}::import"} = $import_meth;
-        ## use critic
+        *{"${package_role}::option"} = $option_role_meth;
+        *{"${package_role}::import"} = $import_meth;
     }
     return;
 }
