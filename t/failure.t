@@ -113,7 +113,22 @@ eval <<EOF
 EOF
     ;
 like $@,
-    qr/^attribute\st\sisn't\sdefined.\sYou\shave\ssomething\swrong\sin\syour\soption_chain_method\s'failure'./x,
+    qr/^attribute\st\sisn't\sdefined\.\sYou\shave\ssomething\swrong\sin\syour\soption_chain_method\s'failure'\./x,
     "option_chain_method do nothing to create attribute with the same name";
+
+eval <<EOF
+{package myRole;
+    use MooX::Options::Role;
+    option t => (is => 'rw');
+    1;
+}
+
+{package FailureMissMooXOptionWithRole;
+    myRole->import;
+    1;
+}
+EOF
+;
+like $@,qr/^MooX::Options\sshould\sbe\simport\sbefore\susing\sthis\srole\./x,"";
 
 done_testing;
