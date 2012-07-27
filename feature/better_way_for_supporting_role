@@ -1,0 +1,46 @@
+package MooX::Options::Role;
+
+use MRO::Compat;
+use Moo::Role;
+
+sub new_with_options {
+  my $class = shift;
+  $class->new($class->parse_options(@_));
+}
+
+sub parse_options {
+  my @option_info = shift->option_information;
+  <code that uses option_information to call Getopt>
+}
+
+sub option_information {
+  shift->maybe::next::method(@_);
+}
+
+1;
+
+package MooX::Options;
+
+use strictures 1;
+
+sub import {
+  my $caller = caller;
+  my $has = $caller->can('has');
+  my $around = $caller->can('around');
+  $caller->can('with')->('MooX::Options::Role');
+  my %option_info;
+  my $modifier_done;
+  my $option = sub {
+    &$has;
+    unless ($modifier_done) {
+      $caller->can('around')->(option_information => sub {
+        my ($orig, $self) = (shift, shift);
+        return ($self->$orig(@_), %option_info);
+      });
+      $modifier_done = 1;
+    }
+    my $name = shift;
+    $option_info{$name} = [ @_ ];
+  };
+  { no strict 'refs'; ${"${caller}::option"} = $option }
+}
