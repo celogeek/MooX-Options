@@ -4,7 +4,7 @@ MooX::Options - add option keywords to your object (Mo/Moo/Mouse/Moose and any o
 
 # VERSION
 
-version 2.3
+version 2.4
 
 # MooX::Options
 
@@ -67,10 +67,8 @@ First of all, I use [Getopt::Long::Descriptive](http://search.cpan.org/perldoc?G
     package t;
     use Moo;
     use MooX::Options;
-    
 
     option 'test' => (is => 'ro');
-    
 
     1;
 
@@ -194,12 +192,10 @@ Ex :
     package t;
     use Moo;
     use MooX::Options;
-    
 
     option test => (is => 'ro', format => 'i@', autosplit => ',');
     #same as : option test => (is => 'ro', format => 'i', autosplit => ',');
     1;
-    
 
     @ARGV=('--test=1,2,3,4');
     my $t = t->new_with_options;
@@ -212,7 +208,6 @@ I automatically take the quoted as a group separator value
     use MooX::Options;
     option test => (is => 'ro', format => 's', repeatable => 1, autosplit => ',');
     1;
-    
 
     @ARGV=('--test=a,b,"c,d",e');
     my $t = str->new_with_options;
@@ -227,10 +222,8 @@ Ex :
     package t;
     use Moo;
     use MooX::Options;
-    
 
     option 'verbose' => (is => 'ro', repeatable => 1, short => 'v');
-    
 
     1;
     @ARGV=('-vvv');
