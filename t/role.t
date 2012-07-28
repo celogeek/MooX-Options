@@ -7,7 +7,9 @@ use Carp;
 use FindBin qw/$RealBin/;
 use Try::Tiny;
 
-{package myRole;
+{
+
+    package myRole;
     use strict;
     use warnings;
     use MooX::Options::Role;
@@ -16,7 +18,9 @@ use Try::Tiny;
     1;
 }
 
-{ package testRole;
+{
+
+    package testRole;
     use Moo;
     use MooX::Options;
     myRole->import;
@@ -27,17 +31,18 @@ use Try::Tiny;
     local @ARGV;
     @ARGV = ();
     my $opt = testRole->new_with_options;
-    ok(!$opt->multi, 'multi not set');
+    ok( !$opt->multi, 'multi not set' );
 }
 {
     local @ARGV;
     @ARGV = ('--multi');
     my $opt = testRole->new_with_options;
-    ok($opt->multi, 'multi set');
+    ok( $opt->multi, 'multi set' );
     trap {
         $opt->option_usage;
     };
-    ok($trap->stdout =~ /\-\-multi\s+multi\sthreading\smode/x, "usage method is properly set");
+    ok( $trap->stdout =~ /\-\-multi\s+multi\sthreading\smode/x,
+        "usage method is properly set" );
 }
 
 done_testing;

@@ -55,7 +55,8 @@ BEGIN {
     package d;
     use Moo;
     use MooX::Options;
-    option 'should_die_ok' => ( is => 'ro', isa => sub { die "this will die ok" } );
+    option 'should_die_ok' =>
+        ( is => 'ro', isa => sub { die "this will die ok" } );
     1;
 }
 

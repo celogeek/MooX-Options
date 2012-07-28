@@ -54,7 +54,8 @@ BEGIN {
     package d;
     use Mouse;
     use MooX::Options;
-    option 'should_die_ok' => ( is => 'ro', trigger => sub { die "this will die ok" } );
+    option 'should_die_ok' =>
+        ( is => 'ro', trigger => sub { die "this will die ok" } );
     1;
 }
 

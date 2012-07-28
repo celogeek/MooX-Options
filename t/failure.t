@@ -128,7 +128,8 @@ eval <<EOF
     1;
 }
 EOF
-;
-like $@,qr/^MooX::Options\sshould\sbe\simport\sbefore\susing\sthis\srole\./x,"";
+    ;
+like $@,
+    qr/^MooX::Options\sshould\sbe\simport\sbefore\susing\sthis\srole\./x, "";
 
 done_testing;

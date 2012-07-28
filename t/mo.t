@@ -55,7 +55,8 @@ BEGIN {
     package d;
     use Mo 'coerce';
     use MooX::Options;
-    option 'should_die_ok' => ( is => 'ro', coerce => sub { die "this will die ok" } );
+    option 'should_die_ok' =>
+        ( is => 'ro', coerce => sub { die "this will die ok" } );
     1;
 }
 

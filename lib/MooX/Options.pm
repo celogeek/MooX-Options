@@ -41,7 +41,8 @@ sub import {
 
     #check options and definition
     while ( my ( $key, $method ) = each %import_options ) {
-        croak "missing option $key, check doc to define one" unless defined $method;
+        croak "missing option $key, check doc to define one"
+            unless defined $method;
         croak "method $method is not defined, check doc to use another name"
             if $key =~ /_chain_method$/x && !$package->can($method);
         croak "method $method already defined, check doc to use another name"
@@ -57,7 +58,7 @@ sub import {
     my $sub_ref = {};
 
     #keywords option
-    $sub_ref->{$import_options{option_method_name}} = sub {
+    $sub_ref->{ $import_options{option_method_name} } = sub {
         my ( $name, %orig_options ) = @_;
         my %options = %orig_options;
         croak
@@ -68,8 +69,8 @@ sub import {
         croak "Can't use option with "
             . $import_options{option_method_name}
             . "_usage, it is implied by MooX::Options"
-            if $name eq $import_options{option_method_name} 
-                . "_usage";
+            if $name eq $import_options{option_method_name}
+            . "_usage";
 
         #fix missing option, autosplit implie repeatable
         $options{repeatable} = 1 if $options{autosplit};
@@ -98,19 +99,21 @@ sub import {
 
         #doc
         my $doc
-            = defined $options{doc} ? $options{doc} : defined $options{documentation} ? $options{documentation} : "no doc for $name";
+            = defined $options{doc}           ? $options{doc}
+            : defined $options{documentation} ? $options{documentation}
+            :                                   "no doc for $name";
 
-        push @Options, [ $name_format, $doc ]; # prepare option for getopt
-        push @Attributes, $name;    # save the attribute for later use
+        push @Options, [ $name_format, $doc ];    # prepare option for getopt
+        push @Attributes,          $name;   # save the attribute for later use
         push @Required_Attributes, $name
-            if $options{required};    # save the required attribute
+            if $options{required};          # save the required attribute
         $Autosplit_Attributes{$name}
             = Data::Record->new(
             { split => $options{autosplit}, unless => $RE{quoted} } )
-            if $options{autosplit};    # save autosplit value
+            if $options{autosplit};         # save autosplit value
 
-        #remove bad key for passing to chain_method(has), avoid warnings with Moo/Moose
-        #by defaut, keep all key
+#remove bad key for passing to chain_method(has), avoid warnings with Moo/Moose
+#by defaut, keep all key
         unless ( $import_options{nofilter} ) {
             delete $orig_options{$_} for @FILTER;
         }
@@ -125,23 +128,23 @@ sub import {
     };
 
     #keyword option_usage
-    $sub_ref->{$import_options{option_method_name}."_usage"} = sub {
+    $sub_ref->{ $import_options{option_method_name} . "_usage" } = sub {
         my ( $code, @messages ) = @_;
         print join( "\n", @messages, $Usage );
         exit($code);
     };
 
     #keyword new_with_options
-    $sub_ref->{$import_options{creation_method_name}} = sub {
+    $sub_ref->{ $import_options{creation_method_name} } = sub {
         my ( $self, %params ) = @_;
 
         #ensure all method will be call properly
         for my $attr (@Attributes) {
             croak "attribute "
-            . $attr
-            . " isn't defined. You have something wrong in your option_chain_method '"
-            . $import_options{option_chain_method} . "'."
-            unless $self->can($attr);
+                . $attr
+                . " isn't defined. You have something wrong in your option_chain_method '"
+                . $import_options{option_chain_method} . "'."
+                unless $self->can($attr);
         }
 
 #if autosplit attributes is present, search and replace in ARGV with full version
@@ -173,7 +176,7 @@ sub import {
 
         #call describe_options
         my $usage_method
-        = $self->can("$import_options{option_method_name}_usage");
+            = $self->can("$import_options{option_method_name}_usage");
         my ( $opt, $usage ) = describe_options(
             @Options,
             [ "help|h", "show this help message" ],
@@ -184,17 +187,17 @@ sub import {
 
         #replace command line attribute in params if params not defined
         my @existing_attributes = grep {
-        my $attr     = $_;
-        my $attr_val = $opt->$attr;
-        defined $attr_val && !exists $params{$attr}
+            my $attr     = $_;
+            my $attr_val = $opt->$attr;
+            defined $attr_val && !exists $params{$attr}
         } @Attributes;
         @params{@existing_attributes} = @$opt{@existing_attributes};
 
         #check required params, if anything missing, display help
         my @missing_params
-        = grep { !defined $params{$_} } @Required_Attributes;
+            = grep { !defined $params{$_} } @Required_Attributes;
         $usage_method->( 1, map {"$_ is missing"} @missing_params )
-        if @missing_params;
+            if @missing_params;
 
         my $creation_method_name = $import_options{creation_chain_method};
         my $creation_method      = $package->can($creation_method_name);
@@ -205,14 +208,15 @@ sub import {
     {
         ## no critic qw(ProhibitNoStrict)
         no strict qw/refs/;
-        for my $meth(keys %$sub_ref) {
+        for my $meth ( keys %$sub_ref ) {
             *{"${package}::$meth"} = $sub_ref->{$meth};
         }
         ## use critic
 
         #Save option name for MooX::Options::Role
         ## no critic qw(ProhibitPackageVars)
-        ${"${package}::_MooX_Options_Option_Name"} = $import_options{option_method_name};
+        ${"${package}::_MooX_Options_Option_Name"}
+            = $import_options{option_method_name};
         ## use critic
     }
 
