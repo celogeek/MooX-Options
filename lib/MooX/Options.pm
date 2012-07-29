@@ -19,19 +19,26 @@ use Data::Dumper;
 # VERSION
 
 sub import {
-  caller->can('with')->('MooX::Options::Role');
+  my $target = caller;
+
+  $target->can('with')->('MooX::Options::Role');
 
   my $option_information = {};
   
-  caller->can('around')->(option_information => sub {
+  $target->can('around')->(option_information => sub {
       my ($orig,$self) = (shift, shift);
       return ($self->$orig(@_), %$option_information);
   });
 
-  caller->can('around')->('option' => sub {
-      my $orig = shift;
-      return $orig->($option_information, @_);
-  });
+  my $has = $target->can('has');
+  my $option = sub {
+    my ($name, %attributes) = @_;
+    $option_information->{$name} = { %attributes };
+    $has->($name => %attributes);
+    return;
+  };
+
+  { no strict 'refs'; *{"${target}::option"} = $option; }
 
   return;
 }

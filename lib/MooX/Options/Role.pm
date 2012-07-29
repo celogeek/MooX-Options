@@ -3,7 +3,6 @@ package MooX::Options::Role;
 # ABSTRACT: role that is apply to your object
 use strict;
 use warnings;
-use feature 'state';
 # VERSION
 
 =head1 TODO
@@ -33,10 +32,4 @@ sub option_information {
   shift->maybe::next::method(@_);
 }
 
-sub option {
-    my ($option_information, $name, %attributes) = @_;
-    has $name => %attributes;
-    $option_information->{$name} = { %attributes };
-    return;
-}
 1;
