@@ -3,6 +3,7 @@ package MooX::Options::Role;
 # ABSTRACT: role that is apply to your object
 use strict;
 use warnings;
+
 # VERSION
 
 =head1 TODO
@@ -18,18 +19,22 @@ use Carp;
 use Data::Dumper;
 
 sub new_with_options {
-  my $class = shift;
-  $class->new($class->parse_options(@_));
+    my $class = shift;
+    $class->new( $class->parse_options(@_) );
 }
 
 sub parse_options {
-  my %option_info = shift->option_information;
-  carp Dumper \%option_info;
-  return;
+    my ( $class, %params ) = @_;
+    my %option_information = shift->option_information;
+
+    #carp Dumper \%option_info;
+    return %params;
 }
 
 sub option_information {
-  shift->maybe::next::method(@_);
+    my ($class) = @_;
+    carp "class $class";
+    shift->maybe::next::method(@_);
 }
 
 1;

@@ -20,21 +20,24 @@ use Data::Dumper;
 
 sub import {
   my $target = caller;
-
   $target->can('with')->('MooX::Options::Role');
-
   my $option_information = {};
-  
-  $target->can('around')->(option_information => sub {
-      my ($orig,$self) = (shift, shift);
-      return ($self->$orig(@_), %$option_information);
-  });
-
-  my $has = $target->can('has');
+  my $modifier_done;
   my $option = sub {
     my ($name, %attributes) = @_;
+    carp "Declare <$name> with : ",Dumper(\%attributes);
     $option_information->{$name} = { %attributes };
-    $has->($name => %attributes);
+    $target->can('has')->($name => %attributes);
+    unless($modifier_done) {
+        carp "change $target";
+        $target->can('around')->(option_information => sub {
+                my ($orig,$self) = (shift, shift);
+                my %option = ($self->$orig(@_), %$option_information);
+                carp Dumper \%option;
+            return %option;
+        });
+    $modifier_done = 1;
+}
     return;
   };
 
