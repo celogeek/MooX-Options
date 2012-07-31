@@ -25,19 +25,19 @@ use v5.16;
 
 BEGIN
 {package mySuperOpt;
-    use Moo;
+    use Moose;
     use MooX::Options;
 
-    option 't1' => ( is => 'rw', doc => 't1' );
+    option 't1' => ( is => 'rw', documentation => 't1' );
     1;
 }
 ;
 {package myOpt;
-    use Moo;
+    use Moose;
     use MooX::Options;
     extends 'mySuperOpt';
 
-    option 't2' => ( 'is' => 'rw', doc => 't2' );
+    option 't2' => ( 'is' => 'rw', documentation => 't2' );
     1;
 };
 
