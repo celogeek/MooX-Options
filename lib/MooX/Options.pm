@@ -13,37 +13,34 @@ You will have "new_with_options" to instanciate new object for command line.
 
 use strict;
 use warnings;
-use Carp;
-use Data::Dumper;
 
 # VERSION
 
 sub import {
-  my $target = caller;
-  $target->can('with')->('MooX::Options::Role');
-  my $option_information = {};
-  my $modifier_done;
-  my $option = sub {
-    my ($name, %attributes) = @_;
-    carp "Declare <$name> with : ",Dumper(\%attributes);
-    $option_information->{$name} = { %attributes };
-    $target->can('has')->($name => %attributes);
-    unless($modifier_done) {
-        carp "change $target";
-        $target->can('around')->(option_information => sub {
-                my ($orig,$self) = (shift, shift);
-                my %option = ($self->$orig(@_), %$option_information);
-                carp Dumper \%option;
-            return %option;
-        });
-    $modifier_done = 1;
-}
+    my $target = caller;
+    $target->can('with')->('MooX::Options::Role');
+    my $option_information = {};
+    my $modifier_done;
+    my $option = sub {
+        my ( $name, %attributes ) = @_;
+        $option_information->{$name} = {%attributes};
+        $target->can('has')->( $name => %attributes );
+        unless ($modifier_done) {
+            $target->can('around')->(
+                option_information => sub {
+                    my ( $orig, $self ) = ( shift, shift );
+                    my %option = ( $self->$orig(@_), %$option_information );
+                    return %option;
+                }
+            );
+            $modifier_done = 1;
+        }
+        return;
+    };
+
+    { no strict 'refs'; *{"${target}::option"} = $option; }
+
     return;
-  };
-
-  { no strict 'refs'; *{"${target}::option"} = $option; }
-
-  return;
 }
 
 1;
