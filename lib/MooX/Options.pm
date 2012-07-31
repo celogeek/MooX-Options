@@ -24,7 +24,7 @@ sub import {
     my $option = sub {
         my ( $name, %attributes ) = @_;
         $option_information->{$name} = {%attributes};
-        $target->can('has')->( $name => %attributes );
+        $target->can('has')->( $name => _filter(%attributes) );
         unless ($modifier_done) {
             $target->can('around')->(
                 option_information => sub {
@@ -41,6 +41,12 @@ sub import {
     { no strict 'refs'; *{"${target}::option"} = $option; }
 
     return;
+}
+
+sub _filter {
+    my %attributes = @_;
+    my %filter_key = map { $_ => 1 } qw/format short repeatable negativable autosplit doc/;
+    return map { ($_ => $attributes{$_}) } grep { !exists $filter_key{$_} } keys %attributes;
 }
 
 1;

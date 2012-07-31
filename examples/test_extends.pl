@@ -21,6 +21,7 @@
 use strict;
 use warnings;
 use v5.16;
+use Data::Dumper;
 
 
 BEGIN
@@ -28,7 +29,7 @@ BEGIN
     use Moose;
     use MooX::Options;
 
-    option 't1' => ( is => 'rw', documentation => 't1' );
+    option 't1' => ( is => 'rw', doc => 't1' );
     1;
 }
 ;
@@ -37,7 +38,7 @@ BEGIN
     use MooX::Options;
     extends 'mySuperOpt';
 
-    option 't2' => ( 'is' => 'rw', documentation => 't2' );
+    option 't2' => ( 'is' => 'rw', doc => 't2' );
     1;
 };
 
@@ -46,4 +47,5 @@ BEGIN
 my $a = myOpt->new_with_options(t1 => 1, t2 => 2);
 say $a->t1;
 say $a->t2;
+say Dumper {$a->option_information};
 
