@@ -22,12 +22,14 @@ sub new_with_options {
 
 sub parse_options {
     my ( $class, %params ) = @_;
-    my %option_information = shift->option_information;
+    my %meta = shift->_options_meta;
+    my @options = ("USAGE: %c %o");
+    my %cmdline_params;
 
-    return %params;
+    return (%cmdline_params, %params);
 }
 
-sub option_information {
+sub _options_meta {
     my ($class) = @_;
     shift->maybe::next::method(@_);
 }

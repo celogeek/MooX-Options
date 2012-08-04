@@ -19,18 +19,17 @@ use warnings;
 sub import {
     my $target = caller;
     $target->can('with')->('MooX::Options::Role');
-    my $option_information = {};
+    my $_options_meta = {};
     my $modifier_done;
     my $option = sub {
         my ( $name, %attributes ) = @_;
-        $option_information->{$name} = {%attributes};
-        $target->can('has')->( $name => _filter(%attributes) );
+        $_options_meta->{$name} = {%attributes};
+        $target->can('has')->( $name => _filter_attributes(%attributes) );
         unless ($modifier_done) {
             $target->can('around')->(
-                option_information => sub {
+                _options_meta => sub {
                     my ( $orig, $self ) = ( shift, shift );
-                    my %option = ( $self->$orig(@_), %$option_information );
-                    return %option;
+                    return ( $self->$orig(@_), _validate_options(%$_options_meta) );
                 }
             );
             $modifier_done = 1;
@@ -43,10 +42,18 @@ sub import {
     return;
 }
 
-sub _filter {
+sub _filter_attributes {
     my %attributes = @_;
     my %filter_key = map { $_ => 1 } qw/format short repeatable negativable autosplit doc/;
     return map { ($_ => $attributes{$_}) } grep { !exists $filter_key{$_} } keys %attributes;
+}
+
+sub _validate_options {
+    my %options = @_;
+
+    carp "TODO: validate options";
+
+    return %options;
 }
 
 1;
