@@ -13,6 +13,7 @@ You will have "new_with_options" to instanciate new object for command line.
 
 use strict;
 use warnings;
+use Carp;
 
 # VERSION
 
