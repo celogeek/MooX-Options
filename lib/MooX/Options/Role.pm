@@ -32,8 +32,9 @@ sub parse_options {
         my ($name, %options) = @_;
         my $cmdline_name = $name;
         $cmdline_name .= '|' . $options{short} if defined $options{short};
-        $cmdline_name .= '+' if $options{repeatable} && !$options{format};
+        $cmdline_name .= '+' if $options{repeatable} && ! defined $options{format};
         $cmdline_name .= '!' if $options{negativable};
+        $cmdline_name .= '=' . $options{format} if defined $options{format};
         return $cmdline_name;
     };
 
@@ -47,9 +48,9 @@ sub parse_options {
         @options,
         ['help|h', "show this help message"]
     );
-    if ($opt->help()) {
+    if ($opt->help() || defined $params{help}) {
         print $usage,"\n";
-        exit(0);
+        exit(0 + ($params{help} // 0));
     }
 
     for my $name(keys %meta) {
@@ -63,5 +64,12 @@ sub _options_meta {
     my ($class) = @_;
     shift->maybe::next::method(@_);
 }
+
+sub options_usage {
+    my ($self, $code, @messages) = @_;
+    print join("\n", @messages,'') if @messages;
+    local @ARGV = ();
+    return $self->parse_options(help => $code // 0);
+};
 
 1;

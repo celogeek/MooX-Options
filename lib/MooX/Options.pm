@@ -43,7 +43,6 @@ sub import {
         }
         return;
     };
-
     { no strict 'refs'; *{"${target}::option"} = $option; }
 
     return;
