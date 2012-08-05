@@ -28,12 +28,18 @@ sub parse_options {
     my @options;
     my %cmdline_params;
 
+    my $option_name = sub {
+        my ($name, %options) = @_;
+        my $cmdline_name = $name;
+        $cmdline_name .= '|' . $options{short} if defined $options{short};
+        $cmdline_name .= '+' if $options{repeatable} && !$options{format};
+        $cmdline_name .= '!' if $options{negativable};
+        return $cmdline_name;
+    };
+
     for my $name(keys %meta) {
         my %options = %{$meta{$name}};
-        my $option_name = $name;
-        $option_name .= '|' . $options{short} if defined $options{short};
-        my $doc = $options{doc} // $options{documentation} // "no doc for $name";
-        push @options, [$option_name, $doc];
+        push @options, [$option_name->($name, %options), $options{doc} // "no doc for $name"];
     }
 
     my ($opt, $usage) = describe_options(

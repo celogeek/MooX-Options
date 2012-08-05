@@ -14,8 +14,11 @@ You will have "new_with_options" to instanciate new object for command line.
 use strict;
 use warnings;
 use Carp;
+use Data::Dumper;
 
 # VERSION
+my @OPTIONS_ATTRIBUTES
+    = qw/format short repeatable negativable autosplit doc/;
 
 sub import {
     my $target = caller;
@@ -24,13 +27,16 @@ sub import {
     my $modifier_done;
     my $option = sub {
         my ( $name, %attributes ) = @_;
-        $_options_meta->{$name} = {%attributes};
+        croak "Can't use option with help, it is implied by MooX::Options"
+            if $name eq 'help';
+        $_options_meta->{$name}
+            = { _validate_and_filter_options(%attributes) };
         $target->can('has')->( $name => _filter_attributes(%attributes) );
         unless ($modifier_done) {
             $target->can('around')->(
                 _options_meta => sub {
                     my ( $orig, $self ) = ( shift, shift );
-                    return ( $self->$orig(@_), _validate_options(%$_options_meta) );
+                    return ( $self->$orig(@_), %$_options_meta );
                 }
             );
             $modifier_done = 1;
@@ -45,16 +51,26 @@ sub import {
 
 sub _filter_attributes {
     my %attributes = @_;
-    my %filter_key = map { $_ => 1 } qw/format short repeatable negativable autosplit doc/;
-    return map { ($_ => $attributes{$_}) } grep { !exists $filter_key{$_} } keys %attributes;
+    my %filter_key = map { $_ => 1 } @OPTIONS_ATTRIBUTES;
+    return map { ( $_ => $attributes{$_} ) }
+        grep { !exists $filter_key{$_} } keys %attributes;
 }
 
-sub _validate_options {
-    my %options = @_;
+sub _validate_and_filter_options {
+    my (%options) = @_;
+    $options{doc} //= $options{documentation};
 
-    carp "TODO: validate options";
+    my %cmdline_options = map { ( $_ => $options{$_} ) }
+        grep { exists $options{$_} } @OPTIONS_ATTRIBUTES;
 
-    return %options;
+    $cmdline_options{repeatable} = 1 if $cmdline_options{autosplit};
+    $cmdline_options{format} .= "@" if $cmdline_options{repeatable} && $cmdline_options{format} && substr( $cmdline_options{format}, -1 ) ne '@';
+
+    croak
+        "Negativable params is not usable with non boolean value, don't pass format to use it !"
+        if $cmdline_options{negativable} && $cmdline_options{format};
+
+    return %cmdline_options;
 }
 
 1;
