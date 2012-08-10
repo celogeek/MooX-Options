@@ -63,7 +63,7 @@ sub _validate_and_filter_options {
         grep { exists $options{$_} } @OPTIONS_ATTRIBUTES;
 
     $cmdline_options{repeatable} = 1 if $cmdline_options{autosplit};
-    $cmdline_options{format} .= "@" if $cmdline_options{repeatable} && $cmdline_options{format} && substr( $cmdline_options{format}, -1 ) ne '@';
+    $cmdline_options{format} .= "@" if $cmdline_options{repeatable} && defined $cmdline_options{format} && substr( $cmdline_options{format}, -1 ) ne '@';
 
     croak
         "Negativable params is not usable with non boolean value, don't pass format to use it !"
