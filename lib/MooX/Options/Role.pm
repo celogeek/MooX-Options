@@ -26,25 +26,25 @@ sub new_with_options {
 
 sub parse_options {
     my ( $class, %params ) = @_;
-    my %meta = shift->_options_meta;
+    my %metas = shift->_options_meta;
     my @options;
     my %cmdline_params;
 
     my $option_name = sub {
-        my ($name, %options) = @_;
+        my ($name, %meta) = @_;
         my $cmdline_name = $name;
-        $cmdline_name .= '|' . $options{short} if defined $options{short};
-        $cmdline_name .= '+' if $options{repeatable} && ! defined $options{format};
-        $cmdline_name .= '!' if $options{negativable};
-        $cmdline_name .= '=' . $options{format} if defined $options{format};
+        $cmdline_name .= '|' . $meta{short} if defined $meta{short};
+        $cmdline_name .= '+' if $meta{repeatable} && ! defined $meta{format};
+        $cmdline_name .= '!' if $meta{negativable};
+        $cmdline_name .= '=' . $meta{format} if defined $meta{format};
         return $cmdline_name;
     };
 
     my %has_to_split;
-    for my $name(keys %meta) {
-        my %options = %{$meta{$name}};
-        push @options, [$option_name->($name, %options), $options{doc} // "no doc for $name"];
-        $has_to_split{$name} = Data::Record->new({ split => $options{autosplit}, unless => $RE{quoted} } ) if defined $options{autosplit};
+    for my $name(keys %metas) {
+        my %meta = %{$metas{$name}};
+        push @options, [$option_name->($name, %meta), $meta{doc} // "no doc for $name"];
+        $has_to_split{$name} = Data::Record->new({ split => $meta{autosplit}, unless => $RE{quoted} } ) if defined $meta{autosplit};
     }
 
     local @ARGV = @ARGV;
@@ -79,11 +79,20 @@ sub parse_options {
         exit(0 + ($params{help} // 0));
     }
 
-    for my $name(keys %meta) {
-        $cmdline_params{$name} = $opt->$name(); 
+    my @missing_required;
+    for my $name(keys %metas) {
+        my %meta = %{$metas{$name}};
+        $cmdline_params{$name} = $params{$name} // $opt->$name(); 
+        push @missing_required, $name if $meta{required} && !defined $cmdline_params{$name};
     }
 
-    return (%cmdline_params, %params);
+    if (@missing_required) {
+        print join("\n", map { $_ . " is missing" } @missing_required,'') if @missing_required;
+        print $usage,"\n";
+        exit(1);
+    }
+
+    return %cmdline_params;
 }
 
 sub _options_meta {

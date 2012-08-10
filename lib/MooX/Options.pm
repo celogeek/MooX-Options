@@ -18,7 +18,7 @@ use Data::Dumper;
 
 # VERSION
 my @OPTIONS_ATTRIBUTES
-    = qw/format short repeatable negativable autosplit doc/;
+    = qw/format short repeatable negativable autosplit doc required/;
 
 sub import {
     my $target = caller;
