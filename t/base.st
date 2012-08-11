@@ -140,9 +140,9 @@ subtest "should_die_ok" => sub {
 subtest "test usage" => sub {
     note "test usage method";
     my $s     = sp_str->new_with_options();
-    my $usage = $s->can('option_usage');
+    my $usage = $s->can('options_usage');
     ok( $usage, "usage method exists" );
-    my @r = trap { $usage->( 127, 'usage work', 'usage really work' ) };
+    my @r = trap { $s->$usage( 127, 'usage work', 'usage really work' ) };
     is( $trap->exit, 127, 'exit code is correct' );
     ok( $trap->stdout =~ /usage work/, 'custom message is present' );
     ok( $trap->stdout =~ /usage really work/,
@@ -156,9 +156,9 @@ subtest "test usage" => sub {
 subtest "doc usage" => sub {
     note "doc usage";
     my $s     = t_doc->new_with_options();
-    my $usage = $s->can('option_usage');
+    my $usage = $s->can('options_usage');
     ok( $usage, "usage method exists" );
-    my @r = trap { $usage->(127) };
+    my @r = trap { $s->$usage(127) };
     is( $trap->exit, 127, 'exit code is correct' );
     ok( $trap->stdout =~ /t.*this is a test/, 'doc on attribute' );
 };
