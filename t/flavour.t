@@ -24,6 +24,16 @@ BEGIN {
 
     1;
 }
+{
+
+    package plain2;
+    use Moo;
+    use MooX::Options protect_argv => 0, flavour => undef;
+
+    option 'bool' => ( is => 'ro' );
+
+    1;
+}
 
 {
 
@@ -36,30 +46,32 @@ BEGIN {
     1;
 }
 
-subtest "unknown option" => sub {
-    note "Without flavour";
-    {
-        local @ARGV = ('anarg');
-        my $plain = plain->new_with_options();
-        is_deeply( [@ARGV], ['anarg'], "anarg is left" );
-    }
-    {
-        local @ARGV = ( '--bool', 'anarg' );
-        my $plain = plain->new_with_options();
-        is( $plain->bool, 1, "bool was set" );
-        is_deeply( [@ARGV], ['anarg'], "anarg is left" );
-    }
-    {
-        local @ARGV = ( '--bool', 'anarg', '--unknown_option' );
-        my @r = trap { plain->new_with_options() };
-        like( $trap->die, qr/USAGE:/, "died with usage message" );
-        like(
-            $trap->warn(0),
-            qr/Unknown option: unknown_option/,
-            "and a warning from GLD"
-        );
-    }
-};
+for my $noflavour(qw/plain plain2/) {
+    subtest "unknown option $noflavour" => sub {
+        note "Without flavour $noflavour";
+        {
+            local @ARGV = ('anarg');
+            my $plain = $noflavour->new_with_options();
+            is_deeply( [@ARGV], ['anarg'], "anarg is left" );
+        }
+        {
+            local @ARGV = ( '--bool', 'anarg' );
+            my $plain = $noflavour->new_with_options();
+            is( $plain->bool, 1, "bool was set" );
+            is_deeply( [@ARGV], ['anarg'], "anarg is left" );
+        }
+        {
+            local @ARGV = ( '--bool', 'anarg', '--unknown_option' );
+            my @r = trap { $noflavour->new_with_options() };
+            like( $trap->die, qr/USAGE:/, "died with usage message" );
+            like(
+                $trap->warn(0),
+                qr/Unknown option: unknown_option/,
+                "and a warning from GLD"
+            );
+        }
+    };
+}
 
 subtest "flavour" => sub {
     note "With flavour";
