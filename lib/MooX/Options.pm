@@ -14,7 +14,6 @@ You will have "new_with_options" to instanciate new object for command line.
 use strict;
 use warnings;
 use Carp;
-use Data::Dumper;
 
 # VERSION
 my @OPTIONS_ATTRIBUTES
@@ -22,7 +21,11 @@ my @OPTIONS_ATTRIBUTES
 
 sub import {
     my $target = caller;
-    $target->can('with')->('MooX::Options::Role');
+    my $with = $target->can('with');
+    my $around = $target->can('around');
+
+    $with->('MooX::Options::Role');
+
     my $_options_meta = {};
     my $modifier_done;
     my $option = sub {
@@ -33,7 +36,7 @@ sub import {
             = { _validate_and_filter_options(%attributes) };
         $target->can('has')->( $name => _filter_attributes(%attributes) );
         unless ($modifier_done) {
-            $target->can('around')->(
+            $around->(
                 _options_meta => sub {
                     my ( $orig, $self ) = ( shift, shift );
                     return ( $self->$orig(@_), %$_options_meta );
