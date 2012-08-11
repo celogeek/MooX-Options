@@ -80,6 +80,14 @@ BEGIN {
     1;
 }
 
+{
+    package t_short;
+    use Moose;
+    use MooX::Options;
+    option 'verbose' => ( is => 'ro', short => 'v' );
+    1;
+}
+
 subtest "Moose" => sub {
     note "Test Moose";
     require $RealBin . '/base.st';

@@ -82,6 +82,14 @@ BEGIN {
     1;
 }
 
+{
+    package t_short;
+    use Mouse;
+    use MooX::Options;
+    option 'verbose' => ( is => 'ro', short => 'v' );
+    1;
+}
+
 subtest "Mouse" => sub {
     note "Test Mouse";
     require $RealBin . '/base.st';

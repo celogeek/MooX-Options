@@ -135,6 +135,24 @@ BEGIN {
     1;
 }
 
+
+{
+    package t_shortRole;
+    use Moo::Role;
+    use Mo;
+    use MooX::Options;
+    option 'verbose' => ( is => 'ro', short => 'v' );
+    1;
+}
+
+{
+    package t_short;
+    use Mo;
+    use Role::Tiny::With;
+    with 't_shortRole';
+    1;
+}
+
 subtest "Mo" => sub {
     note "Test Mo";
     require $RealBin . '/base.st';
