@@ -13,7 +13,6 @@ BEGIN {
     plan skip_all => 'Need Mouse for this test'
         unless check_install( module => 'Mouse' );
 
-    plan skip_all => 'Mouse doesn t work like anything else, need some work on Moo::Role to make it compatible';
 }
 
 
@@ -21,7 +20,7 @@ BEGIN {
 
     package t;
     use Mouse;
-    use MooX::Options filter => 'Mouse';
+    use MooX::Options;
 
     option 'bool'    => ( is => 'ro' );
     option 'counter' => ( is => 'ro', repeatable => 1 );
@@ -35,7 +34,7 @@ BEGIN {
 
     package r;
     use Mouse;
-    use MooX::Options filter => 'Mouse';
+    use MooX::Options;
 
     option 'str_req' => ( is => 'ro', format => 's', required => 1 );
 
@@ -45,7 +44,7 @@ BEGIN {
 
     package sp_str;
     use Mouse;
-    use MooX::Options filter => 'Mouse';
+    use MooX::Options;
 
     option 'split_str' => ( is => 'ro', format => 's', autosplit => "," );
 
