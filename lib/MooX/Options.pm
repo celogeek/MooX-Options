@@ -361,6 +361,10 @@ Ex :
 
 =back
 
+=head1 no more Mouse support
+
+If you are using Mouse, I'm sorry to say than the rewrite of this module has make it just incompatible. Mouse is not design to by compatible with anything else than Mouse itself. I could just suggest to use Moo instead, which is a great and compatible replacement.
+
 =head1 THANKS
 
 =over
