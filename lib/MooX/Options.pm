@@ -20,8 +20,8 @@ my @OPTIONS_ATTRIBUTES
     = qw/format short repeatable negativable autosplit doc required/;
 
 sub import {
-    my $orig = shift;
-    my %import_options = (protect_argv => 1, flavour => [], @_);
+    my ($class, @import) = @_;
+    my %import_options = (protect_argv => 1, flavour => [], @import);
     
     my $target = caller;
     my $with = $target->can('with');
