@@ -20,10 +20,11 @@ use Regexp::Common;
 use Data::Record;
 
 sub new_with_options {
-    my $class = shift;
-    $class->new( $class->parse_options(@_) );
+    my ($class, @params) = @_;
+    return $class->new( $class->parse_options(@params) );
 }
 
+## no critic qw/Modules::ProhibitExcessMainComplexity/
 sub parse_options {
     my ( $class, %params ) = @_;
     my %metas = $class->_options_meta;
@@ -96,15 +97,16 @@ sub parse_options {
 
     return %cmdline_params;
 }
+## use critic
 
 sub _options_meta {
-    my ($class) = @_;
-    shift->maybe::next::method(@_);
+    my ($class, @meta) = @_;
+    return $class->maybe::next::method(@meta);
 }
 
 sub _options_params {
-    my ($class) = @_;
-    shift->maybe::next::method(@_);
+    my ($class, @params) = @_;
+    return $class->maybe::next::method(@params);
 }
 
 sub options_usage {
