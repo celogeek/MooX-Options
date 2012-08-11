@@ -71,7 +71,7 @@ sub _filter_attributes {
 
 sub _validate_and_filter_options {
     my (%options) = @_;
-    $options{doc} //= $options{documentation};
+    $options{doc} = $options{documentation} if !defined $options{doc};
 
     my %cmdline_options = map { ( $_ => $options{$_} ) }
         grep { exists $options{$_} } @OPTIONS_ATTRIBUTES;
