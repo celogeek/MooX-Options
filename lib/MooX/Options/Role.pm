@@ -26,7 +26,8 @@ sub new_with_options {
 
 sub parse_options {
     my ( $class, %params ) = @_;
-    my %metas = shift->_options_meta;
+    my %metas = $class->_options_meta;
+    my %options_params = $class->_options_params;
     my @options;
     my %cmdline_params;
 
@@ -47,7 +48,7 @@ sub parse_options {
         $has_to_split{$name} = Data::Record->new({ split => $meta{autosplit}, unless => $RE{quoted} } ) if defined $meta{autosplit};
     }
 
-    local @ARGV = @ARGV;
+    local @ARGV = @ARGV if $options_params{protect_argv};
     if (%has_to_split) {
         my @new_argv;
         #parse all argv
@@ -72,7 +73,8 @@ sub parse_options {
     my ($opt, $usage) = describe_options(
         ("USAGE: %c %o"),
         @options,
-        ['help|h', "show this help message"]
+        ['help|h', "show this help message"],
+        { getopt_conf => $options_params{flavour} // [] },
     );
     if ($opt->help() || defined $params{help}) {
         print $usage,"\n";
@@ -96,6 +98,11 @@ sub parse_options {
 }
 
 sub _options_meta {
+    my ($class) = @_;
+    shift->maybe::next::method(@_);
+}
+
+sub _options_params {
     my ($class) = @_;
     shift->maybe::next::method(@_);
 }

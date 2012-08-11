@@ -20,6 +20,9 @@ my @OPTIONS_ATTRIBUTES
     = qw/format short repeatable negativable autosplit doc required/;
 
 sub import {
+    my $orig = shift;
+    my %import_options = (protect_argv => 1, flavour => [], @_);
+    
     my $target = caller;
     my $with = $target->can('with');
     my $around = $target->can('around');
@@ -40,6 +43,12 @@ sub import {
                 _options_meta => sub {
                     my ( $orig, $self ) = ( shift, shift );
                     return ( $self->$orig(@_), %$_options_meta );
+                }
+            );
+            $around->(
+                _options_params => sub {
+                    my ( $orig, $self ) = ( shift, shift );
+                    return ( $self->$orig(@_), %import_options );
                 }
             );
             $modifier_done = 1;
