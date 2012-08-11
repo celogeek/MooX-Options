@@ -79,7 +79,7 @@ sub _validate_and_filter_options {
 
     croak
         "Negativable params is not usable with non boolean value, don't pass format to use it !"
-        if $cmdline_options{negativable} && $cmdline_options{format};
+        if $cmdline_options{negativable} && defined $cmdline_options{format};
 
     return %cmdline_options;
 }
