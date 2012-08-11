@@ -33,8 +33,10 @@ sub import {
     my $modifier_done;
     my $option = sub {
         my ( $name, %attributes ) = @_;
-        croak "Can't use option with help, it is implied by MooX::Options"
-            if $name eq 'help';
+        for my $ban(qw/help option new_with_options parse_options options_usage _options_meta _options_params/) {
+            croak "You cannot use an option with the name '$ban', it is implied by MooX::Options"
+            if $name eq $ban;
+        }
         $_options_meta->{$name}
             = { _validate_and_filter_options(%attributes) };
         $target->can('has')->( $name => _filter_attributes(%attributes) );
