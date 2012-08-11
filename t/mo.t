@@ -18,6 +18,7 @@ BEGIN {
 
     package t;
     use Mo;
+    use Role::Tiny;
     use MooX::Options filter => 'Mo';
 
     option 'bool'    => ( is => 'ro' );
@@ -32,6 +33,7 @@ BEGIN {
 
     package r;
     use Mo;
+    use Role::Tiny;
     use MooX::Options filter => 'Mo';
 
     option 'str_req' => ( is => 'ro', format => 's', required => 1 );
@@ -43,6 +45,7 @@ BEGIN {
 
     package sp_str;
     use Mo;
+    use Role::Tiny;
     use MooX::Options;
 
     option 'split_str' => ( is => 'ro', format => 's', autosplit => "," );
@@ -54,6 +57,7 @@ BEGIN {
 
     package d;
     use Mo 'coerce';
+    use Role::Tiny;
     use MooX::Options;
     option 'should_die_ok' =>
         ( is => 'ro', coerce => sub { die "this will die ok" } );
@@ -64,6 +68,7 @@ BEGIN {
 
     package multi_req;
     use Mo;
+    use Role::Tiny;
     use MooX::Options;
     option 'multi_1' => ( is => 'ro', required => 1 );
     option 'multi_2' => ( is => 'ro', required => 1 );
@@ -75,6 +80,7 @@ BEGIN {
 
     package t_doc;
     use Mo;
+    use Role::Tiny;
     use MooX::Options;
     option 't' => ( is => 'ro', doc => 'this is a test' );
     1;
