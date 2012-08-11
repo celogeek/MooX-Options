@@ -1,10 +1,10 @@
 package MooX::Options;
 
-# ABSTRACT: add option keywords to your object (Mo/Moo/Mouse/Moose and any others)
+# ABSTRACT: add option keywords to your object (Mo/Moo/Moose)
 
 =head1 MooX::Options
 
-Use Getopt::Long::Descritive to provide command line option for your Mo/Moo/Mouse/Moose Object.
+Use Getopt::Long::Descritive to provide command line option for your Mo/Moo/Moose Object.
 
 This module will add "option" which act as "has" but support additional feature for getopt.
 
@@ -102,30 +102,6 @@ The import method can take option :
 
 =over
 
-=item creation_chain_method
-
-call this method after parsing option, default : new
-
-=item creation_method_name
-
-name of new method to handle option, default : new_with_options
-
-=item option_chain_method
-
-call this method to create the attribute, default : has
-
-=item option_method_name
-
-name of keyword you want to use to create your option, default : option
-
-it will create ${option_method_name}_usage too, ex: option_usage($exit_code, @{additional messages})
-
-=item nofilter
-
-don't filter extra params for MooX::Options before calling chain_method 
-
-it is usefull if you want to use this params for something else
-
 =item flavour
 
 pass extra arguments for Getopt::Long::Descriptive.  it is usefull if you
@@ -149,24 +125,75 @@ by default, argv is protected. if you want to do something else on it, use this 
 
 First of all, I use L<Getopt::Long::Descriptive>. Everything will be pass to the programs, more specially the format.
 
-    package t;
-    use Moo;
-    use MooX::Options;
+    {
+        package t;
+        use Moo;
+        use MooX::Options;
 
-    option 'test' => (is => 'ro');
+        option 'test' => (is => 'ro');
 
-    1;
+        1;
+    }
 
     my $t = t->new_with_options(); #parse @ARGV
     my $o = t->new_with_options(test => 'override'); #parse ARGV and override any value with the params here
 
 The keyword "option" work exactly like the keyword "has" and take extra argument of Getopt.
 
-=head2 Keyword 'option_usage'
+You can also use it over a Role.
+
+    {
+        package tRole;
+        use Moo::Role;
+        use MooX::Options;
+
+        option 'test' => (is => 'ro');
+
+        1;
+    }
+
+    {
+        package t;
+        use Moo;
+        with 'tRole';
+        1;
+    }
+
+    my $t = t->new_with_options(); #parse @ARGV
+    my $o = t->new_with_options(test => 'override'); #parse ARGV and override any value with the params here
+
+If you use Mo, you have a little bit more work to do. Because Mo lack of "with" and "around".
+
+
+    {
+        package tRole;
+        use Moo::Role;
+        use Mo;
+        use MooX::Options;
+
+        option 'test' => (is => 'ro');
+        1;
+    }
+    {
+
+        package t;
+        use Mo;
+        use Role::Tiny::With;
+        with 'tRole';
+
+        1;
+    }
+    my $t = t->new_with_options(); #parse @ARGV
+    my $o = t->new_with_options(test => 'override'); #parse ARGV and override any value with the params here
+
+It's a bit tricky but, hey, you are using Mo !
+
+=head2 Keyword 'options_usage'
 
 It display the usage message and return the exit code
 
-    option_usage(1, "str is not valid");
+    my $t = t->new_with_options();
+    $t->options_usage(1, "str is not valid");
 
 Params :
 
@@ -192,7 +219,7 @@ You can override the command line params :
 
 Ex:
 
-    @ARGV=('--str=ko');
+    local @ARGV=('--str=ko');
     t->new_with_options(str => 'ok');
     t->str; #ok
 
@@ -259,16 +286,20 @@ params so that they behave as arrays "out of the box" when used outside of
 command line context.
 
 Ex:
-    package t;
-    use Moo;
-    use MooX::Options;
+    {
+        package t;
+        use Moo;
+        use MooX::Options;
 
-    option foo => (is => 'rw', format => 's@', default => sub { [] });
-    option bar => (is => 'rw', format => 'i@', default => sub { [] });
+        option foo => (is => 'rw', format => 's@', default => sub { [] });
+        option bar => (is => 'rw', format => 'i@', default => sub { [] });
+
+        1;
+    }
 
     # this now works as expected and you will no longer see
     # "Can't use an undefined value as an ARRAY reference"
-    my $t = t->new;
+    my $t = t->new_with_options;
     push @{ $t->foo }, 'abc123';
 
     1;
@@ -280,28 +311,32 @@ autosplit take the separator value, ex: ",".
 
 Ex :
 
-    package t;
-    use Moo;
-    use MooX::Options;
+    {
+        package t;
+        use Moo;
+        use MooX::Options;
 
-    option test => (is => 'ro', format => 'i@', autosplit => ',');
-    #same as : option test => (is => 'ro', format => 'i', autosplit => ',');
-    1;
+        option test => (is => 'ro', format => 'i@', autosplit => ',');
+        #same as : option test => (is => 'ro', format => 'i', autosplit => ',');
+        1;
+    }
 
-    @ARGV=('--test=1,2,3,4');
+    local @ARGV=('--test=1,2,3,4');
     my $t = t->new_with_options;
     t->test # [1,2,3,4]
 
 
 I automatically take the quoted as a group separator value
 
-    package str;
-    use Moo;
-    use MooX::Options;
-    option test => (is => 'ro', format => 's', repeatable => 1, autosplit => ',');
-    1;
+    {
+        package str;
+        use Moo;
+        use MooX::Options;
+        option test => (is => 'ro', format => 's', repeatable => 1, autosplit => ',');
+        1;
+    }
 
-    @ARGV=('--test=a,b,"c,d",e');
+    local @ARGV=('--test=a,b,"c,d",e');
     my $t = str->new_with_options;
     t->test # ['a','b','c,d','e']
 
@@ -311,14 +346,16 @@ give short name of an attribute.
 
 Ex :
 
-    package t;
-    use Moo;
-    use MooX::Options;
+    {
+        package t;
+        use Moo;
+        use MooX::Options;
 
-    option 'verbose' => (is => 'ro', repeatable => 1, short => 'v');
+        option 'verbose' => (is => 'ro', repeatable => 1, short => 'v');
 
-    1;
-    @ARGV=('-vvv');
+        1;
+    }
+    local @ARGV=('-vvv');
     my $t = t->new_with_options;
     t->verbose # 3
 
