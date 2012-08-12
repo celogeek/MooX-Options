@@ -20,7 +20,7 @@ my @OPTIONS_ATTRIBUTES
     = qw/format short repeatable negativable autosplit doc required/;
 
 sub import {
-    my ($class, @import) = @_;
+    my (undef, @import) = @_;
     my %import_options = (protect_argv => 1, flavour => [], @import);
     
     my $target = caller;
