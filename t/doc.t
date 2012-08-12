@@ -70,19 +70,19 @@ BEGIN {
 
 {
     my $opt = t->new_with_options;
-    trap { $opt->option_usage };
+    trap { $opt->options_usage };
     ok $trap->stdout =~ /\s+\-t\s+this\sis\sa\stest/x, 'documentation work';
 }
 
 {
     my $opt = t1->new_with_options;
-    trap { $opt->option_usage };
+    trap { $opt->options_usage };
     ok $trap->stdout =~ /\s+\-t\s+this\spass\sfirst/x, 'doc pass first';
 }
 
 {
     my $opt = t2->new_with_options;
-    trap { $opt->option_usage };
+    trap { $opt->options_usage };
     ok $trap->stdout =~ /\s+\-t\s+this\spass\sfirst/x, 'doc pass first';
 }
 

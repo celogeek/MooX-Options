@@ -1,80 +1,153 @@
 package MooX::Options::Role;
 
-# ABSTRACT: create role with option
+# ABSTRACT: role that is apply to your object
 use strict;
 use warnings;
 
 # VERSION
-use Carp;
 
-=head1 SYNOPSIS
+=head1 USAGE
 
-    use strict;
-    use warnings;
-    use v5.16;
-    {package myRole;
-     use MooX::Options::Role;
-     option 'multi' => (is => 'rw', doc => 'multi threaded mode');
-     1;
-    }
-    {package myOpt;
-    use Moo;
-    use MooX::Options;
-    myRole->import;
-    1;
-    }
-
-    my $opt = myOpt->new_with_options();
-    say "Multi : ",$opt->multi;
-
-
-You take a look at t/role.t for more example.
+Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrade your module. But it is useless alone.
 
 =cut
 
-=method import
-Import method "option" that will be transmit to L<MooX::Options> when the role is used.
+use MRO::Compat;
+use Moo::Role;
+use Getopt::Long 2.38;
+use Getopt::Long::Descriptive 0.091;
+use Regexp::Common;
+use Data::Record;
 
-If you decide to change the "option" key in the import of L<MooX::Options>, L<MooX::Options::Role> will know and call the appropriate method.
+=method new_with_options
+
+Same as new but parse ARGV with L<Getopt::Long::Descriptive>
+
+Check full doc L<MooX::Options> for more details.
+
 =cut
-
-sub import {
-    ## no critic qw(ProhibitPackageVars)
-    my $package_role         = caller;
-    my $package_role_options = do {
-        ## no critic qw(ProhibitNoStrict)
-        no strict qw/refs/;
-        ${"${package_role}::_MooX_Options_Option_Spec"} //= {};
-    };
-
-    my $option_role_meth = sub {
-        my ( $name, %options ) = @_;
-        $package_role_options->{$name} = \%options;
-    };
-
-    my $import_meth = sub {
-        my $package          = caller;
-        my $option_meth_name = do {
-            ## no critic qw(ProhibitNoStrict)
-            no strict qw/refs/;
-            ${"${package}::_MooX_Options_Option_Name"};
-        };
-        croak "MooX::Options should be import before using this role."
-            unless defined $option_meth_name;
-        my $option_meth = $package->can($option_meth_name);
-        for my $name ( keys %$package_role_options ) {
-            my %option = %{ $package_role_options->{$name} };
-            $option_meth->( $name, %option );
-        }
-    };
-
-    {
-        ## no critic qw(ProhibitNoStrict)
-        no strict qw/refs/;
-        *{"${package_role}::option"} = $option_role_meth;
-        *{"${package_role}::import"} = $import_meth;
-    }
-    return;
+sub new_with_options {
+    my ($class, @params) = @_;
+    return $class->new( $class->parse_options(@params) );
 }
+
+=method parse_options
+
+Parse your options, call L<Getopt::Long::Descriptve> and convert the result for the "new" method.
+
+It is use by "new_with_options".
+
+=cut
+## no critic qw/Modules::ProhibitExcessMainComplexity/
+sub parse_options {
+    my ( $class, %params ) = @_;
+    my %metas = $class->_options_meta;
+    my %options_params = $class->_options_params;
+    my @options;
+    my %cmdline_params;
+
+    my $option_name = sub {
+        my ($name, %meta) = @_;
+        my $cmdline_name = $name;
+        $cmdline_name .= '|' . $meta{short} if defined $meta{short};
+        $cmdline_name .= '+' if $meta{repeatable} && ! defined $meta{format};
+        $cmdline_name .= '!' if $meta{negativable};
+        $cmdline_name .= '=' . $meta{format} if defined $meta{format};
+        return $cmdline_name;
+    };
+
+    my %has_to_split;
+    for my $name(keys %metas) {
+        my %meta = %{$metas{$name}};
+        my $doc = $meta{doc};
+        $doc = "no doc for $name" if !defined $doc;
+        push @options, [$option_name->($name, %meta), $doc];
+        $has_to_split{$name} = Data::Record->new({ split => $meta{autosplit}, unless => $RE{quoted} } ) if defined $meta{autosplit};
+    }
+
+    local @ARGV = @ARGV if $options_params{protect_argv};
+    if (%has_to_split) {
+        my @new_argv;
+        #parse all argv
+        for my $arg (@ARGV) {
+            my ( $arg_name, $arg_values ) = split( /=/x, $arg, 2 );
+            $arg_name =~ s/^--?//x;
+            if ( my $rec = $has_to_split{$arg_name} ) {
+                foreach my $record ( $rec->records($arg_values) ) {
+
+                    #remove the quoted if exist to chain
+                    $record =~ s/^['"]|['"]$//gx;
+                    push @new_argv, "--$arg_name=$record";
+                }
+            }
+            else {
+                push @new_argv, $arg;
+            }
+        }
+        @ARGV = @new_argv;
+    }
+
+    my @flavour;
+    if (defined $options_params{flavour}) {
+        push @flavour, { getopt_conf => $options_params{flavour} };
+    }
+    my ($opt, $usage) = describe_options(
+        ("USAGE: %c %o"),
+        @options,
+        ['help|h', "show this help message"],
+        @flavour
+    );
+    if ($opt->help() || defined $params{help}) {
+        print $usage,"\n";
+        my $exit_code = 0;
+        $exit_code = 0 + $params{help} if defined $params{help};
+        exit($exit_code);
+    }
+
+    my @missing_required;
+    for my $name(keys %metas) {
+        my %meta = %{$metas{$name}};
+        if (defined $params{$name}) {
+            $cmdline_params{$name} = $params{$name}; 
+        } else {
+            $cmdline_params{$name} = $opt->$name(); 
+        }
+        push @missing_required, $name if $meta{required} && !defined $cmdline_params{$name};
+    }
+
+    if (@missing_required) {
+        print join("\n", map { $_ . " is missing" } @missing_required,'');
+        print $usage,"\n";
+        exit(1);
+    }
+
+    return %cmdline_params;
+}
+## use critic
+
+sub _options_meta {
+    my ($class, @meta) = @_;
+    return $class->maybe::next::method(@meta);
+}
+
+sub _options_params {
+    my ($class, @params) = @_;
+    return $class->maybe::next::method(@params);
+}
+
+=method options_usage
+
+Display help message.
+
+Check full doc L<MooX::Options> for more details.
+
+=cut
+sub options_usage {
+    my ($self, $code, @messages) = @_;
+    $code = 0 if !defined $code;
+    print join("\n", @messages,'') if @messages;
+    local @ARGV = ();
+    return $self->parse_options(help => $code);
+};
 
 1;

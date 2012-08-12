@@ -1,10 +1,10 @@
 package MooX::Options;
 
-# ABSTRACT: add option keywords to your object (Mo/Moo/Mouse/Moose and any others)
+# ABSTRACT: add option keywords to your object (Mo/Moo/Moose)
 
 =head1 MooX::Options
 
-Use Getopt::Long::Descritive to provide command line option for your Mo/Moo/Mouse/Moose Object.
+Use L<Getopt::Long::Descritive> to provide command line option for your Mo/Moo/Moose Object.
 
 This module will add "option" which act as "has" but support additional feature for getopt.
 
@@ -13,214 +13,77 @@ You will have "new_with_options" to instanciate new object for command line.
 
 use strict;
 use warnings;
+use Carp;
 
 # VERSION
-use Carp;
-use Data::Dumper;
-use Getopt::Long 2.38;
-use Getopt::Long::Descriptive 0.091;
-use Regexp::Common;
-use Data::Record;
+my @OPTIONS_ATTRIBUTES
+    = qw/format short repeatable negativable autosplit doc required/;
 
-my %DEFAULT_OPTIONS = (
-    'creation_chain_method' => 'new',
-    'creation_method_name'  => 'new_with_options',
-    'option_chain_method'   => 'has',
-    'option_method_name'    => 'option',
-    'flavour'               => [],
-    'protect_argv'          => 1,
-);
-
-my @FILTER = qw/format short repeatable negativable autosplit doc/;
-
-## no critic qw(ProhibitExcessComplexity)
 sub import {
-    my ( undef, %import_params ) = @_;
-    my (%import_options) = ( %DEFAULT_OPTIONS, %import_params );
-    my $package = caller;
+    my (undef, @import) = @_;
+    my %import_options = (protect_argv => 1, flavour => [], @import);
+    
+    my $target = caller;
+    my $with = $target->can('with');
+    my $around = $target->can('around');
 
-    #check options and definition
-    while ( my ( $key, $method ) = each %import_options ) {
-        croak "missing option $key, check doc to define one"
-            unless defined $method;
-        croak "method $method is not defined, check doc to use another name"
-            if $key =~ /_chain_method$/x && !$package->can($method);
-        croak "method $method already defined, check doc to use another name"
-            if $key =~ /_method_name$/x && $package->can($method);
-    }
+    $with->('MooX::Options::Role');
 
-    my @Options              = ('USAGE: %c %o');
-    my @Attributes           = ();
-    my @Required_Attributes  = ();
-    my %Autosplit_Attributes = ();
-    my $Usage                = "";
-
-    my $sub_ref = {};
-
-    #keywords option
-    $sub_ref->{ $import_options{option_method_name} } = sub {
-        my ( $name, %orig_options ) = @_;
-        my %options = %orig_options;
-        croak
-            "Negativable params is not usable with non boolean value, don't pass format to use it !"
-            if $options{negativable} && $options{format};
-        croak "Can't use option with help, it is implied by MooX::Options"
-            if $name eq 'help';
-        croak "Can't use option with "
-            . $import_options{option_method_name}
-            . "_usage, it is implied by MooX::Options"
-            if $name eq $import_options{option_method_name}
-            . "_usage";
-
-        #fix missing option, autosplit implie repeatable
-        $options{repeatable} = 1 if $options{autosplit};
-
-        #help is use for help message only
-        my $name_long_and_short = join "|", grep { defined $_ } $name,
-            $options{short};
-
-        #fix format for negativable or add + if it is a boolean
-        if ( $options{repeatable} ) {
-            if ( $options{format} ) {
-                $options{format} .= "@"
-                    unless substr( $options{format}, -1 ) eq '@';
-            }
-            else {
-                $name_long_and_short .= "+";
-            }
+    my $_options_meta = {};
+    my $modifier_done;
+    my $option = sub {
+        my ( $name, %attributes ) = @_;
+        for my $ban(qw/help option new_with_options parse_options options_usage _options_meta _options_params/) {
+            croak "You cannot use an option with the name '$ban', it is implied by MooX::Options"
+            if $name eq $ban;
         }
-
-        #negativable for boolean value
-        $name_long_and_short .= "!" if $options{negativable};
-
-        #format the name
-        my $name_format = join "=",
-            grep { defined $_ } $name_long_and_short, $options{format};
-
-        #doc
-        my $doc
-            = defined $options{doc}           ? $options{doc}
-            : defined $options{documentation} ? $options{documentation}
-            :                                   "no doc for $name";
-
-        push @Options, [ $name_format, $doc ];    # prepare option for getopt
-        push @Attributes,          $name;   # save the attribute for later use
-        push @Required_Attributes, $name
-            if $options{required};          # save the required attribute
-        $Autosplit_Attributes{$name}
-            = Data::Record->new(
-            { split => $options{autosplit}, unless => $RE{quoted} } )
-            if $options{autosplit};         # save autosplit value
-
-#remove bad key for passing to chain_method(has), avoid warnings with Moo/Moose
-#by defaut, keep all key
-        unless ( $import_options{nofilter} ) {
-            delete $orig_options{$_} for @FILTER;
-        }
-
-        #chain to chain_method (has)
-        my $chain_method_name = $import_options{option_chain_method};
-        ## no critic qw(ProhibitStringyEval)
-        my $chain_method
-            = eval "package ${package}; sub {${chain_method_name}(\@_)}";
-        ## use critic
-        $chain_method->( $name, %orig_options );
-    };
-
-    #keyword option_usage
-    $sub_ref->{ $import_options{option_method_name} . "_usage" } = sub {
-        my ( $code, @messages ) = @_;
-        print join( "\n", @messages, $Usage );
-        exit($code);
-    };
-
-    #keyword new_with_options
-    $sub_ref->{ $import_options{creation_method_name} } = sub {
-        my ( $self, %params ) = @_;
-
-        #ensure all method will be call properly
-        for my $attr (@Attributes) {
-            croak "attribute "
-                . $attr
-                . " isn't defined. You have something wrong in your option_chain_method '"
-                . $import_options{option_chain_method} . "'."
-                unless $self->can($attr);
-        }
-
-#if autosplit attributes is present, search and replace in ARGV with full version
-#ex --test=1,2,3 become --test=1 --test=2 --test=3
-        ## no critic qw(RequireLocalizedPunctuationVars)
-        local @ARGV = @ARGV if $import_options{protect_argv};
-        if (%Autosplit_Attributes) {
-            my @new_argv;
-
-            #parse all argv
-            for my $arg (@ARGV) {
-                my ( $arg_name, $arg_values ) = split( /=/x, $arg, 2 );
-                $arg_name =~ s/^--?//x;
-                if ( my $rec = $Autosplit_Attributes{$arg_name} ) {
-                    foreach my $record ( $rec->records($arg_values) ) {
-
-                        #remove the quoted if exist to chain
-                        $record =~ s/^['"]|['"]$//gx;
-                        push @new_argv, "--$arg_name=$record";
-                    }
+        $_options_meta->{$name}
+            = { _validate_and_filter_options(%attributes) };
+        $target->can('has')->( $name => _filter_attributes(%attributes) );
+        unless ($modifier_done) {
+            $around->(
+                _options_meta => sub {
+                    my ( $orig, $self ) = ( shift, shift );
+                    return ( $self->$orig(@_), %$_options_meta );
                 }
-                else {
-                    push @new_argv, $arg;
+            );
+            $around->(
+                _options_params => sub {
+                    my ( $orig, $self ) = ( shift, shift );
+                    return ( $self->$orig(@_), %import_options );
                 }
-            }
-            @ARGV = @new_argv;
+            );
+            $modifier_done = 1;
         }
-        ## use critic
-
-        #call describe_options
-        my $usage_method
-            = $self->can("$import_options{option_method_name}_usage");
-        my ( $opt, $usage ) = describe_options(
-            @Options,
-            [ "help|h", "show this help message" ],
-            { getopt_conf => $import_options{flavour} }
-        );
-        $Usage = $usage->text;
-        $usage_method->(0) if $opt->help;
-
-        #replace command line attribute in params if params not defined
-        my @existing_attributes = grep {
-            my $attr     = $_;
-            my $attr_val = $opt->$attr;
-            defined $attr_val && !exists $params{$attr}
-        } @Attributes;
-        @params{@existing_attributes} = @$opt{@existing_attributes};
-
-        #check required params, if anything missing, display help
-        my @missing_params
-            = grep { !defined $params{$_} } @Required_Attributes;
-        $usage_method->( 1, map {"$_ is missing"} @missing_params )
-            if @missing_params;
-
-        my $creation_method_name = $import_options{creation_chain_method};
-        my $creation_method      = $package->can($creation_method_name);
-        $creation_method->( $self, %params );
+        return;
     };
-
-    #inject method
-    {
-        ## no critic qw(ProhibitNoStrict)
-        no strict qw/refs/;
-        for my $meth ( keys %$sub_ref ) {
-            *{"${package}::$meth"} = $sub_ref->{$meth};
-        }
-        ## use critic
-
-        #Save option name for MooX::Options::Role
-        ## no critic qw(ProhibitPackageVars)
-        ${"${package}::_MooX_Options_Option_Name"}
-            = $import_options{option_method_name};
-        ## use critic
-    }
+    { no strict 'refs'; *{"${target}::option"} = $option; }
 
     return;
+}
+
+sub _filter_attributes {
+    my %attributes = @_;
+    my %filter_key = map { $_ => 1 } @OPTIONS_ATTRIBUTES;
+    return map { ( $_ => $attributes{$_} ) }
+        grep { !exists $filter_key{$_} } keys %attributes;
+}
+
+sub _validate_and_filter_options {
+    my (%options) = @_;
+    $options{doc} = $options{documentation} if !defined $options{doc};
+
+    my %cmdline_options = map { ( $_ => $options{$_} ) }
+        grep { exists $options{$_} } @OPTIONS_ATTRIBUTES;
+
+    $cmdline_options{repeatable} = 1 if $cmdline_options{autosplit};
+    $cmdline_options{format} .= "@" if $cmdline_options{repeatable} && defined $cmdline_options{format} && substr( $cmdline_options{format}, -1 ) ne '@';
+
+    croak
+        "Negativable params is not usable with non boolean value, don't pass format to use it !"
+        if $cmdline_options{negativable} && defined $cmdline_options{format};
+
+    return %cmdline_options;
 }
 
 1;
@@ -238,30 +101,6 @@ The import method can take option :
 =item %options
 
 =over
-
-=item creation_chain_method
-
-call this method after parsing option, default : new
-
-=item creation_method_name
-
-name of new method to handle option, default : new_with_options
-
-=item option_chain_method
-
-call this method to create the attribute, default : has
-
-=item option_method_name
-
-name of keyword you want to use to create your option, default : option
-
-it will create ${option_method_name}_usage too, ex: option_usage($exit_code, @{additional messages})
-
-=item nofilter
-
-don't filter extra params for MooX::Options before calling chain_method 
-
-it is usefull if you want to use this params for something else
 
 =item flavour
 
@@ -286,24 +125,75 @@ by default, argv is protected. if you want to do something else on it, use this 
 
 First of all, I use L<Getopt::Long::Descriptive>. Everything will be pass to the programs, more specially the format.
 
-    package t;
-    use Moo;
-    use MooX::Options;
+    {
+        package t;
+        use Moo;
+        use MooX::Options;
 
-    option 'test' => (is => 'ro');
+        option 'test' => (is => 'ro');
 
-    1;
+        1;
+    }
 
     my $t = t->new_with_options(); #parse @ARGV
     my $o = t->new_with_options(test => 'override'); #parse ARGV and override any value with the params here
 
 The keyword "option" work exactly like the keyword "has" and take extra argument of Getopt.
 
-=head2 Keyword 'option_usage'
+You can also use it over a Role.
+
+    {
+        package tRole;
+        use Moo::Role;
+        use MooX::Options;
+
+        option 'test' => (is => 'ro');
+
+        1;
+    }
+
+    {
+        package t;
+        use Moo;
+        with 'tRole';
+        1;
+    }
+
+    my $t = t->new_with_options(); #parse @ARGV
+    my $o = t->new_with_options(test => 'override'); #parse ARGV and override any value with the params here
+
+If you use Mo, you have a little bit more work to do. Because Mo lack of "with" and "around".
+
+
+    {
+        package tRole;
+        use Moo::Role;
+        use Mo;
+        use MooX::Options;
+
+        option 'test' => (is => 'ro');
+        1;
+    }
+    {
+
+        package t;
+        use Mo;
+        use Role::Tiny::With;
+        with 'tRole';
+
+        1;
+    }
+    my $t = t->new_with_options(); #parse @ARGV
+    my $o = t->new_with_options(test => 'override'); #parse ARGV and override any value with the params here
+
+It's a bit tricky but, hey, you are using Mo !
+
+=head2 Keyword 'options_usage'
 
 It display the usage message and return the exit code
 
-    option_usage(1, "str is not valid");
+    my $t = t->new_with_options();
+    $t->options_usage(1, "str is not valid");
 
 Params :
 
@@ -329,7 +219,7 @@ You can override the command line params :
 
 Ex:
 
-    @ARGV=('--str=ko');
+    local @ARGV=('--str=ko');
     t->new_with_options(str => 'ok');
     t->str; #ok
 
@@ -396,16 +286,20 @@ params so that they behave as arrays "out of the box" when used outside of
 command line context.
 
 Ex:
-    package t;
-    use Moo;
-    use MooX::Options;
+    {
+        package t;
+        use Moo;
+        use MooX::Options;
 
-    option foo => (is => 'rw', format => 's@', default => sub { [] });
-    option bar => (is => 'rw', format => 'i@', default => sub { [] });
+        option foo => (is => 'rw', format => 's@', default => sub { [] });
+        option bar => (is => 'rw', format => 'i@', default => sub { [] });
+
+        1;
+    }
 
     # this now works as expected and you will no longer see
     # "Can't use an undefined value as an ARRAY reference"
-    my $t = t->new;
+    my $t = t->new_with_options;
     push @{ $t->foo }, 'abc123';
 
     1;
@@ -417,28 +311,32 @@ autosplit take the separator value, ex: ",".
 
 Ex :
 
-    package t;
-    use Moo;
-    use MooX::Options;
+    {
+        package t;
+        use Moo;
+        use MooX::Options;
 
-    option test => (is => 'ro', format => 'i@', autosplit => ',');
-    #same as : option test => (is => 'ro', format => 'i', autosplit => ',');
-    1;
+        option test => (is => 'ro', format => 'i@', autosplit => ',');
+        #same as : option test => (is => 'ro', format => 'i', autosplit => ',');
+        1;
+    }
 
-    @ARGV=('--test=1,2,3,4');
+    local @ARGV=('--test=1,2,3,4');
     my $t = t->new_with_options;
     t->test # [1,2,3,4]
 
 
 I automatically take the quoted as a group separator value
 
-    package str;
-    use Moo;
-    use MooX::Options;
-    option test => (is => 'ro', format => 's', repeatable => 1, autosplit => ',');
-    1;
+    {
+        package str;
+        use Moo;
+        use MooX::Options;
+        option test => (is => 'ro', format => 's', repeatable => 1, autosplit => ',');
+        1;
+    }
 
-    @ARGV=('--test=a,b,"c,d",e');
+    local @ARGV=('--test=a,b,"c,d",e');
     my $t = str->new_with_options;
     t->test # ['a','b','c,d','e']
 
@@ -448,18 +346,24 @@ give short name of an attribute.
 
 Ex :
 
-    package t;
-    use Moo;
-    use MooX::Options;
+    {
+        package t;
+        use Moo;
+        use MooX::Options;
 
-    option 'verbose' => (is => 'ro', repeatable => 1, short => 'v');
+        option 'verbose' => (is => 'ro', repeatable => 1, short => 'v');
 
-    1;
-    @ARGV=('-vvv');
+        1;
+    }
+    local @ARGV=('-vvv');
     my $t = t->new_with_options;
     t->verbose # 3
 
 =back
+
+=head1 no more Mouse support
+
+If you are using Mouse, I'm sorry to say than the rewrite of this module has make it just incompatible. Mouse is not design to by compatible with anything else than Mouse itself. I could just suggest to use Moo instead, which is a great and compatible replacement.
 
 =head1 THANKS
 

@@ -15,33 +15,52 @@ BEGIN {
 }
 
 {
-
-    package t;
+    package tRole;
+    use Moo::Role;
     use Mo;
-    use MooX::Options filter => 'Mo';
+    use MooX::Options;
 
     option 'bool'    => ( is => 'ro' );
     option 'counter' => ( is => 'ro', repeatable => 1 );
     option 'empty'   => ( is => 'ro', negativable => 1 );
     option 'split'   => ( is => 'ro', format => 'i@', autosplit => ',' );
+    1;
+}
+{
+
+    package t;
+    use Mo;
+    use Role::Tiny::With;
+    with 'tRole';
 
     1;
 }
 
 {
 
-    package r;
+    package rRole;
+    use Moo::Role;
     use Mo;
-    use MooX::Options filter => 'Mo';
+    use MooX::Options;
 
     option 'str_req' => ( is => 'ro', format => 's', required => 1 );
 
     1;
 }
+{
+
+    package r;
+    use Mo;
+    use Role::Tiny::With;
+    with 'rRole';
+
+    1;
+}
 
 {
 
-    package sp_str;
+    package sp_strRole;
+    use Moo::Role;
     use Mo;
     use MooX::Options;
 
@@ -49,20 +68,39 @@ BEGIN {
 
     1;
 }
+{
+
+    package sp_str;
+    use Mo;
+    use Role::Tiny::With;
+    with 'sp_strRole';
+
+    1;
+}
 
 {
 
-    package d;
+    package dRole;
+    use Moo::Role;
     use Mo 'coerce';
     use MooX::Options;
     option 'should_die_ok' =>
         ( is => 'ro', coerce => sub { die "this will die ok" } );
     1;
 }
+{
+
+    package d;
+    use Mo 'coerce';
+    use Role::Tiny::With;
+    with 'dRole';
+    1;
+}
 
 {
 
-    package multi_req;
+    package multi_reqRole;
+    use Moo::Role;
     use Mo;
     use MooX::Options;
     option 'multi_1' => ( is => 'ro', required => 1 );
@@ -70,13 +108,48 @@ BEGIN {
     option 'multi_3' => ( is => 'ro', required => 1 );
     1;
 }
+{
 
+    package multi_req;
+    use Mo;
+    use Role::Tiny::With;
+    with 'multi_reqRole';
+    1;
+}
+
+{
+
+    package t_docRole;
+    use Moo::Role;
+    use Mo;
+    use MooX::Options;
+    option 't' => ( is => 'ro', doc => 'this is a test' );
+    1;
+}
 {
 
     package t_doc;
     use Mo;
+    use Role::Tiny::With;
+    with 't_docRole';
+    1;
+}
+
+
+{
+    package t_shortRole;
+    use Moo::Role;
+    use Mo;
     use MooX::Options;
-    option 't' => ( is => 'ro', doc => 'this is a test' );
+    option 'verbose' => ( is => 'ro', short => 'v' );
+    1;
+}
+
+{
+    package t_short;
+    use Mo;
+    use Role::Tiny::With;
+    with 't_shortRole';
     1;
 }
 

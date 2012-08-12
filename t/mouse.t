@@ -12,13 +12,16 @@ BEGIN {
     use Module::Load::Conditional qw/check_install/;
     plan skip_all => 'Need Mouse for this test'
         unless check_install( module => 'Mouse' );
+        plan skip_all => "Sorry, but I don't support Mouse anymore, the module doesn't work like any others and is fully incompatible with the new way I have wrote MooX::Options. If you really need it, help me to solve this.";
+
 }
+
 
 {
 
     package t;
     use Mouse;
-    use MooX::Options filter => 'Mouse';
+    use MooX::Options;
 
     option 'bool'    => ( is => 'ro' );
     option 'counter' => ( is => 'ro', repeatable => 1 );
@@ -32,7 +35,7 @@ BEGIN {
 
     package r;
     use Mouse;
-    use MooX::Options filter => 'Mouse';
+    use MooX::Options;
 
     option 'str_req' => ( is => 'ro', format => 's', required => 1 );
 
@@ -42,7 +45,7 @@ BEGIN {
 
     package sp_str;
     use Mouse;
-    use MooX::Options filter => 'Mouse';
+    use MooX::Options;
 
     option 'split_str' => ( is => 'ro', format => 's', autosplit => "," );
 
@@ -76,6 +79,14 @@ BEGIN {
     use Mouse;
     use MooX::Options;
     option 't' => ( is => 'ro', doc => 'this is a test' );
+    1;
+}
+
+{
+    package t_short;
+    use Mouse;
+    use MooX::Options;
+    option 'verbose' => ( is => 'ro', short => 'v' );
     1;
 }
 

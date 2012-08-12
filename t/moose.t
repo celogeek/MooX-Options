@@ -18,7 +18,7 @@ BEGIN {
 
     package t;
     use Moose;
-    use MooX::Options filter => 'Moose';
+    use MooX::Options;
 
     option 'bool'    => ( is => 'ro' );
     option 'counter' => ( is => 'ro', repeatable => 1 );
@@ -32,7 +32,7 @@ BEGIN {
 
     package r;
     use Moose;
-    use MooX::Options filter => 'Moose';
+    use MooX::Options;
 
     option 'str_req' => ( is => 'ro', format => 's', required => 1 );
 
@@ -43,7 +43,7 @@ BEGIN {
 
     package sp_str;
     use Moose;
-    use MooX::Options filter => 'Moose';
+    use MooX::Options;
 
     option 'split_str' => ( is => 'ro', format => 's', autosplit => "," );
 
@@ -77,6 +77,14 @@ BEGIN {
     use Moose;
     use MooX::Options;
     option 't' => ( is => 'ro', doc => 'this is a test' );
+    1;
+}
+
+{
+    package t_short;
+    use Moose;
+    use MooX::Options;
+    option 'verbose' => ( is => 'ro', short => 'v' );
     1;
 }
 
