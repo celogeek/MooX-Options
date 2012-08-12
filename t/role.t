@@ -28,6 +28,15 @@ use Try::Tiny;
 }
 
 {
+    package testSkipOpt;
+    use Moo;
+    use MooX::Options skip_options => [qw/multi/];
+    with 'myRole';
+    1;
+}
+
+
+{
     local @ARGV;
     @ARGV = ();
     my $opt = testRole->new_with_options;
@@ -42,6 +51,17 @@ use Try::Tiny;
         $opt->options_usage;
     };
     ok( $trap->stdout =~ /\-\-multi\s+multi\sthreading\smode/x,
+        "usage method is properly set" );
+}
+{
+    local @ARGV;
+    @ARGV = ('--multi');
+    my $opt = testSkipOpt->new_with_options;
+    ok( $opt->multi, 'multi set' );
+    trap {
+        $opt->options_usage;
+    };
+    ok( $trap->stdout !~ /\-\-multi\s+multi\sthreading\smode/x,
         "usage method is properly set" );
 }
 
