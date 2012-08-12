@@ -67,6 +67,7 @@ sub import {
         $apply_modifiers->();
         return;
     };
+    $Role::Tiny::INFO{$target}{not_methods}{$option} = $option;
     { no strict 'refs'; *{"${target}::option"} = $option; }
 
     return;
