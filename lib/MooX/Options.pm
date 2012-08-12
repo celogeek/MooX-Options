@@ -4,7 +4,7 @@ package MooX::Options;
 
 =head1 MooX::Options
 
-Use Getopt::Long::Descritive to provide command line option for your Mo/Moo/Moose Object.
+Use L<Getopt::Long::Descritive> to provide command line option for your Mo/Moo/Moose Object.
 
 This module will add "option" which act as "has" but support additional feature for getopt.
 

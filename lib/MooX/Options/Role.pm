@@ -6,9 +6,9 @@ use warnings;
 
 # VERSION
 
-=head1 TODO
+=head1 USAGE
 
-Write a doc
+Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrade your module. But it is useless alone.
 
 =cut
 
@@ -19,11 +19,25 @@ use Getopt::Long::Descriptive 0.091;
 use Regexp::Common;
 use Data::Record;
 
+=method new_with_options
+
+Same as new but parse ARGV with L<Getopt::Long::Descriptive>
+
+Check full doc L<MooX::Options> for more details.
+
+=cut
 sub new_with_options {
     my ($class, @params) = @_;
     return $class->new( $class->parse_options(@params) );
 }
 
+=method parse_options
+
+Parse your options, call L<Getopt::Long::Descriptve> and convert the result for the "new" method.
+
+It is use by "new_with_options".
+
+=cut
 ## no critic qw/Modules::ProhibitExcessMainComplexity/
 sub parse_options {
     my ( $class, %params ) = @_;
@@ -121,6 +135,13 @@ sub _options_params {
     return $class->maybe::next::method(@params);
 }
 
+=method options_usage
+
+Display help message.
+
+Check full doc L<MooX::Options> for more details.
+
+=cut
 sub options_usage {
     my ($self, $code, @messages) = @_;
     $code = 0 if !defined $code;
