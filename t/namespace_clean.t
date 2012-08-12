@@ -2,20 +2,18 @@ use strict;
 use warnings;
 use Test::More;
 
-eval q{
+use FindBin qw/ $Bin /;
+use lib "$Bin/lib";
 
-    package Foo;
-    use Moo;
-    use MooX::Options;
-    use namespace::clean;
+use_ok 'Foo';
 
-    # FIXME - Don't know why this with is needed?!?!
-    with 'MooX::Options::Role';
-    option foo => (is => 'ro', format => 's');
-};
-
-::ok !$@ or diag $@;
 ::ok Foo->new;
+
+{
+    local @ARGV = ('--foo', '12');
+    my $i = Foo->new_with_options;
+    is $i->foo, 12;
+}
 
 done_testing;
 
