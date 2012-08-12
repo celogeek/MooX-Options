@@ -24,6 +24,8 @@ BEGIN {
     option 'counter' => ( is => 'ro', repeatable => 1 );
     option 'empty'   => ( is => 'ro', negativable => 1 );
     option 'split'   => ( is => 'ro', format => 'i@', autosplit => ',' );
+    option 'has_default' => ( is => 'ro', default => sub { 'foo' } );
+
     1;
 }
 {

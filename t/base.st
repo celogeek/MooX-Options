@@ -6,6 +6,7 @@ subtest "no args" => sub {
     my $t = t->new_with_options();
     ok( $t->can($_), "$_ defined" ) for @params;
     is( $t->$_, undef, "$_ values is undef" ) for @params;
+    is( $t->has_default, 'foo', 'Default works correctly' );
     done_testing();
 };
 
