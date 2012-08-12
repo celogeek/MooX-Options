@@ -44,7 +44,6 @@ sub parse_options {
     my %metas = $class->_options_meta;
     my %options_params = $class->_options_params;
     my @options;
-    my %cmdline_params;
 
     my $option_name = sub {
         my ($name, %meta) = @_;
@@ -105,11 +104,10 @@ sub parse_options {
     }
 
     my @missing_required;
+    my %cmdline_params = %params;
     for my $name(keys %metas) {
         my %meta = %{$metas{$name}};
-        if (defined $params{$name}) {
-            $cmdline_params{$name} = $params{$name}; 
-        } else {
+        if (!defined $cmdline_params{$name}) {
             $cmdline_params{$name} = $opt->$name(); 
         }
         push @missing_required, $name if $meta{required} && !defined $cmdline_params{$name};

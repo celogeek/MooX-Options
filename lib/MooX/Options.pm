@@ -17,11 +17,15 @@ use Carp;
 
 # VERSION
 my @OPTIONS_ATTRIBUTES
-    = qw/format short repeatable negativable autosplit doc required/;
+    = qw/format short repeatable negativable autosplit doc/;
 
 sub import {
     my (undef, @import) = @_;
     my %import_options = (protect_argv => 1, flavour => [], @import);
+    my %skip_options;
+    if (defined $import_options{skip_options}) {
+        %skip_options = map { ($_ => 1) } @{$import_options{skip_options}};
+    }
     
     my $target = caller;
     my $with = $target->can('with');
@@ -37,9 +41,14 @@ sub import {
             croak "You cannot use an option with the name '$ban', it is implied by MooX::Options"
             if $name eq $ban;
         }
-        $_options_meta->{$name}
-            = { _validate_and_filter_options(%attributes) };
+        
         $target->can('has')->( $name => _filter_attributes(%attributes) );
+        
+        if (!$skip_options{$name}) {
+            $_options_meta->{$name}
+            = { _validate_and_filter_options(%attributes) };
+        }
+
         unless ($modifier_done) {
             $around->(
                 _options_meta => sub {
@@ -74,7 +83,7 @@ sub _validate_and_filter_options {
     $options{doc} = $options{documentation} if !defined $options{doc};
 
     my %cmdline_options = map { ( $_ => $options{$_} ) }
-        grep { exists $options{$_} } @OPTIONS_ATTRIBUTES;
+        grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
 
     $cmdline_options{repeatable} = 1 if $cmdline_options{autosplit};
     $cmdline_options{format} .= "@" if $cmdline_options{repeatable} && defined $cmdline_options{format} && substr( $cmdline_options{format}, -1 ) ne '@';
