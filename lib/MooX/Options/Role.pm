@@ -116,7 +116,7 @@ sub parse_options {
     }
 
     if (@missing_required) {
-        print join("\n", map { $_ . " is missing" } @missing_required,'');
+        print join("\n", (map { $_ . " is missing" } @missing_required),'');
         print $usage,"\n";
         exit(1);
     }
