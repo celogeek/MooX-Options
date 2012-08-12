@@ -15,6 +15,7 @@ BEGIN {
 }
 
 {
+
     package tRole;
     use Moo::Role;
     use Mo 'default';
@@ -24,7 +25,7 @@ BEGIN {
     option 'counter' => ( is => 'ro', repeatable => 1 );
     option 'empty'   => ( is => 'ro', negativable => 1 );
     option 'split'   => ( is => 'ro', format => 'i@', autosplit => ',' );
-    option 'has_default' => ( is => 'ro', default => sub { 'foo' } );
+    option 'has_default' => ( is => 'ro', default => sub {'foo'} );
 
     1;
 }
@@ -137,8 +138,8 @@ BEGIN {
     1;
 }
 
-
 {
+
     package t_shortRole;
     use Moo::Role;
     use Mo;
@@ -148,6 +149,7 @@ BEGIN {
 }
 
 {
+
     package t_short;
     use Mo;
     use Role::Tiny::With;
@@ -156,15 +158,17 @@ BEGIN {
 }
 
 {
+
     package t_skipoptRole;
     use Moo::Role;
     use Mo;
     use MooX::Options skip_options => [qw/multi/];
 
-    option 'multi' => (is => 'ro');
+    option 'multi' => ( is => 'ro' );
     1;
 }
 {
+
     package t_skipopt;
     use Mo;
     use Role::Tiny::With;

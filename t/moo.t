@@ -24,7 +24,7 @@ BEGIN {
     option 'counter' => ( is => 'ro', repeatable => 1 );
     option 'empty'   => ( is => 'ro', negativable => 1 );
     option 'split'   => ( is => 'ro', format => 'i@', autosplit => ',' );
-    option 'has_default' => ( is => 'ro', default => sub { 'foo' } );
+    option 'has_default' => ( is => 'ro', default => sub {'foo'} );
 
     1;
 }
@@ -82,6 +82,7 @@ BEGIN {
 }
 
 {
+
     package t_short;
     use Moo;
     use MooX::Options;
@@ -90,11 +91,12 @@ BEGIN {
 }
 
 {
+
     package t_skipopt;
     use Moo;
     use MooX::Options skip_options => [qw/multi/];
 
-    option 'multi' => (is => 'ro');
+    option 'multi' => ( is => 'ro' );
     1;
 }
 

@@ -20,17 +20,19 @@ my @OPTIONS_ATTRIBUTES
     = qw/format short repeatable negativable autosplit doc/;
 
 sub import {
-    my (undef, @import) = @_;
-    my %import_options = (protect_argv => 1, flavour => [], skip_options => [], @import);
+    my ( undef, @import ) = @_;
+    my %import_options
+        = ( protect_argv => 1, flavour => [], skip_options => [], @import );
     my %skip_options;
-    if (defined $import_options{skip_options}) {
-        %skip_options = map { ($_ => 1) } @{$import_options{skip_options}};
+    if ( defined $import_options{skip_options} ) {
+        %skip_options
+            = map { ( $_ => 1 ) } @{ $import_options{skip_options} };
     }
-    
+
     my $target = caller;
-    my $with = $target->can('with');
+    my $with   = $target->can('with');
     my $around = $target->can('around');
-    my $has = $target->can('has');
+    my $has    = $target->can('has');
 
     my $_options_meta = {};
     my $modifier_done;
@@ -54,16 +56,20 @@ sub import {
 
     my $option = sub {
         my ( $name, %attributes ) = @_;
-        for my $ban(qw/help option new_with_options parse_options options_usage _options_meta _options_params/) {
-            croak "You cannot use an option with the name '$ban', it is implied by MooX::Options"
-            if $name eq $ban;
+        for my $ban (
+            qw/help option new_with_options parse_options options_usage _options_meta _options_params/
+            )
+        {
+            croak
+                "You cannot use an option with the name '$ban', it is implied by MooX::Options"
+                if $name eq $ban;
         }
 
         $has->( $name => _filter_attributes(%attributes) );
 
-        if (!$skip_options{$name}) {
+        if ( !$skip_options{$name} ) {
             $_options_meta->{$name}
-            = { _validate_and_filter_options(%attributes) };
+                = { _validate_and_filter_options(%attributes) };
         }
 
         $apply_modifiers->();
@@ -89,7 +95,10 @@ sub _validate_and_filter_options {
         grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
 
     $cmdline_options{repeatable} = 1 if $cmdline_options{autosplit};
-    $cmdline_options{format} .= "@" if $cmdline_options{repeatable} && defined $cmdline_options{format} && substr( $cmdline_options{format}, -1 ) ne '@';
+    $cmdline_options{format} .= "@"
+        if $cmdline_options{repeatable}
+        && defined $cmdline_options{format}
+        && substr( $cmdline_options{format}, -1 ) ne '@';
 
     croak
         "Negativable params is not usable with non boolean value, don't pass format to use it !"

@@ -28,13 +28,13 @@ use Try::Tiny;
 }
 
 {
+
     package testSkipOpt;
     use Moo;
     use MooX::Options skip_options => [qw/multi/];
     with 'myRole';
     1;
 }
-
 
 {
     local @ARGV;

@@ -46,7 +46,7 @@ BEGIN {
     1;
 }
 
-for my $noflavour(qw/plain plain2/) {
+for my $noflavour (qw/plain plain2/) {
     subtest "unknown option $noflavour" => sub {
         note "Without flavour $noflavour";
         {
