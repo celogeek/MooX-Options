@@ -26,44 +26,47 @@ sub import {
     if (defined $import_options{skip_options}) {
         %skip_options = map { ($_ => 1) } @{$import_options{skip_options}};
     }
-    
+
     my $target = caller;
     my $with = $target->can('with');
     my $around = $target->can('around');
-
-    $with->('MooX::Options::Role');
+    my $has = $target->can('has');
 
     my $_options_meta = {};
     my $modifier_done;
+    my $apply_modifiers = sub {
+        return if $modifier_done;
+        $with->('MooX::Options::Role') unless $target->can('_options_meta');
+        $around->(
+            _options_meta => sub {
+                my ( $orig, $self ) = ( shift, shift );
+                return ( $self->$orig(@_), %$_options_meta );
+            }
+        );
+        $around->(
+            _options_params => sub {
+                my ( $orig, $self ) = ( shift, shift );
+                return ( $self->$orig(@_), %import_options );
+            }
+        );
+        $modifier_done = 1;
+    };
+
     my $option = sub {
         my ( $name, %attributes ) = @_;
         for my $ban(qw/help option new_with_options parse_options options_usage _options_meta _options_params/) {
             croak "You cannot use an option with the name '$ban', it is implied by MooX::Options"
             if $name eq $ban;
         }
-        
-        $target->can('has')->( $name => _filter_attributes(%attributes) );
-        
+
+        $has->( $name => _filter_attributes(%attributes) );
+
         if (!$skip_options{$name}) {
             $_options_meta->{$name}
             = { _validate_and_filter_options(%attributes) };
         }
 
-        unless ($modifier_done) {
-            $around->(
-                _options_meta => sub {
-                    my ( $orig, $self ) = ( shift, shift );
-                    return ( $self->$orig(@_), %$_options_meta );
-                }
-            );
-            $around->(
-                _options_params => sub {
-                    my ( $orig, $self ) = ( shift, shift );
-                    return ( $self->$orig(@_), %import_options );
-                }
-            );
-            $modifier_done = 1;
-        }
+        $apply_modifiers->();
         return;
     };
     { no strict 'refs'; *{"${target}::option"} = $option; }
