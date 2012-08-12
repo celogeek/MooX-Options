@@ -24,15 +24,15 @@ my @OPTIONS_ATTRIBUTES
 
 sub import {
     my ( undef, @import ) = @_;
-    my %import_options
-        = ( protect_argv => 1, flavour => [], skip_options => [], @import );
+    my $import_options
+        = { protect_argv => 1, flavour => [], skip_options => [], @import };
 
     my $target = caller;
     my $with   = $target->can('with');
     my $around = $target->can('around');
     my $has    = $target->can('has');
 
-    my $_options_meta = {};
+    my $options_meta = {};
     my $modifier_done;
     my $apply_modifiers = sub {
         return if $modifier_done;
@@ -52,26 +52,32 @@ sub import {
         }
         ';
 
-        if ( my $info = $Role::Tiny::INFO{$target} ) {
-            for my $sref (qw/meta params/) {
-                my $meth = $target->can('_options_' . $sref);
-                $info->{not_methods}{$meth} = $meth;
-            }
-        }
-
         $around->(
             _options_meta => sub {
                 my ( $orig, $self ) = ( shift, shift );
-                return ( $self->$orig(@_), %$_options_meta );
+                return ( $self->$orig(@_), %$options_meta );
             }
         );
 
         $around->(
             _options_params => sub {
                 my ( $orig, $self ) = ( shift, shift );
-                return ( $self->$orig(@_), %import_options );
+                my @p = $self->$orig(@_);
+                my @q = %$import_options;
+                use Carp;
+                use Data::Dumper;
+                carp "p:",Dumper \@p;
+                carp "q:",Dumper \@q;
+                return @p,@q;
             }
         );
+
+        #if ( my $info = $Role::Tiny::INFO{$target} ) {
+        #    for my $sref (qw/meta params/) {
+        #        my $meth = $target->can('_options_' . $sref);
+        #        $info->{not_methods}{$meth} = $meth;
+        #    }
+        #}
 
         $modifier_done = 1;
     };
@@ -89,15 +95,17 @@ sub import {
 
         $has->( $name => _filter_attributes(%attributes) );
 
-        $_options_meta->{$name}
+        $options_meta->{$name}
             = { _validate_and_filter_options(%attributes) };
 
         $apply_modifiers->();
         return;
     };
+
     if ( my $info = $Role::Tiny::INFO{$target} ) {
         $info->{not_methods}{$option} = $option;
     }
+
     { no strict 'refs'; *{"${target}::option"} = $option; }
 
     return;
