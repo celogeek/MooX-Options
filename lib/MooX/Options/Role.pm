@@ -108,7 +108,9 @@ sub parse_options {
     for my $name(keys %metas) {
         my %meta = %{$metas{$name}};
         if (!defined $cmdline_params{$name}) {
-            $cmdline_params{$name} = $opt->$name(); 
+            if (defined (my $val = $opt->$name())) {
+                $cmdline_params{$name} = $val; 
+            }
         }
         push @missing_required, $name if $meta{required} && !defined $cmdline_params{$name};
     }
