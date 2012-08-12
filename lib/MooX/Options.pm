@@ -21,7 +21,7 @@ my @OPTIONS_ATTRIBUTES
 
 sub import {
     my (undef, @import) = @_;
-    my %import_options = (protect_argv => 1, flavour => [], @import);
+    my %import_options = (protect_argv => 1, flavour => [], skip_options => [], @import);
     my %skip_options;
     if (defined $import_options{skip_options}) {
         %skip_options = map { ($_ => 1) } @{$import_options{skip_options}};
@@ -125,6 +125,14 @@ Any flavour is pass to L<Getopt::Long> as a configuration, check the doc to see 
 by default, argv is protected. if you want to do something else on it, use this option and it will change the real argv.
 
     use MooX::Options protect_argv => 0;
+
+=item skip_options
+
+you can skip some option to remove the possibility to the terminal. in that case, the 'option' keyword will just works like an 'has'.
+
+    use MooX::Options skip_options => [qw/multi/];
+
+If you have multiple tools that use the same Role to generate params, you can skip one and force his value. In my example, it could be a multithread option that you want to disabling in some case.
 
 =back
 
