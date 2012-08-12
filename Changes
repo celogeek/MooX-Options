@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+3.0       2012-08-12 02:06:35 Europe/Paris
+
     Full rewrite of MooX::Options
     Add easy support to use it in a Role.
     Break support of Mouse.
