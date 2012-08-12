@@ -17,7 +17,7 @@ BEGIN {
 {
     package tRole;
     use Moo::Role;
-    use Mo;
+    use Mo 'default';
     use MooX::Options;
 
     option 'bool'    => ( is => 'ro' );
