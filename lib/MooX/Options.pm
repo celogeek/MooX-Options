@@ -30,6 +30,7 @@ sub import {
     my $target = caller;
     my $with = $target->can('with');
     my $around = $target->can('around');
+    my $has = $target->can('has');
 
     $with->('MooX::Options::Role');
 
@@ -41,9 +42,9 @@ sub import {
             croak "You cannot use an option with the name '$ban', it is implied by MooX::Options"
             if $name eq $ban;
         }
-        
-        $target->can('has')->( $name => _filter_attributes(%attributes) );
-        
+
+        $has->( $name => _filter_attributes(%attributes) );
+
         if (!$skip_options{$name}) {
             $_options_meta->{$name}
             = { _validate_and_filter_options(%attributes) };
