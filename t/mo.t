@@ -153,6 +153,23 @@ BEGIN {
     1;
 }
 
+{
+    package t_skipoptRole;
+    use Moo::Role;
+    use Mo;
+    use MooX::Options skip_options => [qw/multi/];
+
+    option 'multi' => (is => 'ro');
+    1;
+}
+{
+    package t_skipopt;
+    use Mo;
+    use Role::Tiny::With;
+    with 't_skipoptRole';
+    1;
+}
+
 subtest "Mo" => sub {
     note "Test Mo";
     require $RealBin . '/base.st';

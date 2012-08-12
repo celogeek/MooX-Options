@@ -88,6 +88,15 @@ BEGIN {
     1;
 }
 
+{
+    package t_skipopt;
+    use Moo;
+    use MooX::Options skip_options => [qw/multi/];
+
+    option 'multi' => (is => 'ro');
+    1;
+}
+
 subtest "Moo" => sub {
     note "Test Moo";
     require $RealBin . '/base.st';

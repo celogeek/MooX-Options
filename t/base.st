@@ -166,4 +166,11 @@ subtest "test short" => sub {
     ok ($trap->stdout =~ /\-v \-\-verbose/, 'short doc ok');
 };
 
+subtest "test skip_options" => sub {
+    note "test skip_options";
+    my $s = t_skipopt->new_with_options();
+    trap { $s->options_usage() };
+    ok ($trap->stdout !~ /\-\-multi/, 'multi is no more an option');
+};
+
 1;
