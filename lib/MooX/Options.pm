@@ -19,6 +19,9 @@ use Carp;
 my @OPTIONS_ATTRIBUTES
     = qw/format short repeatable negativable autosplit doc/;
 
+# todo to support multiple role
+# { package $target; sub _option_information { shift->maybe::next::method(@_) } }
+
 sub import {
     my ( undef, @import ) = @_;
     my %import_options
@@ -62,12 +65,15 @@ sub import {
 
         $has->( $name => _filter_attributes(%attributes) );
 
-        $_options_meta->{$name} = { _validate_and_filter_options(%attributes) };
+        $_options_meta->{$name}
+            = { _validate_and_filter_options(%attributes) };
 
         $apply_modifiers->();
         return;
     };
-    $Role::Tiny::INFO{$target}{not_methods}{$option} = $option;
+    if ( my $info = $Role::Tiny::INFO{$target} ) {
+        $info->{not_methods}{$option} = $option;
+    }
     { no strict 'refs'; *{"${target}::option"} = $option; }
 
     return;
