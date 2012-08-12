@@ -36,19 +36,43 @@ sub import {
     my $modifier_done;
     my $apply_modifiers = sub {
         return if $modifier_done;
-        $with->('MooX::Options::Role') unless $target->can('_options_meta');
+        $with->('MooX::Options::Role');
+
+        eval '
+        package '.$target.';
+
+        sub _options_meta {
+            my ( $class, @meta ) = @_;
+            return $class->maybe::next::method(@meta);
+        }
+
+        sub _options_params {
+            my ( $class, @params ) = @_;
+            return $class->maybe::next::method(@params);
+        }
+        ';
+
+        if ( my $info = $Role::Tiny::INFO{$target} ) {
+            for my $sref (qw/meta params/) {
+                my $meth = $target->can('_options_' . $sref);
+                $info->{not_methods}{$meth} = $meth;
+            }
+        }
+
         $around->(
             _options_meta => sub {
                 my ( $orig, $self ) = ( shift, shift );
                 return ( $self->$orig(@_), %$_options_meta );
             }
         );
+
         $around->(
             _options_params => sub {
                 my ( $orig, $self ) = ( shift, shift );
                 return ( $self->$orig(@_), %import_options );
             }
         );
+
         $modifier_done = 1;
     };
 

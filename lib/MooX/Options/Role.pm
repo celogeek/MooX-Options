@@ -135,16 +135,6 @@ sub parse_options {
 }
 ## use critic
 
-sub _options_meta {
-    my ( $class, @meta ) = @_;
-    return $class->maybe::next::method(@meta);
-}
-
-sub _options_params {
-    my ( $class, @params ) = @_;
-    return $class->maybe::next::method(@params);
-}
-
 =method options_usage
 
 Display help message.
