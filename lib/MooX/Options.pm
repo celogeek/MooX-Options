@@ -23,11 +23,6 @@ sub import {
     my ( undef, @import ) = @_;
     my %import_options
         = ( protect_argv => 1, flavour => [], skip_options => [], @import );
-    my %skip_options;
-    if ( defined $import_options{skip_options} ) {
-        %skip_options
-            = map { ( $_ => 1 ) } @{ $import_options{skip_options} };
-    }
 
     my $target = caller;
     my $with   = $target->can('with');
@@ -67,10 +62,7 @@ sub import {
 
         $has->( $name => _filter_attributes(%attributes) );
 
-        if ( !$skip_options{$name} ) {
-            $_options_meta->{$name}
-                = { _validate_and_filter_options(%attributes) };
-        }
+        $_options_meta->{$name} = { _validate_and_filter_options(%attributes) };
 
         $apply_modifiers->();
         return;

@@ -45,6 +45,11 @@ sub parse_options {
     my ( $class, %params ) = @_;
     my %metas          = $class->_options_meta;
     my %options_params = $class->_options_params;
+    my @skip_options;
+    @skip_options = @{$options_params{skip_options}} if defined $options_params{skip_options};
+    if ( @skip_options ) {
+        delete @metas{@skip_options};
+    }
     my @options;
 
     my $option_name = sub {

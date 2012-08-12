@@ -3,9 +3,6 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Trap;
-use Carp;
-use FindBin qw/$RealBin/;
-use Try::Tiny;
 
 {
 
@@ -13,7 +10,7 @@ use Try::Tiny;
     use strict;
     use warnings;
     use Moo::Role;
-    use MooX::Options;
+    use MooX::Options t => 1;
 
     option 'multi' => ( is => 'rw', doc => 'multi threading mode' );
     1;
@@ -31,7 +28,7 @@ use Try::Tiny;
 
     package testSkipOpt;
     use Moo;
-    use MooX::Options skip_options => [qw/multi/];
+    use MooX::Options skip_options => [qw/multi/], u => 2;
     with 'myRole';
     1;
 }
@@ -57,7 +54,7 @@ use Try::Tiny;
     local @ARGV;
     @ARGV = ('--multi');
     my $opt = testSkipOpt->new_with_options;
-    ok( $opt->multi, 'multi set' );
+    ok( !$opt->multi, 'multi not set' );
     trap {
         $opt->options_usage;
     };
