@@ -19,18 +19,6 @@ use Carp;
 my @OPTIONS_ATTRIBUTES
     = qw/format short repeatable negativable autosplit doc/;
 
-# todo to support multiple role
-# { package $target; sub _option_information { shift->maybe::next::method(@_) } }
-
-    #rename _option_data to _option_data
-    #
-    #20:53
-    #and _option_params to _option_config
-    #20:53
-    #?
-    #20:53
-    #flavour is definitely config
-
 sub import {
     my ( undef, @import ) = @_;
     my $options_config
@@ -225,6 +213,7 @@ You can also use it over a Role.
     {
         package t;
         use Moo;
+        use MooX::Options; #you have to add this, or the role will not find the necessary methods
         with 'tRole';
         1;
     }
@@ -430,6 +419,20 @@ Ex :
     t->verbose # 3
 
 =back
+
+=head1 namespace::clean
+
+To use namespace::clean you need to add 2 methods as an exception. It is use by MooX::Options when you run the new_with_options methods.
+
+    {
+        package t;
+        use Moo;
+        use MooX::Options;
+        use namespace::clean -except => [qw/_options_data _options_config/];
+        option 'v' => (is => 'rw');
+        1;
+    }
+    my $r = t->new_with_options;
 
 =head1 no more Mouse support
 
