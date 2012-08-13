@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+3.3       2012-08-13 10:38:16 Europe/Paris
+
     support for namespace::clean
     fix issue with default value
     move ski_options to the role
