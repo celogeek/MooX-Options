@@ -5,10 +5,6 @@ use Test::Trap;
 
 use Test::More;    # last test to print
 
-BEGIN {
-    plan skip_all => 'Will work soon';
-}
-
 {
 
     package r1Role;
@@ -41,9 +37,7 @@ BEGIN {
 local @ARGV = ('--r1','--r2','--r3');
 my $r;
 
-trap {
-    $r = t->new_with_options;
-};
+$r = t->new_with_options;
 ok($r, 'r is defined');
 if (defined $r) {
     ok($r->can('r1'), 'r1 exists');

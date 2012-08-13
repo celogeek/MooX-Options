@@ -22,6 +22,15 @@ my @OPTIONS_ATTRIBUTES
 # todo to support multiple role
 # { package $target; sub _option_information { shift->maybe::next::method(@_) } }
 
+    #rename _option_meta to _option_data
+    #
+    #20:53
+    #and _option_params to _option_config
+    #20:53
+    #?
+    #20:53
+    #flavour is definitely config
+
 sub import {
     my ( undef, @import ) = @_;
     my $import_options
@@ -32,29 +41,46 @@ sub import {
     my $around = $target->can('around');
     my $has    = $target->can('has');
 
+
+    my @target_isa;
+    { no strict 'refs'; @target_isa = @{"${target}::ISA"} };
+
+    if (@target_isa && !$target->can('_options_meta') && !$target->can('_options_params')) {
+        #don't add this to a role
+        #ISA of a role is always empty !
+        ## no critic qw/ProhibitStringyEval/
+        if(eval '{
+        package '.$target.';
+
+            sub _options_meta {
+                my ( $class, @meta ) = @_;
+                return $class->maybe::next::method(@meta);
+            }
+
+            sub _options_params {
+                my ( $class, @params ) = @_;
+                return $class->maybe::next::method(@params);
+            }
+
+        1;
+        }') {
+            $around->(
+                _options_params => sub {
+                    my ( $orig, $self ) = ( shift, shift );
+                    return $self->$orig(@_), %$import_options;
+                }
+            );
+        } else {
+            croak $@;
+        }
+        ## use critic
+    }
+
     my $options_meta = {};
     my $modifier_done;
     my $apply_modifiers = sub {
         return if $modifier_done;
         $with->('MooX::Options::Role');
-
-        ## no critic qw/ProhibitStringyEval/
-        unless(eval '
-        package '.$target.';
-
-        sub _options_meta {
-            my ( $class, @meta ) = @_;
-            return $class->maybe::next::method(@meta);
-        }
-
-        sub _options_params {
-            my ( $class, @params ) = @_;
-            return $class->maybe::next::method(@params);
-        }
-        ') {
-            croak $@ if $@;
-        }
-        ## use critic
 
         $around->(
             _options_meta => sub {
@@ -62,28 +88,6 @@ sub import {
                 return ( $self->$orig(@_), %$options_meta );
             }
         );
-
-        $around->(
-            _options_params => sub {
-                my ( $orig, $self ) = ( shift, shift );
-                return $self->$orig(@_), %$import_options;
-                #for debug purpose
-                #my @p = $self->$orig(@_);
-                #my @q = %$import_options;
-                #use Carp;
-                #use Data::Dumper;
-                #carp "p:",Dumper \@p;
-                #carp "q:",Dumper \@q;
-                #return @p,@q;
-            }
-        );
-
-        #if ( my $info = $Role::Tiny::INFO{$target} ) {
-        #    for my $sref (qw/meta params/) {
-        #        my $meth = $target->can('_options_' . $sref);
-        #        $info->{not_methods}{$meth} = $meth;
-        #    }
-        #}
 
         $modifier_done = 1;
     };
