@@ -120,7 +120,8 @@ sub parse_options {
     for my $name ( keys %options_data ) {
         my %data = %{ $options_data{$name} };
         if ( !defined $cmdline_params{$name} ) {
-            if ( defined( my $val = $opt->$name() ) ) {
+            my $val = $opt->$name();
+            if ( defined $val ) {
                 $cmdline_params{$name} = $val;
             }
         }
