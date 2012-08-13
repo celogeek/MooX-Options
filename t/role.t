@@ -51,6 +51,7 @@ use Test::Trap;
         "usage method is properly set" );
 }
 {
+    local $TODO = "Role not fully functional ...";
     local @ARGV;
     @ARGV = ('--multi');
     my $opt = testSkipOpt->new_with_options;
