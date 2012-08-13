@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Carp;
 
 eval <<EOF
     package FailureNegativableWithFormat;
@@ -38,6 +39,28 @@ EOF
     like $@,
         qr/^You\scannot\suse\san\soption\swith\sthe\sname\s'$ban',\sit\sis\simplied\sby\sMooX::Options/x,
         "$ban method can't be defined";
+}
+
+{
+    eval <<EOF
+    {
+        package FailureRoleMyRole;
+        use Moo::Role;
+        use MooX::Options;
+        option 't' => (is => 'rw');
+        1;
+    }
+    {
+        package FailureRole;
+        use Moo;
+        with 'FailureRoleMyRole';
+        1;
+    }
+EOF
+    ;
+    like $@,
+    qr/^Can't\sapply\sFailureRoleMyRole\sto\sFailureRole\s-\smissing\s_options_data,\s_options_config/x,
+    "role could only be apply with a MooX::Options ready package"
 }
 
 done_testing;
