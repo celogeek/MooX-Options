@@ -1,5 +1,14 @@
 {{$NEXT}}
 
+    support for namespace::clean
+    fix issue with default value
+    move ski_options to the role
+    move options_meta and options_params to the main package
+    fix role issues
+
+    TODO: make role fully work
+
+
 3.2       2012-08-12 14:41:26 Europe/Paris
 
     add option skip_options to remove option to the terminal
