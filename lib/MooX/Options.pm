@@ -33,7 +33,7 @@ sub import {
     my @target_isa;
     { no strict 'refs'; @target_isa = @{"${target}::ISA"} };
 
-    if (@target_isa && !$target->can('_options_data') && !$target->can('_options_config')) {
+    if (@target_isa) {
         #don't add this to a role
         #ISA of a role is always empty !
         ## no critic qw/ProhibitStringyEval/
