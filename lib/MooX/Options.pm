@@ -62,13 +62,15 @@ sub import {
         $around->(
             _options_params => sub {
                 my ( $orig, $self ) = ( shift, shift );
-                my @p = $self->$orig(@_);
-                my @q = %$import_options;
-                use Carp;
-                use Data::Dumper;
-                carp "p:",Dumper \@p;
-                carp "q:",Dumper \@q;
-                return @p,@q;
+                return $self->$orig(@_), %$import_options;
+                #for debug purpose
+                #my @p = $self->$orig(@_);
+                #my @q = %$import_options;
+                #use Carp;
+                #use Data::Dumper;
+                #carp "p:",Dumper \@p;
+                #carp "q:",Dumper \@q;
+                #return @p,@q;
             }
         );
 
