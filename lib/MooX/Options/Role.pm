@@ -19,6 +19,10 @@ use Getopt::Long::Descriptive 0.091;
 use Regexp::Common;
 use Data::Record;
 
+
+requires qw/_options_data _options_config/;
+
+
 =method new_with_options
 
 Same as new but parse ARGV with L<Getopt::Long::Descriptive>
