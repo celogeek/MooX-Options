@@ -4,7 +4,7 @@ MooX::Options - add option keywords to your object (Mo/Moo/Moose)
 
 # VERSION
 
-version 3.4
+version 3.5
 
 # MooX::Options
 
@@ -78,6 +78,7 @@ You can also use it over a Role.
     {
         package t;
         use Moo;
+        use MooX::Options; #you have to add this, or the role will not find the necessary methods
         with 'tRole';
         1;
     }
@@ -273,6 +274,20 @@ Ex :
     local @ARGV=('-vvv');
     my $t = t->new_with_options;
     t->verbose # 3
+
+# namespace::clean
+
+To use namespace::clean you need to add 2 methods as an exception. It is use by MooX::Options when you run the new\_with\_options methods.
+
+    {
+        package t;
+        use Moo;
+        use MooX::Options;
+        use namespace::clean -except => [qw/_options_data _options_config/];
+        option 'v' => (is => 'rw');
+        1;
+    }
+    my $r = t->new_with_options;
 
 # no more Mouse support
 
