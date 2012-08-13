@@ -38,7 +38,8 @@ sub import {
         return if $modifier_done;
         $with->('MooX::Options::Role');
 
-        eval '
+        ## no critic qw/ProhibitStringyEval/
+        unless(eval '
         package '.$target.';
 
         sub _options_meta {
@@ -50,7 +51,10 @@ sub import {
             my ( $class, @params ) = @_;
             return $class->maybe::next::method(@params);
         }
-        ';
+        ') {
+            croak $@ if $@;
+        }
+        ## use critic
 
         $around->(
             _options_meta => sub {
