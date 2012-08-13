@@ -43,38 +43,38 @@ It is use by "new_with_options".
 ## no critic qw/Modules::ProhibitExcessMainComplexity/
 sub parse_options {
     my ( $class, %params ) = @_;
-    my %metas          = $class->_options_meta;
-    my %options_params = $class->_options_params;
+    my %options_data          = $class->_options_data;
+    my %options_config = $class->_options_config;
     my @skip_options;
-    @skip_options = @{$options_params{skip_options}} if defined $options_params{skip_options};
+    @skip_options = @{$options_config{skip_options}} if defined $options_config{skip_options};
     if ( @skip_options ) {
-        delete @metas{@skip_options};
+        delete @options_data{@skip_options};
     }
     my @options;
 
     my $option_name = sub {
-        my ( $name, %meta ) = @_;
+        my ( $name, %data ) = @_;
         my $cmdline_name = $name;
-        $cmdline_name .= '|' . $meta{short} if defined $meta{short};
-        $cmdline_name .= '+' if $meta{repeatable} && !defined $meta{format};
-        $cmdline_name .= '!' if $meta{negativable};
-        $cmdline_name .= '=' . $meta{format} if defined $meta{format};
+        $cmdline_name .= '|' . $data{short} if defined $data{short};
+        $cmdline_name .= '+' if $data{repeatable} && !defined $data{format};
+        $cmdline_name .= '!' if $data{negativable};
+        $cmdline_name .= '=' . $data{format} if defined $data{format};
         return $cmdline_name;
     };
 
     my %has_to_split;
-    for my $name ( keys %metas ) {
-        my %meta = %{ $metas{$name} };
-        my $doc  = $meta{doc};
+    for my $name ( keys %options_data ) {
+        my %data = %{ $options_data{$name} };
+        my $doc  = $data{doc};
         $doc = "no doc for $name" if !defined $doc;
-        push @options, [ $option_name->( $name, %meta ), $doc ];
+        push @options, [ $option_name->( $name, %data ), $doc ];
         $has_to_split{$name}
             = Data::Record->new(
-            { split => $meta{autosplit}, unless => $RE{quoted} } )
-            if defined $meta{autosplit};
+            { split => $data{autosplit}, unless => $RE{quoted} } )
+            if defined $data{autosplit};
     }
 
-    local @ARGV = @ARGV if $options_params{protect_argv};
+    local @ARGV = @ARGV if $options_config{protect_argv};
     if (%has_to_split) {
         my @new_argv;
 
@@ -98,8 +98,8 @@ sub parse_options {
     }
 
     my @flavour;
-    if ( defined $options_params{flavour} ) {
-        push @flavour, { getopt_conf => $options_params{flavour} };
+    if ( defined $options_config{flavour} ) {
+        push @flavour, { getopt_conf => $options_config{flavour} };
     }
     my ( $opt, $usage )
         = describe_options( ("USAGE: %c %o"), @options,
@@ -113,15 +113,15 @@ sub parse_options {
 
     my @missing_required;
     my %cmdline_params = %params;
-    for my $name ( keys %metas ) {
-        my %meta = %{ $metas{$name} };
+    for my $name ( keys %options_data ) {
+        my %data = %{ $options_data{$name} };
         if ( !defined $cmdline_params{$name} ) {
             if ( defined( my $val = $opt->$name() ) ) {
                 $cmdline_params{$name} = $val;
             }
         }
         push @missing_required, $name
-            if $meta{required} && !defined $cmdline_params{$name};
+            if $data{required} && !defined $cmdline_params{$name};
     }
 
     if (@missing_required) {

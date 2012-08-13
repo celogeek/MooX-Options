@@ -6,7 +6,7 @@ eval q{
     package Foo;
     use Moo;
     use MooX::Options;
-    use namespace::clean -except => [qw/_options_meta _options_params/];
+    use namespace::clean -except => [qw/_options_data _options_config/];
 
     option foo => (is => 'ro', format => 's');
 

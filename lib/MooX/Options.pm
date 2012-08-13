@@ -22,7 +22,7 @@ my @OPTIONS_ATTRIBUTES
 # todo to support multiple role
 # { package $target; sub _option_information { shift->maybe::next::method(@_) } }
 
-    #rename _option_meta to _option_data
+    #rename _option_data to _option_data
     #
     #20:53
     #and _option_params to _option_config
@@ -33,7 +33,7 @@ my @OPTIONS_ATTRIBUTES
 
 sub import {
     my ( undef, @import ) = @_;
-    my $import_options
+    my $options_config
         = { protect_argv => 1, flavour => [], skip_options => [], @import };
 
     my $target = caller;
@@ -45,19 +45,19 @@ sub import {
     my @target_isa;
     { no strict 'refs'; @target_isa = @{"${target}::ISA"} };
 
-    if (@target_isa && !$target->can('_options_meta') && !$target->can('_options_params')) {
+    if (@target_isa && !$target->can('_options_data') && !$target->can('_options_config')) {
         #don't add this to a role
         #ISA of a role is always empty !
         ## no critic qw/ProhibitStringyEval/
         if(eval '{
         package '.$target.';
 
-            sub _options_meta {
+            sub _options_data {
                 my ( $class, @meta ) = @_;
                 return $class->maybe::next::method(@meta);
             }
 
-            sub _options_params {
+            sub _options_config {
                 my ( $class, @params ) = @_;
                 return $class->maybe::next::method(@params);
             }
@@ -65,9 +65,9 @@ sub import {
         1;
         }') {
             $around->(
-                _options_params => sub {
+                _options_config => sub {
                     my ( $orig, $self ) = ( shift, shift );
-                    return $self->$orig(@_), %$import_options;
+                    return $self->$orig(@_), %$options_config;
                 }
             );
         } else {
@@ -76,16 +76,16 @@ sub import {
         ## use critic
     }
 
-    my $options_meta = {};
+    my $options_data = {};
     my $modifier_done;
     my $apply_modifiers = sub {
         return if $modifier_done;
         $with->('MooX::Options::Role');
 
         $around->(
-            _options_meta => sub {
+            _options_data => sub {
                 my ( $orig, $self ) = ( shift, shift );
-                return ( $self->$orig(@_), %$options_meta );
+                return ( $self->$orig(@_), %$options_data );
             }
         );
 
@@ -95,7 +95,7 @@ sub import {
     my $option = sub {
         my ( $name, %attributes ) = @_;
         for my $ban (
-            qw/help option new_with_options parse_options options_usage _options_meta _options_params/
+            qw/help option new_with_options parse_options options_usage _options_data _options_config/
             )
         {
             croak
@@ -105,7 +105,7 @@ sub import {
 
         $has->( $name => _filter_attributes(%attributes) );
 
-        $options_meta->{$name}
+        $options_data->{$name}
             = { _validate_and_filter_options(%attributes) };
 
         $apply_modifiers->();

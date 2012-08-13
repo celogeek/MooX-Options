@@ -22,7 +22,7 @@ like $@,
     "negativable and format are incompatible";
 
 for my $ban (
-    qw/help option new_with_options parse_options options_usage _options_meta _options_params/
+    qw/help option new_with_options parse_options options_usage _options_data _options_config/
     )
 {
     eval <<EOF
