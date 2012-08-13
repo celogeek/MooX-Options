@@ -7,7 +7,7 @@ use Test::More;    # last test to print
 
 {
 
-    package r1;
+    package r1Role;
     use Moo::Role;
     use MooX::Options;
 
@@ -16,7 +16,7 @@ use Test::More;    # last test to print
 }
 {
 
-    package r2;
+    package r2Role;
     use Moo::Role;
     use MooX::Options;
 
@@ -28,7 +28,7 @@ use Test::More;    # last test to print
     package t;
     use Moo;
     use MooX::Options;
-    with 'r1', 'r2';
+    with 'r1Role', 'r2Role';
     option 'r3' => ( is => 'ro' );
     
     1
