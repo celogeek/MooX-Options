@@ -63,4 +63,22 @@ EOF
     "role could only be apply with a MooX::Options ready package"
 }
 
+{
+    eval <<EOF
+    {
+        package t;
+        use Moo;
+        sub _options_data {};
+        sub _options_config {};
+        use MooX::Options;
+        1;
+    }
+EOF
+    ;
+    like $@,
+    qr/^Subroutine\s_options_data\sredefined/x,
+    'redefined methods';
+    ok (!t->can('new_with_options'), 't has crash');
+}
+
 done_testing;

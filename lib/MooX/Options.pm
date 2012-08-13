@@ -37,7 +37,8 @@ sub import {
         #don't add this to a role
         #ISA of a role is always empty !
         ## no critic qw/ProhibitStringyEval/
-        if(eval '{
+        use warnings FATAL => 'redefine';
+        eval '{
         package '.$target.';
 
             sub _options_data {
@@ -51,16 +52,18 @@ sub import {
             }
 
         1;
-        }') {
-            $around->(
-                _options_config => sub {
-                    my ( $orig, $self ) = ( shift, shift );
-                    return $self->$orig(@_), %$options_config;
-                }
-            );
-        } else {
-            croak $@;
-        }
+        }';
+        use warnings FATAL => qw/void/;
+
+        croak $@ if $@;
+
+        $around->(
+            _options_config => sub {
+                my ( $orig, $self ) = ( shift, shift );
+                return $self->$orig(@_), %$options_config;
+            }
+        );
+
         ## use critic
     }
 
