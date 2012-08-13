@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+    working role !
+    fix namespace clean
+    add doc to use it
+
 3.4       2012-08-13 20:34:17 Europe/Paris
 
     disabling failing test
