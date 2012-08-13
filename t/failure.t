@@ -3,12 +3,6 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN {
-    use Module::Load::Conditional qw/check_install/;
-    plan skip_all => 'Need Moo for this test'
-        unless check_install( module => 'Moo' );
-}
-
 eval <<EOF
     package FailureNegativableWithFormat;
     use Moo;

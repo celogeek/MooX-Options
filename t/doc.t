@@ -7,12 +7,6 @@ use Carp;
 use FindBin qw/$RealBin/;
 use Try::Tiny;
 
-BEGIN {
-    use Module::Load::Conditional qw/check_install/;
-    plan skip_all => 'Need Moo for this test'
-        unless check_install( module => 'Moo' );
-}
-
 {
 
     package t;
