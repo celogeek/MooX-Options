@@ -441,11 +441,17 @@ To use namespace::clean you need to add 2 methods as an exception. It is use by 
 
 If you are using Mouse, I'm sorry to say than the rewrite of this module has make it just incompatible. Mouse is not design to by compatible with anything else than Mouse itself. I could just suggest to use Moo instead, which is a great and compatible replacement.
 
+=head1 More examples
+
+L<http://perltalks.celogeek.com/slides/2012/08/moox-options-slide3d.html>
+
 =head1 THANKS
 
 =over
 
 =item Matt S. Trout (mst) <mst@shadowcat.co.uk> : For his patience and advice.
+
+=item Tomas Doran (t0m) <bobtfish@bobtfish.net> : To help me release the new version, and using it :)
 
 =back
 
