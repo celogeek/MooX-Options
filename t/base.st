@@ -60,6 +60,15 @@ subtest "split" => sub {
             "split three arg with autosplit"
         );
     }
+    {
+        local @ARGV = ( '--split', '1', '--split', '2', '--split', '3,4' );
+        my $t = t->new_with_options();
+        is_deeply(
+            $t->split,
+            [ 1, 2, 3, 4 ],
+            "split three arg with autosplit and space"
+        );
+    }
     done_testing();
 };
 

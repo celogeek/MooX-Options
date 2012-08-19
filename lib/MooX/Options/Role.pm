@@ -83,15 +83,19 @@ sub parse_options {
         my @new_argv;
 
         #parse all argv
-        for my $arg (@ARGV) {
+        for my $i (0..$#ARGV) {
+            my $arg = $ARGV[$i];
             my ( $arg_name, $arg_values ) = split( /=/x, $arg, 2 );
             $arg_name =~ s/^--?//x;
+            unless(defined $arg_values) {
+                $arg_values = $ARGV[++$i];
+            }
             if ( my $rec = $has_to_split{$arg_name} ) {
                 foreach my $record ( $rec->records($arg_values) ) {
 
                     #remove the quoted if exist to chain
                     $record =~ s/^['"]|['"]$//gx;
-                    push @new_argv, "--$arg_name=$record";
+                    push @new_argv, "--$arg_name", $record;
                 }
             }
             else {
