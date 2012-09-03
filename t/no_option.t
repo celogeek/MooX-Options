@@ -14,6 +14,6 @@ use Test::More;                      # last test to print
 }
 
 my $p = t->new_with_options;
-ok($p->can('help'), 't has options');
+ok($p, 't has options');
 
 done_testing;

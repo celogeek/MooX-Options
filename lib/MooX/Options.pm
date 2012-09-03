@@ -68,9 +68,8 @@ sub import {
     }
 
     my $options_data = {};
-    my $modifier_done;
     my $apply_modifiers = sub {
-        return if $modifier_done;
+        return if $target->can('new_with_options');
         $with->('MooX::Options::Role');
 
         $around->(
@@ -79,8 +78,6 @@ sub import {
                 return ( $self->$orig(@_), %$options_data );
             }
         );
-
-        $modifier_done = 1;
     };
 
     my $option = sub {
@@ -108,6 +105,8 @@ sub import {
     }
 
     { no strict 'refs'; *{"${target}::option"} = $option; }
+
+    $apply_modifiers->();
 
     return;
 }
