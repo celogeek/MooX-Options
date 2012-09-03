@@ -452,5 +452,7 @@ L<http://perltalks.celogeek.com/slides/2012/08/moox-options-slide3d.html>
 
 =item Tomas Doran (t0m) <bobtfish@bobtfish.net> : To help me release the new version, and using it :)
 
+=item Torsten Raudssus (Getty) : to use it a lot in DuckDuckGo (go to see L<MooX> module also)
+
 =back
 
