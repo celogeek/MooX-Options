@@ -4,7 +4,7 @@ MooX::Options - add option keywords to your object (Mo/Moo/Moose)
 
 # VERSION
 
-version 3.71
+version 3.72
 
 # MooX::Options
 
@@ -20,29 +20,29 @@ You will have "new\_with\_options" to instanciate new object for command line.
 
 The import method can take option :
 
-    - %options
+- %options
     - flavour
 
-    pass extra arguments for Getopt::Long::Descriptive.  it is usefull if you
-    want to configure Getopt::Long.
+        pass extra arguments for Getopt::Long::Descriptive.  it is usefull if you
+        want to configure Getopt::Long.
 
-        use MooX::Options flavour => [qw( pass_through )];
+            use MooX::Options flavour => [qw( pass_through )];
 
-    Any flavour is pass to [Getopt::Long](http://search.cpan.org/perldoc?Getopt::Long) as a configuration, check the doc to see what is possible.
+        Any flavour is pass to [Getopt::Long](http://search.cpan.org/perldoc?Getopt::Long) as a configuration, check the doc to see what is possible.
 
     - protect\_argv
 
-    by default, argv is protected. if you want to do something else on it, use this option and it will change the real argv.
+        by default, argv is protected. if you want to do something else on it, use this option and it will change the real argv.
 
-        use MooX::Options protect_argv => 0;
+            use MooX::Options protect_argv => 0;
 
     - skip\_options
 
-    you can skip some option to remove the possibility to the terminal. in that case, the 'option' keyword will just works like an 'has'.
+        you can skip some option to remove the possibility to the terminal. in that case, the 'option' keyword will just works like an 'has'.
 
-        use MooX::Options skip_options => [qw/multi/];
+            use MooX::Options skip_options => [qw/multi/];
 
-    If you have multiple tools that use the same Role to generate params, you can skip one and force his value. In my example, it could be a multithread option that you want to disabling in some case.
+        If you have multiple tools that use the same Role to generate params, you can skip one and force his value. In my example, it could be a multithread option that you want to disabling in some case.
 
 # USAGE
 
@@ -122,13 +122,13 @@ Params :
 
 - $exit\_code
 
-Exit code after displaying the usage message
+    Exit code after displaying the usage message
 
 - @messages
 
-Additional message to display before the usage message
+    Additional message to display before the usage message
 
-Ex: str is not valid
+    Ex: str is not valid
 
 ## Keyword 'new\_with\_options'
 
@@ -146,134 +146,134 @@ Ex:
 
 - doc
 
-Specified the documentation for the attribute
+    Specified the documentation for the attribute
 
 - documentation
 
-Specified the documentation for the attribute. It is usefull if you chain with other module like [MooseX::App::Cmd](http://search.cpan.org/perldoc?MooseX::App::Cmd) that use this attribute.
+    Specified the documentation for the attribute. It is usefull if you chain with other module like [MooseX::App::Cmd](http://search.cpan.org/perldoc?MooseX::App::Cmd) that use this attribute.
 
-If doc attribute is defined, this one will be ignored.
+    If doc attribute is defined, this one will be ignored.
 
 - required
 
-Specified if the attribute is needed
+    Specified if the attribute is needed
 
 - format
 
-Format of the params. It is the same as [Getopt::Long::Descriptive](http://search.cpan.org/perldoc?Getopt::Long::Descriptive).
+    Format of the params. It is the same as [Getopt::Long::Descriptive](http://search.cpan.org/perldoc?Getopt::Long::Descriptive).
 
-Example :
+    Example :
 
-    i : integer
-    i@: array of integer
-    s : string
-    s@: array of string
-    f : float value
+        i : integer
+        i@: array of integer
+        s : string
+        s@: array of string
+        f : float value
 
-by default, it's a boolean value.
+    by default, it's a boolean value.
 
-Take a look of available format with [Getopt::Long::Descriptive](http://search.cpan.org/perldoc?Getopt::Long::Descriptive).
+    Take a look of available format with [Getopt::Long::Descriptive](http://search.cpan.org/perldoc?Getopt::Long::Descriptive).
 
 - negativable
 
-add the attribute "!" to the name. It will allow negative params.
+    add the attribute "!" to the name. It will allow negative params.
 
-Ex :
+    Ex :
 
-    test --quiet
-    => quiet = 1
+        test --quiet
+        => quiet = 1
 
-    test --quiet --no-quiet
-    => quiet = 0
+        test --quiet --no-quiet
+        => quiet = 0
 
 - repeatable
 
-add the attribute "@" to the name. It will allow repeatable params.
+    add the attribute "@" to the name. It will allow repeatable params.
 
-Ex :
+    Ex :
 
-    test --verbose
-    => verbose = 1
+        test --verbose
+        => verbose = 1
 
-    test --verbose --verbose
-    => verbose = 2
+        test --verbose --verbose
+        => verbose = 2
 
-it is advisable to use a "default" option on the attribute for repeatable
-params so that they behave as arrays "out of the box" when used outside of
-command line context.
+    it is advisable to use a "default" option on the attribute for repeatable
+    params so that they behave as arrays "out of the box" when used outside of
+    command line context.
 
-Ex:
-    {
-        package t;
-        use Moo;
-        use MooX::Options;
+    Ex:
+        {
+            package t;
+            use Moo;
+            use MooX::Options;
 
-        option foo => (is => 'rw', format => 's@', default => sub { [] });
-        option bar => (is => 'rw', format => 'i@', default => sub { [] });
+            option foo => (is => 'rw', format => 's@', default => sub { [] });
+            option bar => (is => 'rw', format => 'i@', default => sub { [] });
+
+            1;
+        }
+
+        # this now works as expected and you will no longer see
+        # "Can't use an undefined value as an ARRAY reference"
+        my $t = t->new_with_options;
+        push @{ $t->foo }, 'abc123';
 
         1;
-    }
-
-    # this now works as expected and you will no longer see
-    # "Can't use an undefined value as an ARRAY reference"
-    my $t = t->new_with_options;
-    push @{ $t->foo }, 'abc123';
-
-    1;
 
 - autosplit
 
-auto split args to generate multiple value. It implie "repeatable".
-autosplit take the separator value, ex: ",".
+    auto split args to generate multiple value. It implie "repeatable".
+    autosplit take the separator value, ex: ",".
 
-Ex :
+    Ex :
 
-    {
-        package t;
-        use Moo;
-        use MooX::Options;
+        {
+            package t;
+            use Moo;
+            use MooX::Options;
 
-        option test => (is => 'ro', format => 'i@', autosplit => ',');
-        #same as : option test => (is => 'ro', format => 'i', autosplit => ',');
-        1;
-    }
+            option test => (is => 'ro', format => 'i@', autosplit => ',');
+            #same as : option test => (is => 'ro', format => 'i', autosplit => ',');
+            1;
+        }
 
-    local @ARGV=('--test=1,2,3,4');
-    my $t = t->new_with_options;
-    t->test # [1,2,3,4]
+        local @ARGV=('--test=1,2,3,4');
+        my $t = t->new_with_options;
+        t->test # [1,2,3,4]
 
-I automatically take the quoted as a group separator value
+    I automatically take the quoted as a group separator value
 
-    {
-        package str;
-        use Moo;
-        use MooX::Options;
-        option test => (is => 'ro', format => 's', repeatable => 1, autosplit => ',');
-        1;
-    }
+        {
+            package str;
+            use Moo;
+            use MooX::Options;
+            option test => (is => 'ro', format => 's', repeatable => 1, autosplit => ',');
+            1;
+        }
 
-    local @ARGV=('--test=a,b,"c,d",e');
-    my $t = str->new_with_options;
-    t->test # ['a','b','c,d','e']
+        local @ARGV=('--test=a,b,"c,d",e');
+        my $t = str->new_with_options;
+        t->test # ['a','b','c,d','e']
 
 - short
 
-give short name of an attribute.
+    give short name of an attribute.
 
-Ex :
+    Ex :
 
-    {
-        package t;
-        use Moo;
-        use MooX::Options;
+        {
+            package t;
+            use Moo;
+            use MooX::Options;
 
-        option 'verbose' => (is => 'ro', repeatable => 1, short => 'v');
+            option 'verbose' => (is => 'ro', repeatable => 1, short => 'v');
 
-        1;
-    }
-    local @ARGV=('-vvv');
-    my $t = t->new_with_options;
-    t->verbose # 3
+            1;
+        }
+        local @ARGV=('-vvv');
+        my $t = t->new_with_options;
+        t->verbose # 3
 
 # namespace::clean
 
@@ -306,7 +306,7 @@ If you are using Mouse, I'm sorry to say than the rewrite of this module has mak
 # BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/celogeek/MooX-Options/issues
+http://tasks.celogeek.com/projects/perl-modules-moox-options
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
