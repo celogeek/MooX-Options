@@ -17,7 +17,7 @@ use Carp;
 
 # VERSION
 my @OPTIONS_ATTRIBUTES
-    = qw/format short repeatable negativable autosplit doc/;
+    = qw/format short repeatable negativable autosplit doc order/;
 
 sub import {
     my ( undef, @import ) = @_;
@@ -121,6 +121,7 @@ sub _filter_attributes {
 sub _validate_and_filter_options {
     my (%options) = @_;
     $options{doc} = $options{documentation} if !defined $options{doc};
+    $options{order} = 0 if !defined $options{order};
 
     my %cmdline_options = map { ( $_ => $options{$_} ) }
         grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
@@ -419,6 +420,10 @@ Ex :
     local @ARGV=('-vvv');
     my $t = t->new_with_options;
     t->verbose # 3
+
+=item order
+
+Specified the order of the attribute.
 
 =back
 
