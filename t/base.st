@@ -183,4 +183,23 @@ subtest "test skip_options" => sub {
     ok ($trap->stdout !~ /\-\-multi/, 'multi is no more an option');
 };
 
+subtest "test dash" => sub {
+    note "test dash";
+    {
+        local @ARGV = ('--start_date=2012-12-12');
+        my $t = t_dash->new_with_options();
+        is( $t->start_date, '2012-12-12', '--start_date ok' );
+    }
+    {
+        local @ARGV = ('--start-date=2012-12-12');
+        my $t = t_dash->new_with_options();
+        is( $t->start_date, '2012-12-12', '--start-date ok' );
+    }
+    {
+        local @ARGV = ('-s2012-12-12');
+        my $t = t_dash->new_with_options();
+        is( $t->start_date, '2012-12-12', '-s ok' );
+    }
+};
+
 1;

@@ -176,6 +176,25 @@ BEGIN {
     1;
 }
 
+{
+
+    package t_dashRole;
+    use Moo::Role;
+    use Mo;
+    use MooX::Options;
+
+    option 'start_date' => ( is => 'ro', dash => 1, format => 's', short => 's' );
+    1;
+}
+{
+
+    package t_dash;
+    use Mo;
+    use Role::Tiny::With;
+    with 't_dashRole';
+    1;
+}
+
 subtest "Mo" => sub {
     note "Test Mo";
     require $RealBin . '/base.st';

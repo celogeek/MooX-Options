@@ -17,7 +17,7 @@ use Carp;
 
 # VERSION
 my @OPTIONS_ATTRIBUTES
-    = qw/format short repeatable negativable autosplit doc order/;
+    = qw/format short repeatable negativable autosplit doc order dash/;
 
 sub import {
     my ( undef, @import ) = @_;
@@ -424,6 +424,25 @@ Ex :
 =item order
 
 Specified the order of the attribute.
+
+=item dash
+
+to support '-' in the name. will auto convert '_' into '-' if it is enabled.
+
+Ex :
+
+    {
+        package t;
+        use Moo;
+        use MooX::Options;
+
+        option 'start_date' => (is => 'ro', format => 's', dash => 1);
+
+        1;
+    }
+    local @ARGV=('--start-date 2012-12-20');
+    my $t = t->new_with_options;
+    t->start_date # 2012-12-20
 
 =back
 

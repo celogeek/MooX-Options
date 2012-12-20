@@ -60,6 +60,10 @@ sub parse_options {
         my ( $name, %data ) = @_;
         my $cmdline_name = $name;
         $cmdline_name .= '|' . $data{short} if defined $data{short};
+        if ($data{dash}) {
+            my $dash_name = $name; $dash_name =~ tr/_/-/;
+            $cmdline_name .= '|' . $dash_name;
+        }
         $cmdline_name .= '+' if $data{repeatable} && !defined $data{format};
         $cmdline_name .= '!' if $data{negativable};
         $cmdline_name .= '=' . $data{format} if defined $data{format};

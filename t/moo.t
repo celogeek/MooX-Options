@@ -94,6 +94,16 @@ use Try::Tiny;
     1;
 }
 
+{
+
+    package t_dash;
+    use Moo;
+    use MooX::Options;
+
+    option 'start_date' => ( is => 'ro', dash => 1, format => 's', short => 's' );
+    1;
+}
+
 subtest "Moo" => sub {
     note "Test Moo";
     require $RealBin . '/base.st';
