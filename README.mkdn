@@ -4,7 +4,7 @@ MooX::Options - add option keywords to your object (Mo/Moo/Moose)
 
 # VERSION
 
-version 3.73
+version 3.74
 
 # MooX::Options
 
@@ -274,6 +274,10 @@ Ex:
         local @ARGV=('-vvv');
         my $t = t->new_with_options;
         t->verbose # 3
+
+- order
+
+    Specified the order of the attribute.
 
 # namespace::clean
 
