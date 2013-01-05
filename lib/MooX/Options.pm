@@ -17,7 +17,7 @@ use Carp;
 
 # VERSION
 my @OPTIONS_ATTRIBUTES
-    = qw/format short repeatable negativable autosplit doc order dash/;
+    = qw/format short repeatable negativable autosplit doc order/;
 
 sub import {
     my ( undef, @import ) = @_;
@@ -425,27 +425,6 @@ Ex :
 
 Specified the order of the attribute.
 
-=item dash
-
-to support '-' in the name. will auto convert '_' into '-' if it is enabled.
-
-Ex :
-
-    {
-        package t;
-        use Moo;
-        use MooX::Options;
-
-        option 'start_date' => (is => 'ro', format => 's', dash => 1);
-
-        1;
-    }
-    local @ARGV=('--start-date 2012-12-20');
-    my $t = t->new_with_options;
-    t->start_date # 2012-12-20
-
-=back
-
 =head1 namespace::clean
 
 To use namespace::clean you need to add 2 methods as an exception. It is use by MooX::Options when you run the new_with_options methods.
@@ -459,6 +438,12 @@ To use namespace::clean you need to add 2 methods as an exception. It is use by 
         1;
     }
     my $r = t->new_with_options;
+
+=head1 dash support
+
+You can call the option with underscore or dash in the name.
+
+For example, --start-date or --start_date will fill the option 'start_date'.
 
 =head1 no more Mouse support
 

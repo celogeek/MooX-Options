@@ -106,7 +106,7 @@ BEGIN {
     use Moose;
     use MooX::Options;
 
-    option 'start_date' => ( is => 'ro', dash => 1, format => 's', short => 's' );
+    option 'start_date' => ( is => 'ro', format => 's', short => 's' );
     1;
 }
 
