@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+    Support for prefered commandline (Tom Lanyon)
+
 3.77      2013-01-05 18:23:49 Europe/Paris
 
     Support for dash in option
