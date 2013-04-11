@@ -178,6 +178,24 @@ BEGIN {
 
 {
 
+    package t_prefer_cliRole;
+    use Moo::Role;
+    use Mo;
+    use MooX::Options prefer_commandline => 1;
+
+    option 't' => ( is => 'ro', format => 's' );
+    1;
+}
+{
+    package t_prefer_cli;
+    use Mo;
+    use Role::Tiny::With;
+    with 't_prefer_cliRole';
+    1;
+}
+
+{
+
     package t_dashRole;
     use Moo::Role;
     use Mo;

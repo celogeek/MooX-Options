@@ -134,7 +134,7 @@ sub parse_options {
     my %cmdline_params = %params;
     for my $name ( keys %options_data ) {
         my %data = %{ $options_data{$name} };
-        if ( !defined $cmdline_params{$name} ) {
+        if ( !defined $cmdline_params{$name} || $options_config{prefer_commandline}) {
             my $val = $opt->$name();
             if ( defined $val ) {
                 $cmdline_params{$name} = $val;

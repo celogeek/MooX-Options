@@ -96,6 +96,16 @@ use Try::Tiny;
 
 {
 
+    package t_prefer_cli;
+    use Moo;
+    use MooX::Options prefer_commandline => 1;
+
+    option 't' => ( is => 'ro', format => 's' );
+    1;
+}
+
+{
+
     package t_dash;
     use Moo;
     use MooX::Options;

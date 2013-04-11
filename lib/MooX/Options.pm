@@ -22,7 +22,10 @@ my @OPTIONS_ATTRIBUTES
 sub import {
     my ( undef, @import ) = @_;
     my $options_config
-        = { protect_argv => 1, flavour => [], skip_options => [], @import };
+        = { protect_argv => 1, flavour => [],
+            skip_options => [], prefer_commandline => 0,
+            @import
+          };
 
     my $target = caller;
     my $with   = $target->can('with');
@@ -177,6 +180,25 @@ you can skip some option to remove the possibility to the terminal. in that case
     use MooX::Options skip_options => [qw/multi/];
 
 If you have multiple tools that use the same Role to generate params, you can skip one and force his value. In my example, it could be a multithread option that you want to disabling in some case.
+
+=item prefer_commandline
+
+By default, arguments to L<new_with_options()|/"Keyword 'new_with_options'"> are used in preference of items provided via command line options.
+
+You may enable the L</prefer_commandline> option to reverse this behaviour;  this allows you to provide some default values to L<new_with_options()|/"Keyword 'new_with_options'"> and override them on the command line.
+
+    {
+        package t;
+        use Moo;
+        use MooX::Options prefer_commandline => 1;
+
+        option 'test' => (is => 'ro');
+
+        1;
+    }
+
+    # parse ARGV for options but default to those provided here
+    my $t = t->new_with_options( test => 'default' );
 
 =back
 

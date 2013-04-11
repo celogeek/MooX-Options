@@ -183,6 +183,15 @@ subtest "test skip_options" => sub {
     ok ($trap->stdout !~ /\-\-multi/, 'multi is no more an option');
 };
 
+subtest "test prefer_commandline" => sub {
+    note "test prefer_commandline";
+    {
+        local @ARGV = ('--t=override');
+        my $t = t_prefer_cli->new_with_options( t => 'default value' );
+        is( $t->t, 'override', 'prefer_commandline ok' );
+    }
+};
+
 subtest "test dash" => sub {
     note "test dash";
     {
