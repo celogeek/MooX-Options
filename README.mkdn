@@ -4,7 +4,7 @@ MooX::Options - add option keywords to your object (Mo/Moo/Moose)
 
 # VERSION
 
-version 3.77
+version 3.78
 
 # MooX::Options
 
@@ -43,6 +43,25 @@ The import method can take option :
             use MooX::Options skip_options => [qw/multi/];
 
         If you have multiple tools that use the same Role to generate params, you can skip one and force his value. In my example, it could be a multithread option that you want to disabling in some case.
+
+    - prefer\_commandline
+
+        By default, arguments to [new\_with\_options()](#Keyword 'new\_with\_options') are used in preference of items provided via command line options.
+
+        You may enable the ["prefer\_commandline"](#prefer\_commandline) option to reverse this behaviour;  this allows you to provide some default values to [new\_with\_options()](#Keyword 'new\_with\_options') and override them on the command line.
+
+            {
+                package t;
+                use Moo;
+                use MooX::Options prefer_commandline => 1;
+
+                option 'test' => (is => 'ro');
+
+                1;
+            }
+
+            # parse ARGV for options but default to those provided here
+            my $t = t->new_with_options( test => 'default' );
 
 # USAGE
 
