@@ -17,7 +17,7 @@ use Carp;
 
 # VERSION
 my @OPTIONS_ATTRIBUTES
-    = qw/format short repeatable negativable autosplit doc order/;
+    = qw/format short repeatable negativable autosplit doc order json/;
 
 sub import {
     my ( undef, @import ) = @_;
@@ -126,8 +126,16 @@ sub _validate_and_filter_options {
     $options{doc} = $options{documentation} if !defined $options{doc};
     $options{order} = 0 if !defined $options{order};
 
+    if ($options{json}) {
+        delete $options{repeatable};
+        delete $options{autosplit};
+        delete $options{negativable};
+        $options{format} = 's';
+    }
+
     my %cmdline_options = map { ( $_ => $options{$_} ) }
         grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
+
 
     $cmdline_options{repeatable} = 1 if $cmdline_options{autosplit};
     $cmdline_options{format} .= "@"
@@ -446,6 +454,27 @@ Ex :
 =item order
 
 Specified the order of the attribute.
+
+The order value is an integer.
+
+=item json
+
+The parameter will be treat like a json string.
+
+Ex :
+
+    {
+        package t;
+        use Moo;
+        use MooX::Options;
+
+        option 'hash' => (is => 'ro', json => 1);
+
+        1;
+    }
+    local @ARGV=('--hash', '{"a":1,"b":2}');
+    my $t = t->new_with_options;
+    t->hash # { a => 1, b => 2 }
 
 =head1 namespace::clean
 
