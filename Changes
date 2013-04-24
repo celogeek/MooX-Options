@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+    * Feature #192 : support json mode (Celogeek San)
+
 3.78      2013-04-12 01:16:12 Europe/Paris
 
     Support for prefered commandline (Tom Lanyon)

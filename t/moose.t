@@ -121,6 +121,16 @@ BEGIN {
     1;
 }
 
+{
+
+    package t_json;
+    use Moose;
+    use MooX::Options;
+
+    option 't' => ( is => 'ro', json => 1 );
+    1;
+}
+
 subtest "Moose" => sub {
     note "Test Moose";
     require $RealBin . '/base.st';

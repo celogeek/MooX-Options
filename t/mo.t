@@ -213,9 +213,30 @@ BEGIN {
     1;
 }
 
+{
+    package t_jsonRole;
+    use Moo::Role;
+    use Mo;
+    use MooX::Options;
+
+    option 't' => ( is => 'ro', json => 1 );
+    1;
+
+}
+
+{
+
+    package t_json;
+    use Mo;
+    use Role::Tiny::With;
+    with 't_jsonRole';
+    1;
+}
+
 subtest "Mo" => sub {
     note "Test Mo";
     require $RealBin . '/base.st';
 };
+
 
 done_testing;
