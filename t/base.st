@@ -211,4 +211,13 @@ subtest "test dash" => sub {
     }
 };
 
+subtest "json" => sub {
+    note "json";
+    {
+        local @ARGV = ("--t", "{\"a\":1,\"b\":2}");
+        my $t = t_json->new_with_options();
+        is_deeply($t->t, {a => 1, b => 2}, 'json properly set');
+    }
+};
+
 1;

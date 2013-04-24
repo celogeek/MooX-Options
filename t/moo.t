@@ -114,6 +114,16 @@ use Try::Tiny;
     1;
 }
 
+{
+
+    package t_json;
+    use Moo;
+    use MooX::Options;
+
+    option 't' => ( is => 'ro', json => 1 );
+    1;
+}
+
 subtest "Moo" => sub {
     note "Test Moo";
     require $RealBin . '/base.st';
