@@ -4,7 +4,7 @@ MooX::Options - add option keywords to your object (Mo/Moo/Moose)
 
 # VERSION
 
-version 3.78
+version 3.79
 
 # MooX::Options
 
@@ -297,6 +297,27 @@ Ex:
 - order
 
     Specified the order of the attribute.
+
+    The order value is an integer.
+
+- json
+
+    The parameter will be treat like a json string.
+
+    Ex :
+
+        {
+            package t;
+            use Moo;
+            use MooX::Options;
+
+            option 'hash' => (is => 'ro', json => 1);
+
+            1;
+        }
+        local @ARGV=('--hash', '{"a":1,"b":2}');
+        my $t = t->new_with_options;
+        t->hash # { a => 1, b => 2 }
 
     # namespace::clean
 
