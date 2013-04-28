@@ -476,6 +476,8 @@ Ex :
     my $t = t->new_with_options;
     t->hash # { a => 1, b => 2 }
 
+=back
+
 =head1 namespace::clean
 
 To use namespace::clean you need to add 2 methods as an exception. It is use by MooX::Options when you run the new_with_options methods.
