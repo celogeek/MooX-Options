@@ -4,7 +4,7 @@ MooX::Options - add option keywords to your object (Mo/Moo/Moose)
 
 # VERSION
 
-version 3.79
+version 3.80
 
 # MooX::Options
 
@@ -319,56 +319,56 @@ Ex:
         my $t = t->new_with_options;
         t->hash # { a => 1, b => 2 }
 
-    # namespace::clean
+# namespace::clean
 
-    To use namespace::clean you need to add 2 methods as an exception. It is use by MooX::Options when you run the new\_with\_options methods.
+To use namespace::clean you need to add 2 methods as an exception. It is use by MooX::Options when you run the new\_with\_options methods.
 
-        {
-            package t;
-            use Moo;
-            use MooX::Options;
-            use namespace::clean -except => [qw/_options_data _options_config/];
-            option 'v' => (is => 'rw');
-            1;
-        }
-        my $r = t->new_with_options;
+    {
+        package t;
+        use Moo;
+        use MooX::Options;
+        use namespace::clean -except => [qw/_options_data _options_config/];
+        option 'v' => (is => 'rw');
+        1;
+    }
+    my $r = t->new_with_options;
 
-    # dash support
+# dash support
 
-    You can call the option with underscore or dash in the name.
+You can call the option with underscore or dash in the name.
 
-    For example, --start-date or --start\_date will fill the option 'start\_date'.
+For example, --start-date or --start\_date will fill the option 'start\_date'.
 
-    # no more Mouse support
+# no more Mouse support
 
-    If you are using Mouse, I'm sorry to say than the rewrite of this module has make it just incompatible. Mouse is not design to by compatible with anything else than Mouse itself. I could just suggest to use Moo instead, which is a great and compatible replacement.
+If you are using Mouse, I'm sorry to say than the rewrite of this module has make it just incompatible. Mouse is not design to by compatible with anything else than Mouse itself. I could just suggest to use Moo instead, which is a great and compatible replacement.
 
-    # More examples
+# More examples
 
-    [http://perltalks.celogeek.com/slides/2012/08/moox-options-slide3d.html](http://perltalks.celogeek.com/slides/2012/08/moox-options-slide3d.html)
+[http://perltalks.celogeek.com/slides/2012/08/moox-options-slide3d.html](http://perltalks.celogeek.com/slides/2012/08/moox-options-slide3d.html)
 
-    # THANKS
+# THANKS
 
-    - Matt S. Trout (mst) <mst@shadowcat.co.uk> : For his patience and advice.
-    - Tomas Doran (t0m) <bobtfish@bobtfish.net> : To help me release the new version, and using it :)
-    - Torsten Raudssus (Getty) : to use it a lot in [DuckDuckGo](http://duckduckgo.com) (go to see [MooX](http://search.cpan.org/perldoc?MooX) module also)
+- Matt S. Trout (mst) <mst@shadowcat.co.uk> : For his patience and advice.
+- Tomas Doran (t0m) <bobtfish@bobtfish.net> : To help me release the new version, and using it :)
+- Torsten Raudssus (Getty) : to use it a lot in [DuckDuckGo](http://duckduckgo.com) (go to see [MooX](http://search.cpan.org/perldoc?MooX) module also)
 
-    # BUGS
+# BUGS
 
-    Please report any bugs or feature requests on the bugtracker website
-    http://tasks.celogeek.com/projects/perl-modules-moox-options
+Please report any bugs or feature requests on the bugtracker website
+http://tasks.celogeek.com/projects/perl-modules-moox-options
 
-    When submitting a bug or request, please include a test-file or a
-    patch to an existing test-file that illustrates the bug or desired
-    feature.
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
-    # AUTHOR
+# AUTHOR
 
-    celogeek <me@celogeek.com>
+celogeek <me@celogeek.com>
 
-    # COPYRIGHT AND LICENSE
+# COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2011 by celogeek <me@celogeek.com>.
+This software is copyright (c) 2011 by celogeek <me@celogeek.com>.
 
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
