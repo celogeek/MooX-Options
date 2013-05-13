@@ -4,7 +4,7 @@ MooX::Options - add option keywords to your object (Mo/Moo/Moose)
 
 # VERSION
 
-version 3.80
+version 3.83
 
 # MooX::Options
 
@@ -356,7 +356,7 @@ If you are using Mouse, I'm sorry to say than the rewrite of this module has mak
 # BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://tasks.celogeek.com/projects/perl-modules-moox-options
+https://tasks.celogeek.com/projects/perl-modules-moox-options
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
