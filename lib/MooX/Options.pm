@@ -398,7 +398,7 @@ Ex:
 
 =item autosplit
 
-auto split args to generate multiple value. It implie "repeatable".
+auto split args to generate multiple value. It implies "repeatable".
 autosplit take the separator value, ex: ",".
 
 Ex :
@@ -415,7 +415,7 @@ Ex :
 
     local @ARGV=('--test=1,2,3,4');
     my $t = t->new_with_options;
-    t->test # [1,2,3,4]
+    $t->test; # [1,2,3,4]
 
 
 I automatically take the quoted as a group separator value
@@ -430,7 +430,7 @@ I automatically take the quoted as a group separator value
 
     local @ARGV=('--test=a,b,"c,d",e');
     my $t = str->new_with_options;
-    t->test # ['a','b','c,d','e']
+    $t->test; # ['a','b','c,d','e']
 
 =item short
 
@@ -449,7 +449,7 @@ Ex :
     }
     local @ARGV=('-vvv');
     my $t = t->new_with_options;
-    t->verbose # 3
+    $t->verbose; # 3
 
 =item order
 
@@ -474,7 +474,7 @@ Ex :
     }
     local @ARGV=('--hash', '{"a":1,"b":2}');
     my $t = t->new_with_options;
-    t->hash # { a => 1, b => 2 }
+    $t->hash; # { a => 1, b => 2 }
 
 =back
 
