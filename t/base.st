@@ -137,6 +137,29 @@ subtest "split_complexe_str" => sub {
     done_testing();
 };
 
+subtest "split_complexe_str_short" => sub {
+    note "split on complexe str short";
+    TODO: {
+        local $TODO = 'short and autosplit';
+        local @ARGV = ("-z=a");
+        my $t = sp_str_short->new_with_options();
+        is_deeply( $t->split_str, [qw/a/], 'str req is ok' );
+    }
+    TODO: {
+        local $TODO = 'short and autosplit';
+        local @ARGV = ("-z=a,b,c");
+        my $t = sp_str_short->new_with_options();
+        is_deeply( $t->split_str, [qw/a b c/], 'str req is ok' );
+    }
+    TODO: {
+        local $TODO = 'short and autosplit';
+        local @ARGV = ('-z=a,"b,c",d');
+        my $t = sp_str_short->new_with_options();
+        is_deeply( $t->split_str, [ 'a', 'b,c', 'd' ], 'str req is ok' );
+    }
+    done_testing();
+};
+
 subtest "split_str_shorter_name" => sub {
     note "split_str_shorter_name";
     TODO: {

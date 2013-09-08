@@ -47,6 +47,17 @@ use Try::Tiny;
 
 {
 
+    package sp_str_short;
+    use Moo;
+    use MooX::Options;
+
+    option 'split_str' => ( is => 'ro', format => 's', autosplit => ",", short => 'z' );
+
+    1;
+}
+
+{
+
     package d;
     use Moo;
     use MooX::Options;
