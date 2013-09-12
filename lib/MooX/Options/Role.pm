@@ -19,7 +19,6 @@ use Getopt::Long::Descriptive 0.091;
 use Regexp::Common;
 use Data::Record;
 use JSON;
-use Carp;
 
 requires qw/_options_data _options_config/;
 
@@ -92,11 +91,7 @@ sub parse_options {
             }
             for(my $i=1; $i < length($name); $i++) {
                 my $long_short = substr($name, 0, $i);
-                if (exists $has_to_split{"--${long_short}"}) {
-                    $has_to_split{"--${long_short}"} = "Please be more specific !";
-                } else {
-                    $has_to_split{"--${long_short}"} = $has_to_split{"--${name}"};
-                }
+                $has_to_split{"--${long_short}"} = $has_to_split{"--${name}"};
             }
         }
     }
@@ -113,9 +108,7 @@ sub parse_options {
                 $arg_values = $ARGV[++$i];
             }
             if ( my $rec = $has_to_split{$arg_name} ) {
-                croak $rec if defined $rec && ! ref $rec;
                 foreach my $record ( $rec->records($arg_values) ) {
-
                     #remove the quoted if exist to chain
                     $record =~ s/^['"]|['"]$//gx;
                     push @new_argv, $arg_name, $record;
