@@ -137,6 +137,44 @@ subtest "split_complexe_str" => sub {
     done_testing();
 };
 
+subtest "split_complexe_str_short" => sub {
+    note "split on complexe str short";
+    {
+        local @ARGV = ("-z=a");
+        my $t = sp_str_short->new_with_options();
+        is_deeply( $t->split_str, [qw/a/], 'str req is ok' );
+    }
+    {
+        local @ARGV = ("-z=a,b,c");
+        my $t = sp_str_short->new_with_options();
+        is_deeply( $t->split_str, [qw/a b c/], 'str req is ok' );
+    }
+    {
+        local @ARGV = ('-z=a,"b,c",d');
+        my $t = sp_str_short->new_with_options();
+        is_deeply( $t->split_str, [ 'a', 'b,c', 'd' ], 'str req is ok' );
+    }
+    done_testing();
+};
+
+subtest "split_str_shorter_name" => sub {
+    note "shorter long split";
+    {
+        local @ARGV = ("--split_st=a,b,c");
+        my $t = sp_str->new_with_options();
+        is_deeply( $t->split_str, [qw/a b c/], 'str req is ok' );
+    }
+    note "shorter long split with conflict";
+    {
+        local @ARGV = ("--split_co=a,b,c");
+        trap {
+            sp_str->new_with_options();
+        };
+        ok $trap->stderr =~ qr/Option\ssplit_co\sis\sambiguous/, 'conflict detected';
+    }
+    done_testing();
+};
+
 subtest "should_die_ok" => sub {
     note "Test chain method";
     try {
