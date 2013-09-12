@@ -90,15 +90,14 @@ sub parse_options {
             if (my $short = $data{short}) {
                 $has_to_split{"-${short}"} = $has_to_split{"--${name}"};
             }
-           for(my $i=1; $i < length($name); $i++) {
-               my $long_short = substr($name, 0, $i);
-               if (exists $has_to_split{"--${long_short}"}) {
-                   $has_to_split{"--${long_short}"} = "Please be more specific !";
-               } else {
-                   $has_to_split{"--${long_short}"} = $has_to_split{"--${name}"};
-               }
-           }
-        
+            for(my $i=1; $i < length($name); $i++) {
+                my $long_short = substr($name, 0, $i);
+                if (exists $has_to_split{"--${long_short}"}) {
+                    $has_to_split{"--${long_short}"} = "Please be more specific !";
+                } else {
+                    $has_to_split{"--${long_short}"} = $has_to_split{"--${name}"};
+                }
+            }
         }
     }
 
