@@ -47,6 +47,8 @@ BEGIN {
     use MooX::Options;
 
     option 'split_str' => ( is => 'ro', format => 's', autosplit => "," );
+    option 'split_conflict_str1' => ( is => 'ro', format => 's', autosplit => "," );
+    option 'split_conflict_str2' => ( is => 'ro', format => 's', autosplit => "," );
 
     1;
 }
