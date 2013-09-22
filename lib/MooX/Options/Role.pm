@@ -74,13 +74,13 @@ sub parse_options {
     };
 
     my %format_doc = (
-        's'  => 'String',
+        's'  => ' String',
         's@' => '[Strings]',
-        'i'  => 'Int',
+        'i'  => ' Int',
         'i@' => '[Ints]',
-        'o'  => 'Ext. Int',
+        'o'  => ' Ext. Int',
         'o@' => '[Ext. Ints]',
-        'f'  => 'Real',
+        'f'  => ' Real',
         'f@' => '[Reals]',
     );
 
@@ -92,9 +92,10 @@ sub parse_options {
         my %data = %{ $options_data{$name} };
         my $doc  = $data{doc};
         $doc = "no doc for $name" if !defined $doc;
-        if (defined $data{format} && defined (my $format_doc_str = $format_doc{$data{format}})) {
-            $doc .= ', Format:  ' . $format_doc_str;
-        }
+        my $format_doc_str = $data{format} // ' None';
+        $format_doc_str = $format_doc{$format_doc_str} if defined $format_doc{$format_doc_str};
+        $doc = "( " . sprintf("%-11s", $format_doc_str) . " ), " . $doc;
+
         push @options, [ $option_name->( $name, %data ), $doc ];
         if (defined $data{autosplit}) {
             $has_to_split{"--${name}"}
