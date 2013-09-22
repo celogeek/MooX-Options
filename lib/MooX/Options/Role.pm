@@ -73,6 +73,17 @@ sub parse_options {
         return $cmdline_name;
     };
 
+    my %format_doc = (
+        's'  => 'String',
+        's@' => '[Strings]',
+        'i'  => 'Int',
+        'i@' => '[Ints]',
+        'o'  => 'Ext. Int',
+        'o@' => '[Ext. Ints]',
+        'f'  => 'Real',
+        'f@' => '[Reals]',
+    );
+
     my %has_to_split;
     for my $name (sort {
                       $options_data{$a}{order} <=> $options_data{$b}{order} # sort by order
@@ -81,6 +92,9 @@ sub parse_options {
         my %data = %{ $options_data{$name} };
         my $doc  = $data{doc};
         $doc = "no doc for $name" if !defined $doc;
+        if (defined $data{format} && defined (my $format_doc_str = $format_doc{$data{format}})) {
+            $doc .= ', Format:  ' . $format_doc_str;
+        }
         push @options, [ $option_name->( $name, %data ), $doc ];
         if (defined $data{autosplit}) {
             $has_to_split{"--${name}"}
