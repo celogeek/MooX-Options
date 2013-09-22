@@ -65,19 +65,19 @@ use Try::Tiny;
 {
     my $opt = t->new_with_options;
     trap { $opt->options_usage };
-    ok $trap->stdout =~ /\s+\-t\s+this\sis\sa\stest/x, 'documentation work';
+    ok $trap->stdout =~ /\s+\-t.*this\sis\sa\stest/x, 'documentation work';
 }
 
 {
     my $opt = t1->new_with_options;
     trap { $opt->options_usage };
-    ok $trap->stdout =~ /\s+\-t\s+this\spass\sfirst/x, 'doc pass first';
+    ok $trap->stdout =~ /\s+\-t.*this\spass\sfirst/x, 'doc pass first';
 }
 
 {
     my $opt = t2->new_with_options;
     trap { $opt->options_usage };
-    ok $trap->stdout =~ /\s+\-t\s+this\spass\sfirst/x, 'doc pass first';
+    ok $trap->stdout =~ /\s+\-t.*this\spass\sfirst/x, 'doc pass first';
 }
 
 done_testing;

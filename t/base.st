@@ -195,7 +195,7 @@ subtest "test usage" => sub {
         'custom message is really present'
     );
     ok( $trap->stdout =~ /help.*show this help message/, 'help is present' );
-    ok( $trap->stdout =~ /split_str.*no doc for split_str/,
+    ok( $trap->stdout =~ /split_str.*no\n.*doc for split_str/,
         'attr no doc is present' );
 };
 
