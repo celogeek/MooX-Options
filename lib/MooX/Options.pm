@@ -231,6 +231,37 @@ You may enable the L</prefer_commandline> option to reverse this behaviour;  thi
     # parse ARGV for options but default to those provided here
     my $t = t->new_with_options( test => 'default' );
 
+=item with_config_from_file
+
+Add to command line 'config_files' and 'config_prefix' from L<MooX::ConfigFromFile>.
+
+This will allow you to pass params from command line or from config file (next priority), to your module.
+
+    Your script : MyPackage
+    {
+        package t;
+        use Moo;
+        use MooX::Options with_config_from_file => 1;
+
+        option 'test' => (is => 'ro');
+
+        1;
+    }
+
+    In /etc/MyPackage.json
+    {
+        "test" : 1
+    }
+
+    my $t = t->new_with_options( );
+    $t->test # 1
+    
+    {
+        local @ARGS = '--test 2';
+        $t = t->new_with_options();
+        $t->test # 2
+    }
+
 =back
 
 =back
@@ -538,6 +569,8 @@ L<http://perltalks.celogeek.com/slides/2012/08/moox-options-slide3d.html>
 =item Tomas Doran (t0m) <bobtfish@bobtfish.net> : To help me release the new version, and using it :)
 
 =item Torsten Raudssus (Getty) : to use it a lot in L<DuckDuckGo|http://duckduckgo.com> (go to see L<MooX> module also)
+
+=item Jens Rehsack (REHSACK) : to purpose the with_config_from_file idea for PKGSRC.
 
 =back
 
