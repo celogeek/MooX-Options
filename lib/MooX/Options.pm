@@ -23,7 +23,7 @@ sub import {
     my ( undef, @import ) = @_;
     my $options_config
         = { protect_argv => 1, flavour => [],
-            skip_options => [], prefer_commandline => 0,
+            skip_options => [], prefer_commandline => 0, with_config_from_file => 0,
             @import
           };
 
@@ -68,12 +68,32 @@ sub import {
         );
 
         ## use critic
+    } else {
+        if ($options_config->{with_config_from_file}) {
+            croak 'Please, don\'t use the option <with_config_from_file> into a role.';
+        }
     }
 
     my $options_data = {};
+    if ($options_config->{with_config_from_file}) {
+        $options_data->{config_prefix} = {
+            format => 's',
+            doc => 'config prefix',
+            order => 0,
+        };
+        $options_data->{config_files} = {
+            format => 's@',
+            doc => 'config files',
+            order => 0,
+        };
+    }
+
     my $apply_modifiers = sub {
         return if $target->can('new_with_options');
         $with->('MooX::Options::Role');
+        if ($options_config->{with_config_from_file}) {
+            $with->('MooX::ConfigFromFile::Role');
+        }
 
         $around->(
             _options_data => sub {

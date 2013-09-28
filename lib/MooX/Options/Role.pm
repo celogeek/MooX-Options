@@ -19,9 +19,9 @@ use Getopt::Long::Descriptive 0.091;
 use Regexp::Common;
 use Data::Record;
 use JSON;
+use Carp;
 
 requires qw/_options_data _options_config/;
-
 
 =method new_with_options
 
@@ -33,7 +33,17 @@ Check full doc L<MooX::Options> for more details.
 
 sub new_with_options {
     my ( $class, @params ) = @_;
-    return $class->new( $class->parse_options(@params) );
+    my $self;
+    return $self if eval{$self = $class->new($class->parse_options(@params)); 1};
+    if ($@ =~ /^Attribute\s\((.*?)\)\sis\srequired/x) {
+        print "$1 is missing\n";
+    } elsif($@ =~ /^Missing\srequired\sarguments:\s(.*)\sat\s\(/x) {
+        my @missing_required = split /,\s/x, $1;
+        print join( "\n", ( map { $_ . " is missing" } @missing_required ), '' );
+    } else {
+        croak $@;
+    }
+    return $class->parse_options( help => 1 );
 }
 
 =method parse_options
@@ -150,7 +160,6 @@ sub parse_options {
         exit($exit_code);
     }
 
-    my @missing_required;
     my %cmdline_params = %params;
     for my $name ( keys %options_data ) {
         my %data = %{ $options_data{$name} };
@@ -164,15 +173,6 @@ sub parse_options {
                 }
             }
         }
-        push @missing_required, $name
-            if $data{required} && !defined $cmdline_params{$name};
-    }
-
-    if (@missing_required) {
-        print join( "\n", ( map { $_ . " is missing" } @missing_required ),
-            '' );
-        print $usage, "\n";
-        exit(1);
     }
 
     return %cmdline_params;
