@@ -11,7 +11,7 @@ use Try::Tiny;
 BEGIN {
     use Module::Load::Conditional qw/check_install/;
     plan skip_all => 'Need Mo for this test'
-        unless check_install( module => 'Mo' );
+      unless check_install( module => 'Mo' );
 }
 
 {
@@ -67,9 +67,11 @@ BEGIN {
     use Mo;
     use MooX::Options;
 
-    option 'split_str'           => ( is => 'ro', format => 's', autosplit => "," );
-    option 'split_conflict_str1' => ( is => 'ro', format => 's', autosplit => "," );
-    option 'split_conflict_str2' => ( is => 'ro', format => 's', autosplit => "," );
+    option 'split_str' => ( is => 'ro', format => 's', autosplit => "," );
+    option 'split_conflict_str1' =>
+      ( is => 'ro', format => 's', autosplit => "," );
+    option 'split_conflict_str2' =>
+      ( is => 'ro', format => 's', autosplit => "," );
 
     1;
 }
@@ -90,7 +92,8 @@ BEGIN {
     use Mo;
     use MooX::Options;
 
-    option 'split_str' => ( is => 'ro', format => 's', autosplit => ",", short => 'z' );
+    option 'split_str' =>
+      ( is => 'ro', format => 's', autosplit => ",", short => 'z' );
 
     1;
 }
@@ -105,7 +108,6 @@ BEGIN {
 }
 
 
-
 {
 
     package dRole;
@@ -113,7 +115,7 @@ BEGIN {
     use Mo 'coerce';
     use MooX::Options;
     option 'should_die_ok' =>
-        ( is => 'ro', coerce => sub { die "this will die ok" } );
+      ( is => 'ro', coerce => sub { die "this will die ok" } );
     1;
 }
 {
@@ -212,6 +214,7 @@ BEGIN {
     1;
 }
 {
+
     package t_prefer_cli;
     use Mo;
     use Role::Tiny::With;
@@ -239,6 +242,7 @@ BEGIN {
 }
 
 {
+
     package t_jsonRole;
     use Moo::Role;
     use Mo;

@@ -19,9 +19,9 @@ use Getopt::Long::Descriptive 0.091;
 use Regexp::Common;
 use Data::Record;
 use JSON;
+use Carp;
 
 requires qw/_options_data _options_config/;
-
 
 =method new_with_options
 
@@ -33,7 +33,21 @@ Check full doc L<MooX::Options> for more details.
 
 sub new_with_options {
     my ( $class, @params ) = @_;
-    return $class->new( $class->parse_options(@params) );
+    my $self;
+    return $self
+      if eval { $self = $class->new( $class->parse_options(@params) ); 1 };
+    if ( $@ =~ /^Attribute\s\((.*?)\)\sis\srequired/x ) {
+        print "$1 is missing\n";
+    }
+    elsif ( $@ =~ /^Missing\srequired\sarguments:\s(.*)\sat\s\(/x ) {
+        my @missing_required = split /,\s/x, $1;
+        print
+          join( "\n", ( map { $_ . " is missing" } @missing_required ), '' );
+    }
+    else {
+        croak $@;
+    }
+    return $class->parse_options( help => 1 );
 }
 
 =method parse_options
@@ -47,11 +61,12 @@ It is use by "new_with_options".
 ## no critic qw/Modules::ProhibitExcessMainComplexity/
 sub parse_options {
     my ( $class, %params ) = @_;
-    my %options_data          = $class->_options_data;
+    my %options_data   = $class->_options_data;
     my %options_config = $class->_options_config;
     my @skip_options;
-    @skip_options = @{$options_config{skip_options}} if defined $options_config{skip_options};
-    if ( @skip_options ) {
+    @skip_options = @{ $options_config{skip_options} }
+      if defined $options_config{skip_options};
+    if (@skip_options) {
         delete @options_data{@skip_options};
     }
     my @options;
@@ -62,8 +77,9 @@ sub parse_options {
         $cmdline_name .= '|' . $data{short} if defined $data{short};
 
         #dash name support
-        my $dash_name = $name; $dash_name =~ tr/_/-/;
-        if ($dash_name ne $name) {
+        my $dash_name = $name;
+        $dash_name =~ tr/_/-/;
+        if ( $dash_name ne $name ) {
             $cmdline_name .= '|' . $dash_name;
         }
 
@@ -85,27 +101,31 @@ sub parse_options {
     );
 
     my %has_to_split;
-    for my $name (sort {
-                      $options_data{$a}{order} <=> $options_data{$b}{order} # sort by order
-                          or $a cmp $b                                      # sort by attr name
-                  } keys %options_data) {
+    for my $name (
+        sort {
+            $options_data{$a}{order}
+              <=> $options_data{$b}{order}    # sort by order
+              or $a cmp $b                    # sort by attr name
+        } keys %options_data
+      )
+    {
         my %data = %{ $options_data{$name} };
         my $doc  = $data{doc};
         $doc = "no doc for $name" if !defined $doc;
         my $format_doc_str = $data{format} // ' None';
-        $format_doc_str = $format_doc{$format_doc_str} if defined $format_doc{$format_doc_str};
-        $doc = "( " . sprintf("%-11s", $format_doc_str) . " ), " . $doc;
+        $format_doc_str = $format_doc{$format_doc_str}
+          if defined $format_doc{$format_doc_str};
+        $doc = "( " . sprintf( "%-11s", $format_doc_str ) . " ), " . $doc;
 
         push @options, [ $option_name->( $name, %data ), $doc ];
-        if (defined $data{autosplit}) {
-            $has_to_split{"--${name}"}
-                = Data::Record->new(
+        if ( defined $data{autosplit} ) {
+            $has_to_split{"--${name}"} = Data::Record->new(
                 { split => $data{autosplit}, unless => $RE{quoted} } );
-            if (my $short = $data{short}) {
+            if ( my $short = $data{short} ) {
                 $has_to_split{"-${short}"} = $has_to_split{"--${name}"};
             }
-            for(my $i=1; $i < length($name); $i++) {
-                my $long_short = substr($name, 0, $i);
+            for ( my $i = 1; $i < length($name); $i++ ) {
+                my $long_short = substr( $name, 0, $i );
                 $has_to_split{"--${long_short}"} = $has_to_split{"--${name}"};
             }
         }
@@ -116,14 +136,15 @@ sub parse_options {
         my @new_argv;
 
         #parse all argv
-        for my $i (0..$#ARGV) {
+        for my $i ( 0 .. $#ARGV ) {
             my $arg = $ARGV[$i];
             my ( $arg_name, $arg_values ) = split( /=/x, $arg, 2 );
-            unless(defined $arg_values) {
-                $arg_values = $ARGV[++$i];
+            unless ( defined $arg_values ) {
+                $arg_values = $ARGV[ ++$i ];
             }
             if ( my $rec = $has_to_split{$arg_name} ) {
                 foreach my $record ( $rec->records($arg_values) ) {
+
                     #remove the quoted if exist to chain
                     $record =~ s/^['"]|['"]$//gx;
                     push @new_argv, $arg_name, $record;
@@ -140,9 +161,10 @@ sub parse_options {
     if ( defined $options_config{flavour} ) {
         push @flavour, { getopt_conf => $options_config{flavour} };
     }
-    my ( $opt, $usage )
-        = describe_options( ("USAGE: %c %o"), @options,
-        [ 'help|h', "show this help message" ], @flavour );
+    my ( $opt, $usage ) = describe_options(
+        ("USAGE: %c %o"), @options,
+        [ 'help|h', "show this help message" ], @flavour
+    );
     if ( $opt->help() || defined $params{help} ) {
         print $usage, "\n";
         my $exit_code = 0;
@@ -150,29 +172,22 @@ sub parse_options {
         exit($exit_code);
     }
 
-    my @missing_required;
     my %cmdline_params = %params;
     for my $name ( keys %options_data ) {
         my %data = %{ $options_data{$name} };
-        if ( !defined $cmdline_params{$name} || $options_config{prefer_commandline}) {
+        if ( !defined $cmdline_params{$name}
+            || $options_config{prefer_commandline} )
+        {
             my $val = $opt->$name();
             if ( defined $val ) {
-                if ($data{json}) {
+                if ( $data{json} ) {
                     $cmdline_params{$name} = decode_json($val);
-                } else {
+                }
+                else {
                     $cmdline_params{$name} = $val;
                 }
             }
         }
-        push @missing_required, $name
-            if $data{required} && !defined $cmdline_params{$name};
-    }
-
-    if (@missing_required) {
-        print join( "\n", ( map { $_ . " is missing" } @missing_required ),
-            '' );
-        print $usage, "\n";
-        exit(1);
     }
 
     return %cmdline_params;

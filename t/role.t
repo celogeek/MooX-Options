@@ -38,7 +38,8 @@ use Test::Trap;
 
     package testSkipOpt;
     use Moo;
-    use MooX::Options skip_options => [qw/multi/], flavour => [qw( pass_through )];
+    use MooX::Options skip_options => [qw/multi/],
+      flavour                      => [qw( pass_through )];
     with 'myRole';
     1;
 }
@@ -58,7 +59,8 @@ use Test::Trap;
         $opt->options_usage;
     };
     ok( $trap->stdout =~ /\-\-multi.*multi\sthreading\smode/x,
-        "usage method is properly set" );
+        "usage method is properly set"
+    );
 }
 {
     local @ARGV;
@@ -75,7 +77,8 @@ use Test::Trap;
         $opt->options_usage;
     };
     ok( $trap->stdout =~ /\-\-multi.*multi\sthreading\smode/x,
-        "usage method is properly set" );
+        "usage method is properly set"
+    );
 }
 {
     local @ARGV;
@@ -86,7 +89,8 @@ use Test::Trap;
         $opt->options_usage;
     };
     ok( $trap->stdout !~ /\-\-multi\s+multi\sthreading\smode/x,
-        "usage method is properly set" );
+        "usage method is properly set"
+    );
 }
 
 done_testing;

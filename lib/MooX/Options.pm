@@ -16,16 +16,17 @@ use warnings;
 use Carp;
 
 # VERSION
-my @OPTIONS_ATTRIBUTES
-    = qw/format short repeatable negativable autosplit doc order json/;
+my @OPTIONS_ATTRIBUTES =
+  qw/format short repeatable negativable autosplit doc order json/;
 
 sub import {
     my ( undef, @import ) = @_;
-    my $options_config
-        = { protect_argv => 1, flavour => [],
-            skip_options => [], prefer_commandline => 0,
-            @import
-          };
+    my $options_config = {
+        protect_argv          => 1,  flavour            => [],
+        skip_options          => [], prefer_commandline => 0,
+        with_config_from_file => 0,
+        @import
+    };
 
     my $target = caller;
     my $with   = $target->can('with');
@@ -37,12 +38,13 @@ sub import {
     { no strict 'refs'; @target_isa = @{"${target}::ISA"} };
 
     if (@target_isa) {
+
         #don't add this to a role
         #ISA of a role is always empty !
         ## no critic qw/ProhibitStringyEval/
         use warnings FATAL => 'redefine';
         eval '{
-        package '.$target.';
+        package ' . $target . ';
 
             sub _options_data {
                 my ( $class, @meta ) = @_;
@@ -69,11 +71,33 @@ sub import {
 
         ## use critic
     }
+    else {
+        if ( $options_config->{with_config_from_file} ) {
+            croak
+              'Please, don\'t use the option <with_config_from_file> into a role.';
+        }
+    }
 
     my $options_data = {};
+    if ( $options_config->{with_config_from_file} ) {
+        $options_data->{config_prefix} = {
+            format => 's',
+            doc    => 'config prefix',
+            order  => 0,
+        };
+        $options_data->{config_files} = {
+            format => 's@',
+            doc    => 'config files',
+            order  => 0,
+        };
+    }
+
     my $apply_modifiers = sub {
         return if $target->can('new_with_options');
         $with->('MooX::Options::Role');
+        if ( $options_config->{with_config_from_file} ) {
+            $with->('MooX::ConfigFromFile::Role');
+        }
 
         $around->(
             _options_data => sub {
@@ -83,21 +107,24 @@ sub import {
         );
     };
 
+    my @banish_keywords =
+      qw/help option new_with_options parse_options options_usage _options_data _options_config/;
+    if ( $options_config->{with_config_from_file} ) {
+        push @banish_keywords, qw/config_files config_prefix config_dirs/;
+    }
+
     my $option = sub {
         my ( $name, %attributes ) = @_;
-        for my $ban (
-            qw/help option new_with_options parse_options options_usage _options_data _options_config/
-            )
-        {
+        for my $ban (@banish_keywords) {
             croak
-                "You cannot use an option with the name '$ban', it is implied by MooX::Options"
-                if $name eq $ban;
+              "You cannot use an option with the name '$ban', it is implied by MooX::Options"
+              if $name eq $ban;
         }
 
         $has->( $name => _filter_attributes(%attributes) );
 
-        $options_data->{$name}
-            = { _validate_and_filter_options(%attributes) };
+        $options_data->{$name} =
+          { _validate_and_filter_options(%attributes) };
 
         $apply_modifiers->();
         return;
@@ -118,7 +145,7 @@ sub _filter_attributes {
     my %attributes = @_;
     my %filter_key = map { $_ => 1 } @OPTIONS_ATTRIBUTES;
     return map { ( $_ => $attributes{$_} ) }
-        grep { !exists $filter_key{$_} } keys %attributes;
+      grep { !exists $filter_key{$_} } keys %attributes;
 }
 
 sub _validate_and_filter_options {
@@ -126,7 +153,7 @@ sub _validate_and_filter_options {
     $options{doc} = $options{documentation} if !defined $options{doc};
     $options{order} = 0 if !defined $options{order};
 
-    if ($options{json}) {
+    if ( $options{json} ) {
         delete $options{repeatable};
         delete $options{autosplit};
         delete $options{negativable};
@@ -134,18 +161,18 @@ sub _validate_and_filter_options {
     }
 
     my %cmdline_options = map { ( $_ => $options{$_} ) }
-        grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
+      grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
 
 
     $cmdline_options{repeatable} = 1 if $cmdline_options{autosplit};
     $cmdline_options{format} .= "@"
-        if $cmdline_options{repeatable}
-        && defined $cmdline_options{format}
-        && substr( $cmdline_options{format}, -1 ) ne '@';
+      if $cmdline_options{repeatable}
+      && defined $cmdline_options{format}
+      && substr( $cmdline_options{format}, -1 ) ne '@';
 
     croak
-        "Negativable params is not usable with non boolean value, don't pass format to use it !"
-        if $cmdline_options{negativable} && defined $cmdline_options{format};
+      "Negativable params is not usable with non boolean value, don't pass format to use it !"
+      if $cmdline_options{negativable} && defined $cmdline_options{format};
 
     return %cmdline_options;
 }
@@ -207,6 +234,37 @@ You may enable the L</prefer_commandline> option to reverse this behaviour;  thi
 
     # parse ARGV for options but default to those provided here
     my $t = t->new_with_options( test => 'default' );
+
+=item with_config_from_file
+
+Add to command line 'config_files' and 'config_prefix' from L<MooX::ConfigFromFile>.
+
+This will allow you to pass params from command line or from config file (next priority), to your module.
+
+    Your script : MyPackage
+    {
+        package t;
+        use Moo;
+        use MooX::Options with_config_from_file => 1;
+
+        option 'test' => (is => 'ro');
+
+        1;
+    }
+
+    In /etc/MyPackage.json
+    {
+        "test" : 1
+    }
+
+    my $t = t->new_with_options( );
+    $t->test # 1
+    
+    {
+        local @ARGS = '--test 2';
+        $t = t->new_with_options();
+        $t->test # 2
+    }
 
 =back
 
@@ -515,6 +573,8 @@ L<http://perltalks.celogeek.com/slides/2012/08/moox-options-slide3d.html>
 =item Tomas Doran (t0m) <bobtfish@bobtfish.net> : To help me release the new version, and using it :)
 
 =item Torsten Raudssus (Getty) : to use it a lot in L<DuckDuckGo|http://duckduckgo.com> (go to see L<MooX> module also)
+
+=item Jens Rehsack (REHSACK) : to purpose the with_config_from_file idea for PKGSRC.
 
 =back
 

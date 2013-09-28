@@ -17,14 +17,14 @@ eval <<EOF
 
     1;
 EOF
-    ;
+  ;
 like $@,
-    qr/^Negativable\sparams\sis\snot\susable\swith\snon\sboolean\svalue,\sdon't\spass\sformat\sto\suse\sit\s\!/x,
-    "negativable and format are incompatible";
+  qr/^Negativable\sparams\sis\snot\susable\swith\snon\sboolean\svalue,\sdon't\spass\sformat\sto\suse\sit\s\!/x,
+  "negativable and format are incompatible";
 
 for my $ban (
     qw/help option new_with_options parse_options options_usage _options_data _options_config/
-    )
+  )
 {
     eval <<EOF
     package FailureHelp$ban;
@@ -35,10 +35,10 @@ for my $ban (
         is => 'rw',
     );
 EOF
-        ;
+      ;
     like $@,
-        qr/^You\scannot\suse\san\soption\swith\sthe\sname\s'$ban',\sit\sis\simplied\sby\sMooX::Options/x,
-        "$ban method can't be defined";
+      qr/^You\scannot\suse\san\soption\swith\sthe\sname\s'$ban',\sit\sis\simplied\sby\sMooX::Options/x,
+      "$ban method can't be defined";
 }
 
 {
@@ -57,10 +57,10 @@ EOF
         1;
     }
 EOF
-    ;
+      ;
     like $@,
-    qr/^Can't\sapply\sFailureRoleMyRole\sto\sFailureRole\s-\smissing\s_options_data,\s_options_config/x,
-    "role could only be apply with a MooX::Options ready package"
+      qr/^Can't\sapply\sFailureRoleMyRole\sto\sFailureRole\s-\smissing\s_options_data,\s_options_config/x,
+      "role could only be apply with a MooX::Options ready package"
 }
 
 {
@@ -74,11 +74,9 @@ EOF
         1;
     }
 EOF
-    ;
-    like $@,
-    qr/^Subroutine\s_options_data\sredefined/x,
-    'redefined methods';
-    ok (!t->can('new_with_options'), 't has crash');
+      ;
+    like $@, qr/^Subroutine\s_options_data\sredefined/x, 'redefined methods';
+    ok( !t->can('new_with_options'), 't has crash' );
 }
 
 done_testing;

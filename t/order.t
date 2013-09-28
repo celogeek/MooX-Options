@@ -5,6 +5,7 @@ use Test::More tests => 3;
 use Test::Trap;
 
 {
+
     package t1;
     use Moo;
     use MooX::Options;
@@ -37,6 +38,7 @@ use Test::Trap;
 }
 
 {
+
     package t2;
     use Moo;
     use MooX::Options;
@@ -65,6 +67,7 @@ use Test::Trap;
 }
 
 {
+
     package t3;
     use Moo;
     use MooX::Options;
@@ -97,19 +100,22 @@ use Test::Trap;
 {
     my $opt = t1->new_with_options;
     trap { $opt->options_usage };
-    ok $trap->stdout =~ /first.+second.+third.+fourth/gms, 'order work w/ order attribute';
+    ok $trap->stdout =~ /first.+second.+third.+fourth/gms,
+      'order work w/ order attribute';
 }
 
 {
     my $opt = t2->new_with_options;
     trap { $opt->options_usage };
-    ok $trap->stdout =~ /first.+fourth.+second.+third/gms, 'order work w/o order attribute';
+    ok $trap->stdout =~ /first.+fourth.+second.+third/gms,
+      'order work w/o order attribute';
 }
 
 {
     my $opt = t3->new_with_options;
     trap { $opt->options_usage };
-    ok $trap->stdout =~ /fourth.+third.+first.+second/gms, 'order work w/ mixed mode';
+    ok $trap->stdout =~ /fourth.+third.+first.+second/gms,
+      'order work w/ mixed mode';
 }
 
 done_testing;
