@@ -11,7 +11,7 @@ use Try::Tiny;
 BEGIN {
     use Module::Load::Conditional qw/check_install/;
     plan skip_all => 'Need Moose for this test'
-        unless check_install( module => 'Moose' );
+      unless check_install( module => 'Moose' );
 }
 
 {
@@ -47,8 +47,10 @@ BEGIN {
     use MooX::Options;
 
     option 'split_str' => ( is => 'ro', format => 's', autosplit => "," );
-    option 'split_conflict_str1' => ( is => 'ro', format => 's', autosplit => "," );
-    option 'split_conflict_str2' => ( is => 'ro', format => 's', autosplit => "," );
+    option 'split_conflict_str1' =>
+      ( is => 'ro', format => 's', autosplit => "," );
+    option 'split_conflict_str2' =>
+      ( is => 'ro', format => 's', autosplit => "," );
 
     1;
 }
@@ -59,7 +61,8 @@ BEGIN {
     use Moose;
     use MooX::Options;
 
-    option 'split_str' => ( is => 'ro', format => 's', autosplit => ",", short => 'z' );
+    option 'split_str' =>
+      ( is => 'ro', format => 's', autosplit => ",", short => 'z' );
 
     1;
 }
@@ -70,7 +73,7 @@ BEGIN {
     use Moose;
     use MooX::Options;
     option 'should_die_ok' =>
-        ( is => 'ro', trigger => sub { die "this will die ok" } );
+      ( is => 'ro', trigger => sub { die "this will die ok" } );
     1;
 }
 

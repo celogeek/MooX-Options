@@ -41,8 +41,10 @@ use Try::Tiny;
     use MooX::Options;
 
     option 'split_str' => ( is => 'ro', format => 's', autosplit => "," );
-    option 'split_conflict_str1' => ( is => 'ro', format => 's', autosplit => "," );
-    option 'split_conflict_str2' => ( is => 'ro', format => 's', autosplit => "," );
+    option 'split_conflict_str1' =>
+      ( is => 'ro', format => 's', autosplit => "," );
+    option 'split_conflict_str2' =>
+      ( is => 'ro', format => 's', autosplit => "," );
 
     1;
 }
@@ -53,7 +55,8 @@ use Try::Tiny;
     use Moo;
     use MooX::Options;
 
-    option 'split_str' => ( is => 'ro', format => 's', autosplit => ",", short => 'z' );
+    option 'split_str' =>
+      ( is => 'ro', format => 's', autosplit => ",", short => 'z' );
 
     1;
 }
@@ -64,7 +67,7 @@ use Try::Tiny;
     use Moo;
     use MooX::Options;
     option 'should_die_ok' =>
-        ( is => 'ro', isa => sub { die "this will die ok" } );
+      ( is => 'ro', isa => sub { die "this will die ok" } );
     1;
 }
 
