@@ -102,12 +102,15 @@ sub import {
             }
         );
     };
+    
+    my @banish_keywords = qw/help option new_with_options parse_options options_usage _options_data _options_config/;
+    if ($options_config->{with_config_from_file}) {
+        push @banish_keywords, qw/config_files config_prefix config_dirs/;
+    }
 
     my $option = sub {
         my ( $name, %attributes ) = @_;
-        for my $ban (
-            qw/help option new_with_options parse_options options_usage _options_data _options_config/
-            )
+        for my $ban (@banish_keywords)
         {
             croak
                 "You cannot use an option with the name '$ban', it is implied by MooX::Options"
