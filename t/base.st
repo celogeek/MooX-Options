@@ -91,7 +91,13 @@ subtest "test required" => sub {
         my @r = trap { multi_req->new_with_options };
         is( $trap->exit, 1, "missing args exit 1" );
         my @missing = $trap->stdout =~ /(multi_\d is missing)\n/g;
-        is( scalar @missing, 3, "multi is missing" );
+        my @target_isa;
+        { no strict 'refs'; @target_isa = @{"multi_req::ISA"} };
+        if (multi_req->isa('Moose::Object')) {
+            is( scalar @missing, 1, "only one missing for moose" );
+        } else {
+            is( scalar @missing, 3, "multi is missing" );
+        }
     }
     done_testing();
 };
