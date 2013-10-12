@@ -32,10 +32,16 @@ Check full doc L<MooX::Options> for more details.
 =cut
 
 sub new_with_options {
-    my ( $class, @params ) = @_;
+    my ( $class, %params ) = @_;
     my $self;
+    my %cmdline_params = $class->parse_options(%params);
+
+    if ($cmdline_params{help}) {
+        return $class->options_usage($params{help}, $cmdline_params{help});
+    }
+
     return $self
-      if eval { $self = $class->new( $class->parse_options(@params) ); 1 };
+      if eval { $self = $class->new( %cmdline_params ); 1 };
     if ( $@ =~ /^Attribute\s\((.*?)\)\sis\srequired/x ) {
         print "$1 is missing\n";
     }
@@ -49,7 +55,8 @@ sub new_with_options {
     else {
         croak $@;
     }
-    return $class->parse_options( help => 1 );
+    %cmdline_params = $class->parse_options( help => 1 );
+    return $class->options_usage(1, $cmdline_params{help});
 }
 
 =method parse_options
@@ -167,12 +174,6 @@ sub parse_options {
         ("USAGE: %c %o"), @options,
         [ 'help|h', "show this help message" ], @flavour
     );
-    if ( $opt->help() || defined $params{help} ) {
-        print $usage, "\n";
-        my $exit_code = 0;
-        $exit_code = 0 + $params{help} if defined $params{help};
-        exit($exit_code);
-    }
 
     my %cmdline_params = %params;
     for my $name ( keys %options_data ) {
@@ -192,6 +193,10 @@ sub parse_options {
         }
     }
 
+    if ( $opt->help() || defined $params{help} ) {
+        $cmdline_params{help} = $usage;
+    }
+
     return %cmdline_params;
 }
 ## use critic
@@ -205,11 +210,21 @@ Check full doc L<MooX::Options> for more details.
 =cut
 
 sub options_usage {
-    my ( $self, $code, @messages ) = @_;
+    my ( $class, $code, @messages ) = @_;
+    my $usage;
+    if (@messages && ref $messages[$#messages] eq 'Getopt::Long::Descriptive::Usage') {
+        $usage = shift @messages;
+    }
     $code = 0 if !defined $code;
     print join( "\n", @messages, '' ) if @messages;
-    local @ARGV = ();
-    return $self->parse_options( help => $code );
+    if (!$usage) {
+        local @ARGV = ();
+        my %cmdline_params = $class->parse_options( help => $code );
+        $usage = $cmdline_params{help};
+    }
+    print $usage . "\n";
+    exit($code) if $code >= 0;
+    return;
 }
 
 1;
