@@ -43,7 +43,7 @@ BEGIN {
 
     package rRole;
     use Moo::Role;
-    use Mo;
+    use Mo 'required';
     use MooX::Options;
 
     option 'str_req' => ( is => 'ro', format => 's', required => 1 );
@@ -131,7 +131,7 @@ BEGIN {
 
     package multi_reqRole;
     use Moo::Role;
-    use Mo;
+    use Mo 'required';
     use MooX::Options;
     option 'multi_1' => ( is => 'ro', required => 1 );
     option 'multi_2' => ( is => 'ro', required => 1 );
