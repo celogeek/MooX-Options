@@ -212,7 +212,7 @@ Check full doc L<MooX::Options> for more details.
 sub options_usage {
     my ( $class, $code, @messages ) = @_;
     my $usage;
-    if (@messages && ref $messages[$#messages] eq 'Getopt::Long::Descriptive::Usage') {
+    if (@messages && ref $messages[-1] eq 'Getopt::Long::Descriptive::Usage') {
         $usage = shift @messages;
     }
     $code = 0 if !defined $code;
