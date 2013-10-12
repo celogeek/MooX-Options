@@ -93,7 +93,7 @@ subtest "test required" => sub {
         my @missing = $trap->stdout =~ /(multi_\d is missing)\n/g;
         my @target_isa;
         { no strict 'refs'; @target_isa = @{"multi_req::ISA"} };
-        if (multi_req->isa('Moose::Object')) {
+        if (multi_req->isa('Moose::Object') || multi_req->isa('Mo::Object')) {
             is( scalar @missing, 1, "only one missing for moose" );
         } else {
             is( scalar @missing, 3, "multi is missing" );
