@@ -1,3 +1,6 @@
+3.89  2013-10-14 18:31:12 GMT
+    * Feature #335 : Fix changes based on kwaleeti (Celogeek San)
+
 3.88  2013-10-12 17:39:25 GMT
     * Feature #332 : Create real usage_option method, and use it for help message (Celogeek San)
 
@@ -19,209 +22,152 @@
 3.82  2013-05-13 08:40:27 GMT
     * Feature #158 : use GRS for release (Celogeek San)
 
-3.81
-
+3.81  2013-05-13
     * dummy
 
-3.80      2013-04-28 23:46:23 Europe/Paris
-
+3.80  2013-04-28 23:46:23 Europe/Paris
     * Bug #198 : Fix pod, issue with metacpan (Celogeek San)
 
-3.79      2013-04-25 00:12:25 Europe/Paris
-
+3.79  2013-04-25 00:12:25 Europe/Paris
     * Feature #192 : support json mode (Celogeek San)
 
-3.78      2013-04-12 01:16:12 Europe/Paris
+3.78   2013-04-12 01:16:12 Europe/Paris
+    * Support for prefered commandline (Tom Lanyon)
 
-    Support for prefered commandline (Tom Lanyon)
+3.77  2013-01-05 18:23:49 Europe/Paris
+    * Support for dash in option
 
-3.77      2013-01-05 18:23:49 Europe/Paris
+3.76  2012-12-24 12:47:40 Europe/Paris
+    * Reupload due to pause failure
 
-    Support for dash in option
+3.75  2012-12-24 12:46:12 Europe/Paris
+    * Update changes
 
-3.76      2012-12-24 12:47:40 Europe/Paris
+3.74  2012-12-24 12:36:12 Europe/Paris
+    * [Keedi Kim] : Allow ordering of params (by name by default, can be selected order)
 
-    Reupload due to pause failure
+3.73  2012-12-08 20:07:07 Europe/Paris
+    * Add deps
 
-3.75      2012-12-24 12:46:12 Europe/Paris
+3.72  2012-11-26 00:47:35 Europe/Paris
+    * Change bugtracker and git repository
 
-    Update changes
+3.71  2012-09-03 02:18:06 Europe/Paris
 
-3.74      2012-12-24 12:36:12 Europe/Paris
+3.7   2012-09-03 02:12:10 Europe/Paris
 
-    [Keedi Kim] : Allow ordering of params (by name by default, can be selected order)
+3.6   2012-08-20 00:28:50 Europe/Paris
+    * Fix: autosplit with space
+    * Add: greeding and slides
 
-3.73      2012-12-08 20:07:07 Europe/Paris
+3.5   2012-08-13 23:34:33 Europe/Paris
+    * working role !
+    * fix namespace clean
+    * add doc to use it
 
-    Add deps
+3.4   2012-08-13 20:34:17 Europe/Paris
+    * disabling failing test
+    * moo is now a necessary deps
 
-3.72      2012-11-26 00:47:35 Europe/Paris
+3.3   2012-08-13 10:38:16 Europe/Paris
+    * support for namespace::clean
+    * fix issue with default value
+    * move ski_options to the role
+    * move options_meta and options_params to the main package
+    * fix role issues
 
-    Change bugtracker and git repository
+    * TODO: make role fully work
 
+3.2   2012-08-12 14:41:26 Europe/Paris
+    * add option skip_options to remove option to the terminal
 
-3.71      2012-09-03 02:18:06 Europe/Paris
+3.1   2012-08-12 02:45:07 Europe/Paris
+    * Fix is missing
 
-3.7       2012-09-03 02:12:10 Europe/Paris
+3.0   2012-08-12 02:06:35 Europe/Paris
+    * Full rewrite of MooX::Options
+    * Add easy support to use it in a Role.
+    * Break support of Mouse.
 
-3.6       2012-08-20 00:28:50 Europe/Paris
+2.4   2012-07-27 02:06:03 Europe/Paris
+    * Fix: Role, wasn't working very well
 
-    Fix: autosplit with space
-    Add: greeding and slides
-
-3.5       2012-08-13 23:34:33 Europe/Paris
-
-    working role !
-    fix namespace clean
-    add doc to use it
-
-3.4       2012-08-13 20:34:17 Europe/Paris
-
-    disabling failing test
-    moo is now a necessary deps
-
-3.3       2012-08-13 10:38:16 Europe/Paris
-
-    support for namespace::clean
-    fix issue with default value
-    move ski_options to the role
-    move options_meta and options_params to the main package
-    fix role issues
-
-    TODO: make role fully work
-
-
-3.2       2012-08-12 14:41:26 Europe/Paris
-
-    add option skip_options to remove option to the terminal
-
-3.1       2012-08-12 02:45:07 Europe/Paris
-
-    Fix is missing
-
-3.0       2012-08-12 02:06:35 Europe/Paris
-
-    Full rewrite of MooX::Options
-    Add easy support to use it in a Role.
-    Break support of Mouse.
-
-2.4       2012-07-27 02:06:03 Europe/Paris
-
-    Fix: Role, wasn't working very well
-
-2.3       2012-07-25 18:48:47 Europe/Paris
-
-    Add MooX::Options::Role 
-        You can create role in your module that automatically call MooX::Option
+2.3   2012-07-25 18:48:47 Europe/Paris
+    * Add MooX::Options::Role 
+      - You can create role in your module that automatically call MooX::Option
         'option' method when the role is imported.
 
-2.2       2012-07-19 12:52:59 Europe/Paris
+2.2   2012-07-19 12:52:59 Europe/Paris
+    * Fix test for Moo 1.0
 
-    Fix test for Moo 1.0
+2.1   2012-07-17 18:11:38 Europe/Paris
+    * Fix pod
 
-2.1       2012-07-17 18:11:38 Europe/Paris
+2.0   2012-07-17 18:04:48 Europe/Paris
+    * Add 'documentation', an alternative 'doc' option attribute
 
-    Fix pod
+1.9   2012-07-17 15:02:42 Europe/Paris
+    * Remove bugs section (duplicate)
 
+1.8   2012-07-16 16:51:44 Europe/Paris
+    * use Dist::Zilla::PluginBundle::Author::Celogeek v0.7
 
-2.0       2012-07-17 18:04:48 Europe/Paris
+1.7   2012-07-16 14:55:02 Europe/Paris
+    * use Dist::Zilla::PluginBundle::Author::Celogeek
 
-    Add 'documentation', an alternative 'doc' option attribute
-
-1.9       2012-07-17 15:02:42 Europe/Paris
-
-    Remove bugs section (duplicate)
-
-
-1.8       2012-07-16 16:51:44 Europe/Paris
-
-    use Dist::Zilla::PluginBundle::Author::Celogeek v0.7
-
-1.7       2012-07-16 14:55:02 Europe/Paris
-
-    use Dist::Zilla::PluginBundle::Author::Celogeek
-
-1.6 - 2012-06-08 11:20
-===
-
+1.6   2012-06-08 11:20
     * Change author name
 
-1.5 - 2012-06-01 01:10
-===
-
+1.5   2012-06-01 01:10
     * fix mouse test
     * add doc, markdown, cleanup
 
-1.4 - 2012-05-16 23:30
-===
-
+1.4   2012-05-16 23:30
     * remove goto method, compat with older perl
 
-1.3 - 2012-05-12 00:30
-===
+1.3   2012-05-12 00:30
     * fix minimum version to 5.8.9
     * fix test unit
 
-1.2 - 2012-05-02 02:20
-===
-
+1.2   2012-05-02 02:20
     * add advice on repeatable option (Alex Howarth)
     * full test and 100% coverage
     * fix import_options and add protection.
 
-1.1 - 2012-03-13 23:20
-===
-
+1.1   2012-03-13 23:20
     * remove min version for testing Moo
     * remove deps on Mo/Moo/Mouse/Moose from test (if present do the test, else skip)
 
-1.0 - 2012-03-10 16:00
-===
-
+1.0   2012-03-10 16:00
     * use perl 5.006 syntax compatible, allow use MooX::Options with older version
 
-0.9 - 2012-02-14 21:40
-===
-
+0.9   2012-02-14 21:40
     * Add flavour to pass options to GetOpt::Long (zengargoyle)
 
-0.8 - 2011-12-25 14:30
-===
-
+0.8   2011-12-25 14:30
     * use Moo 0.009013 to pass cpantester tests
 
-0.7 - 2011-12-09 00:10
-===
-
+0.7   2011-12-09 00:10
     * change name to MooX::Options
     * fix Global name (UPPERCASE)
     * fix Global name (Camel_Case)
     * fix private name (no more "_")
 
-0.6 - 2011-12-04 13:00
-===
-
+0.6   2011-12-04 13:00
     * add option_usage
-      add test for it
+    * add test for it
 
-0.5 - 2011-12-04 12:20
-===
-
+0.5   2011-12-04 12:20
     * fix doc
 
-0.4 - 2011-12-04 12:00
-===
-
+0.4   2011-12-04 12:00
     * fix call chain method (don't call properly because new method was not already generated at the call)
-      add test for chain_method (should_die_ok)
+    * add test for chain_method (should_die_ok)
 
-0.3 - 2011-12-03 13:00
-===
-
+0.3   2011-12-03 13:00
     * fix test unit
 
-0.2 - 2011-12-02 01:30
-===
+0.2   2011-12-02 01:30
     * improve help test
     * fix possible miss reading
     * Factorize test import_options rename options for import_options (better reading) remove synopsis filter is on by default, can be cancel with \"nofilter\" import doc at the end
@@ -229,9 +175,6 @@
     * fix tests for autosplit, add complex autosplit for str with quote
     * add some better handle of repeatable and negativable, use Data::Record to resplit the args
 
-0.1 - 2011-11-30 18:30
-===
-
+0.1   2011-11-30 18:30
     * First release of MooX::Getopt
-    Fully compatible with Mo/Moo/Mouse/Moose and more
-
+    * Fully compatible with Mo/Moo/Mouse/Moose and more
