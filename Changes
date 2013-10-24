@@ -1,3 +1,6 @@
+3.93  2013-10-24 20:15:53 GMT
+    * Feature #350 : Push back Mo support with proper deps (Celogeek San)
+
 3.92  2013-10-24 16:27:01 GMT
     * Bug #349 : drop Mo support, it use Mouse ! (Celogeek San)
 
