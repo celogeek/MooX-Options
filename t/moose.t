@@ -9,9 +9,11 @@ use FindBin qw/$RealBin/;
 use Try::Tiny;
 
 BEGIN {
-    use Module::Load::Conditional qw/check_install/;
-    plan skip_all => 'Need Moose for this test'
-      unless check_install( module => 'Moose' );
+	eval 'use Moose';
+	if ($@) {
+		plan skip_all => 'Need Moose for this test';
+		exit 0;
+	}
 }
 
 {

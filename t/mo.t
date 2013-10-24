@@ -9,13 +9,14 @@ use FindBin qw/$RealBin/;
 use Try::Tiny;
 
 BEGIN {
-    use Module::Load::Conditional qw/check_install/;
-    plan skip_all => 'Need Mo for this test'
-      unless check_install( module => 'Mo' );
+	eval 'use Mo 0.36';
+	if ($@) {
+    	plan skip_all => 'Need Mo (0.36) for this test';
+		exit 0;
+	}
 }
 
 {
-
     package tRole;
     use Moo::Role;
     use Mo 'default';
