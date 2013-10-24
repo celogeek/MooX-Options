@@ -316,32 +316,6 @@ You can also use it over a Role.
     my $t = t->new_with_options(); #parse @ARGV
     my $o = t->new_with_options(test => 'override'); #parse ARGV and override any value with the params here
 
-If you use Mo, you have a little bit more work to do. Because Mo lack of "with" and "around".
-
-
-    {
-        package tRole;
-        use Moo::Role;
-        use Mo;
-        use MooX::Options;
-
-        option 'test' => (is => 'ro');
-        1;
-    }
-    {
-
-        package t;
-        use Mo;
-        use Role::Tiny::With;
-        with 'tRole';
-
-        1;
-    }
-    my $t = t->new_with_options(); #parse @ARGV
-    my $o = t->new_with_options(test => 'override'); #parse ARGV and override any value with the params here
-
-It's a bit tricky but, hey, you are using Mo !
-
 =head2 Keyword 'options_usage'
 
 It display the usage message and return the exit code
@@ -563,6 +537,10 @@ For example, --start-date or --start_date will fill the option 'start_date'.
 =head1 no more Mouse support
 
 If you are using Mouse, I'm sorry to say than the rewrite of this module has make it just incompatible. Mouse is not design to by compatible with anything else than Mouse itself. I could just suggest to use Moo instead, which is a great and compatible replacement.
+
+=head1 no more Mo support
+
+Mo start using Mouse as a backend, so no more support !
 
 =head1 More examples
 
