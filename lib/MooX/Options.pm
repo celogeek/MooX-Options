@@ -1,8 +1,8 @@
 package MooX::Options;
 
-# ABSTRACT: add option keywords to your object (Mo/Moo/Moose)
+# ABSTRACT: create a command line tools with your Object (Mo / Moo / Moose)
 
-=head1 MooX::Options
+=head1 DESCRIPTION
 
 Use L<Getopt::Long::Descritive> to provide command line option for your Mo/Moo/Moose Object.
 
