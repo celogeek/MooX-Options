@@ -29,10 +29,14 @@ sub import {
     };
 
     my $target = caller;
+	for my $needed_methods(qw/with around has/) {
+		next if $target->can($needed_methods);
+		croak "Can't find the method <$needed_methods> in <$target> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.";
+	}
+
     my $with   = $target->can('with');
     my $around = $target->can('around');
     my $has    = $target->can('has');
-
 
     my @target_isa;
     { no strict 'refs'; @target_isa = @{"${target}::ISA"} };
