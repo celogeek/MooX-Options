@@ -1,3 +1,6 @@
+3.92  2013-10-24 16:27:01 GMT
+    * Bug #349 : drop Mo support, it use Mouse ! (Celogeek San)
+
 3.91  2013-10-24 16:04:05 GMT
     * Bug #348 : die if the caller is not able to run "around" or "with" (Celogeek San)
 
