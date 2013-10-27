@@ -99,7 +99,7 @@ sub option_text {
 		my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
 		my $format_doc_str;
 		$format_doc_str = $format_doc{$format} if defined $format;
-		push @message, (defined $short ? "-" . $short . " " : "") . "--" . $opt->{name} . ":" . (defined $format_doc_str ? " " . $format_doc_str : "");
+		push @message, (defined $short ? "-" . $short . " " : "") . "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name} . ":" . (defined $format_doc_str ? " " . $format_doc_str : "");
 		push @message, wrap("    ", "        ", $opt->{desc});
 		push @message, "";
 	}
