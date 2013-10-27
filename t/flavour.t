@@ -8,6 +8,8 @@ use Carp;
 use FindBin qw/$RealBin/;
 use Try::Tiny;
 
+local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
+
 {
 
     package plain;

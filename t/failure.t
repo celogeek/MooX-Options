@@ -4,6 +4,8 @@ use warnings;
 use Test::More;
 use Carp;
 
+local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
+
 eval <<__EOF__
     package FailureNegativableWithFormat;
     use Moo;

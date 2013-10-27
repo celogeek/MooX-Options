@@ -4,6 +4,8 @@ use warnings;
 use Test::More;
 use Test::Trap;
 
+local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
+
 {
 
     package myRole;
@@ -58,7 +60,7 @@ use Test::Trap;
     trap {
         $opt->options_usage;
     };
-    ok( $trap->stdout =~ /\-\-multi.*multi\sthreading\smode/x,
+    ok( $trap->stdout =~ /\-\-multi:\n\s+multi\sthreading\smode/x,
         "usage method is properly set"
     );
 }
@@ -76,7 +78,7 @@ use Test::Trap;
     trap {
         $opt->options_usage;
     };
-    ok( $trap->stdout =~ /\-\-multi.*multi\sthreading\smode/x,
+    ok( $trap->stdout =~ /\-\-multi:\n\s+multi\sthreading\smode/x,
         "usage method is properly set"
     );
 }
