@@ -2,6 +2,14 @@ package MooX::Options::Descriptive::Usage;
 
 # ABSTRACT: Usage class
 
+=head1 DESCRIPTION
+
+Usage class to display the error message.
+
+This class use the full size of your terminal
+
+=cut
+
 use strict;
 use warnings;
 # VERSION
@@ -20,6 +28,26 @@ my %format_doc = (
     'f@' => '[Reals]',
 );
 
+=method new
+
+The object is create with L<MooX::Options::Descriptive>.
+
+Valid option is :
+
+=over
+
+=item leader_text
+
+Text that appear on top of your message
+
+=item options
+
+The options spec of your message
+
+=back
+
+=cut
+
 sub new {
 	my ($class, $args) = @_;
 
@@ -29,21 +57,37 @@ sub new {
 	return bless \%self => $class;
 }
 
+=method leader_text
+
+Return the leader_text.
+
+=cut
 sub leader_text { return shift->{leader_text} }
 
+=method text
+
+Return the full text help, leader and option text.
+
+=cut
 sub text {
 	my ($self) = @_;
 
 	return join("\n", $self->leader_text, $self->option_text);
 }
 
+# set the column size of your terminal into the wrapper
 sub _set_column_size {
-	my ($columns, $rows) = chars();
+	my ($columns) = chars();
 	$columns //= 78;
 	$Text::WrapI18N::columns = $columns - 4;
 	return;
 }
 
+=method option_text
+
+Return the help message for your options
+
+=cut
 sub option_text {
 	my ($self) = @_;
 	my $options = $self->{options};
@@ -62,7 +106,18 @@ sub option_text {
 	return join("\n    ", "", @message);
 }
 
+=method warn
+
+Warn your options help message
+
+=cut
 sub warn { return CORE::warn shift->text }
+
+=method die
+
+Croak your options help message
+
+=cut
 sub die  { return CORE::die  shift->text }
 
 
