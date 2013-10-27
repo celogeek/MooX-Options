@@ -2,8 +2,9 @@
 use strict;
 use warnings;
 use Test::Trap;
-
 use Test::More;    # last test to print
+
+local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 
 {
 

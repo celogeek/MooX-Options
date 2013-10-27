@@ -4,6 +4,8 @@ use warnings;
 use Test::More tests => 3;
 use Test::Trap;
 
+local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
+
 {
 
     package t1;

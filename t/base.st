@@ -1,3 +1,4 @@
+local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 
 my @params = qw/bool counter empty/;
 subtest "no args" => sub {
@@ -200,8 +201,8 @@ subtest "test usage" => sub {
     ok( $trap->stdout =~ /usage really work/,
         'custom message is really present'
     );
-    ok( $trap->stdout =~ /help.*show this help message/, 'help is present' );
-    ok( $trap->stdout =~ /split_str.*no\n.*doc for split_str/,
+    ok( $trap->stdout =~ /help:\n\s+show this help message/, 'help is present' );
+    ok( $trap->stdout =~ /split_str: \[Strings\]\n\s+no doc for split_str/,
         'attr no doc is present' );
 };
 
@@ -210,7 +211,7 @@ subtest "doc usage" => sub {
     my $s     = t_doc->new_with_options();
     my @r = trap { $s->options_usage(127) };
     is( $trap->exit, 127, 'exit code is correct' );
-    ok( $trap->stdout =~ /t.*this is a test/, 'doc on attribute' );
+    ok( $trap->stdout =~ /t:\n\s+this is a test/, 'doc on attribute' );
 };
 
 subtest "test short" => sub {
