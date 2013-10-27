@@ -10,6 +10,6 @@ use Getopt::Long 2.38;
 use Getopt::Long::Descriptive 0.091;
 use MooX::Options::Descriptive::Usage;
 use parent 'Getopt::Long::Descriptive';
-sub usage_class { 'MooX::Options::Descriptive::Usage' }
+sub usage_class { return 'MooX::Options::Descriptive::Usage' }
 
 1;

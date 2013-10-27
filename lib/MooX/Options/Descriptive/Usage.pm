@@ -29,13 +29,7 @@ sub new {
 	return bless \%self => $class;
 }
 
-sub _set_column_size {
-	my ($columns, $rows) = chars();
-	$columns //= 78;
-	$Text::WrapI18N::columns = $columns - 4;
-}
-
-sub leader_text { shift->{leader_text} }
+sub leader_text { return shift->{leader_text} }
 
 sub text {
 	my ($self) = @_;
@@ -43,13 +37,21 @@ sub text {
 	return join("\n", $self->leader_text, $self->option_text);
 }
 
+sub _set_column_size {
+	my ($columns, $rows) = chars();
+	$columns //= 78;
+	$Text::WrapI18N::columns = $columns - 4;
+	return;
+}
+
 sub option_text {
-	my $options = $_[0]->{options};
+	my ($self) = @_;
+	my $options = $self->{options};
 
 	my @message;
 	_set_column_size;
 	for my $opt(@$options) {
-		my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/;
+		my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
 		my $format_doc_str;
 		$format_doc_str = $format_doc{$format} if defined $format;
 		push @message, (defined $short ? "-" . $short . " " : "") . "--" . $opt->{name} . ":" . (defined $format_doc_str ? " " . $format_doc_str : "");
@@ -60,15 +62,15 @@ sub option_text {
 	return join("\n    ", "", @message);
 }
 
-sub warn { CORE::warn shift->text }
-sub die  { CORE::die  shift->text }
+sub warn { return CORE::warn shift->text }
+sub die  { return CORE::die  shift->text }
 
 
 use overload (
 	q{""} => "text",
 	'&{}' => sub {
     my ($self) = @_;
-    return sub { return $_[0] ? $self->text : $self->warn; };
+    return sub { my ($self) = @_; return $self ? $self->text : $self->warn; };
   }
 );
 

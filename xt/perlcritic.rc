@@ -11,3 +11,6 @@ allow = refs
 [Variables::RequireLocalizedPunctuationVars]
 allow = @ARGV
 [-Miscellanea::ProhibitUnrestrictedNoCritic]
+[Variables::ProhibitPackageVars]
+add_packages = Text::WrapI18N
+[-Subroutines::ProhibitBuiltinHomonyms]
