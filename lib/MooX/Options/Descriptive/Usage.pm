@@ -79,6 +79,7 @@ sub text {
 sub _set_column_size {
 	my ($columns) = chars();
 	$columns //= 78;
+	$columns = $ENV{TEST_FORCE_COLUMN_SIZE} if defined $ENV{TEST_FORCE_COLUMN_SIZE};
 	$Text::WrapI18N::columns = $columns - 4;
 	return;
 }
