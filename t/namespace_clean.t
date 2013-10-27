@@ -4,6 +4,8 @@ use Test::More;
 use FindBin qw/ $Bin /;
 use lib "$Bin/lib";
 
+local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
+
 use_ok 'TestNamespaceClean';
 
 ok TestNamespaceClean->new, 'TestNamespaceClean is a package';

@@ -1,3 +1,4 @@
+local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 
 my @params = qw/bool counter empty/;
 subtest "no args" => sub {
