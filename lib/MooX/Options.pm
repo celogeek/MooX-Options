@@ -560,6 +560,18 @@ You can call the option with underscore or dash in the name.
 
 For example, --start-date or --start_date will fill the option 'start_date'.
 
+=head1 MooX::Cmd support
+
+If MooX::Cmd is used, the program name is computed based on the information we receive from MooX::Cmd.
+
+If you have a subcommand "sub1", and another subcommand "sub2" of "sub1", this :
+
+  myTools sub1 sub2 -h
+
+display an usage message :
+
+  USAGE: myTools sub1 sub2 [-h] ...
+
 =head1 no more Mouse support
 
 If you are using Mouse, I'm sorry to say than the rewrite of this module has make it just incompatible. Mouse is not design to by compatible with anything else than Mouse itself. I could just suggest to use Moo instead, which is a great and compatible replacement.

@@ -154,18 +154,16 @@ sub parse_options {
     if ( defined $options_config{flavour} ) {
         push @flavour, { getopt_conf => $options_config{flavour} };
     }
-    if ( $class->can("command_chain") ) {
-	use DDP;
-	my @prog_name;
-	push @prog_name, Getopt::Long::Descriptive::prog_name;
-	foreach my $cmd (@{$params{command_chain}}) {
-	    my %command_names = reverse %{$cmd->command_commands};
-	    $cmd->command_name and push @prog_name, $command_names{$cmd->command_name};
+
+    my $prog_name = Getopt::Long::Descriptive::prog_name;
+    # support of MooX::Cmd
+	if ( $class->can("command_chain") ) {
+        for my $cmd (@{$params{command_chain}}) {
+            $prog_name .= ' ' . join(' ', keys %{$cmd->command_commands});
+        }
 	}
-	Getopt::Long::Descriptive::prog_name(join(" ", @prog_name));
-    }
     my ( $opt, $usage ) = describe_options(
-        ("USAGE: %c %o"), @options,
+        ("USAGE: $prog_name %o"), @options,
         [ 'help|h', "show this help message" ], @flavour
     );
 
