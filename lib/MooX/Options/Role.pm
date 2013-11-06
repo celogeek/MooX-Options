@@ -154,10 +154,21 @@ sub parse_options {
     if ( defined $options_config{flavour} ) {
         push @flavour, { getopt_conf => $options_config{flavour} };
     }
+    my $orig_prog_name = Getopt::Long::Descriptive::prog_name;
+    if ( $class->can("command_chain") ) {
+	my @prog_name;
+	push @prog_name, $orig_prog_name;
+	foreach my $cmd (@{$params{command_chain}}) {
+	    $cmd->command_name and push @prog_name, $cmd->command_name;
+	}
+	Getopt::Long::Descriptive::prog_name(join(" ", @prog_name));
+    }
     my ( $opt, $usage ) = describe_options(
         ("USAGE: %c %o"), @options,
         [ 'help|h', "show this help message" ], @flavour
     );
+    $class->can("command_chain")
+      and Getopt::Long::Descriptive::prog_name($orig_prog_name);
 
     my %cmdline_params = %params;
     for my $name ( keys %options_data ) {
