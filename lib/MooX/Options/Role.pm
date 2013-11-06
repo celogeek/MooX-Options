@@ -154,8 +154,16 @@ sub parse_options {
     if ( defined $options_config{flavour} ) {
         push @flavour, { getopt_conf => $options_config{flavour} };
     }
+
+    my $prog_name = Getopt::Long::Descriptive::prog_name;
+    # support of MooX::Cmd
+	if ( $class->can("command_chain") ) {
+        for my $cmd (@{$params{command_chain}}) {
+            $prog_name .= ' ' . join(' ', keys %{$cmd->command_commands});
+        }
+	}
     my ( $opt, $usage ) = describe_options(
-        ("USAGE: %c %o"), @options,
+        ("USAGE: $prog_name %o"), @options,
         [ 'help|h', "show this help message" ], @flavour
     );
 
