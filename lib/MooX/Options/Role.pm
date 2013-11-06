@@ -159,7 +159,11 @@ sub parse_options {
     # support of MooX::Cmd
 	if ( $class->can("command_chain") ) {
         for my $cmd (@{$params{command_chain}}) {
-            $prog_name .= ' ' . join(' ', keys %{$cmd->command_commands});
+            if (defined (my $cmd_name = $cmd->command_name)) {
+                $prog_name .= ' ' . $cmd_name;
+            } else {
+                $prog_name .= ' ' . join(' ', keys %{$cmd->command_commands});
+            }
         }
 	}
     my ( $opt, $usage ) = describe_options(
