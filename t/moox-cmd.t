@@ -24,13 +24,15 @@ trap {
 };
 
 like $trap->stdout, qr{\QUSAGE: moox-cmd.t [-h]\E}, 'base command help ok';
+like $trap->stdout, qr{\QAvailable commands: test1\E}, 'base available commands ok';
 
 trap {
 	local @ARGV = ('test1', '-h');
 	t::lib::MooXCmdTest->new_with_cmd();
 };
 
-like $trap->stdout, qr{\QUSAGE: moox-cmd.t test1 [-h]\E}, 'subcommand 1 ok';
+like $trap->stdout, qr{\QUSAGE: moox-cmd.t test1 [-h]\E}, 'subcommand 1 help ok';
+like $trap->stdout, qr{\QAvailable commands: test2\E}, 'subcommand 1 available commands ok';
 
 trap {
 	local @ARGV = ('test1', '-h');
@@ -80,5 +82,6 @@ trap {
 };
 
 like $trap->stdout, qr{\QUSAGE: moox-cmd.t test1 test2 [-h]\E}, 'subcommand 2 ok';
+unlike $trap->stdout, qr{\QAvailable commands\E}, 'subcommand 2 no avail commands ok';
 
 done_testing;
