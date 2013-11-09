@@ -9,9 +9,9 @@ use FindBin qw/$RealBin/;
 use Try::Tiny;
 
 BEGIN {
-	eval 'use MooX::Cmd 0.006001';
+	eval 'use MooX::Cmd 0.007';
 	if ($@) {
-		plan skip_all => 'Need MooX::Cmd (0.006001) for this test';
+		plan skip_all => 'Need MooX::Cmd (0.007) for this test';
 		exit 0;
 	}
 }
