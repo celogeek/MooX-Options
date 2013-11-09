@@ -157,14 +157,15 @@ sub parse_options {
 
     my $prog_name = Getopt::Long::Descriptive::prog_name;
     # support of MooX::Cmd
-	if ( $class->can("command_chain") ) {
-        for my $cmd (@{$params{command_chain}}) {
-            if (defined (my $cmd_name = $cmd->command_name)) {
-                $prog_name .= ' ' . $cmd_name;
-            } else {
-                $prog_name .= ' ' . join(' ', keys %{$cmd->command_commands});
-            }
-        }
+	if ( ref $params{command_chain} eq 'ARRAY' ) {
+		for my $cmd (@{$params{command_chain}}) {
+			next if !ref $cmd;
+			next if !UNIVERSAL::can($cmd,'isa');
+			next if !$cmd->can('command_name');
+			if (defined (my $cmd_name = $cmd->command_name)) {
+				$prog_name .= ' ' . $cmd_name;
+			}
+		}
 	}
     my ( $opt, $usage ) = describe_options(
         ("USAGE: $prog_name %o"), @options,

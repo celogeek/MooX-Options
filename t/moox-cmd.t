@@ -9,9 +9,9 @@ use FindBin qw/$RealBin/;
 use Try::Tiny;
 
 BEGIN {
-	eval 'use MooX::Cmd';
+	eval 'use MooX::Cmd 0.007';
 	if ($@) {
-		plan skip_all => 'Need MooX::Cmd for this test';
+		plan skip_all => 'Need MooX::Cmd (0.007) for this test';
 		exit 0;
 	}
 }
@@ -27,10 +27,52 @@ like $trap->stdout, qr{\QUSAGE: moox-cmd.t [-h]\E}, 'base command help ok';
 
 trap {
 	local @ARGV = ('test1', '-h');
-	t::lib::MooXCmdTest->new_with_cmd;
+	t::lib::MooXCmdTest->new_with_cmd();
 };
 
 like $trap->stdout, qr{\QUSAGE: moox-cmd.t test1 [-h]\E}, 'subcommand 1 ok';
+
+trap {
+	local @ARGV = ('test1', '-h');
+	t::lib::MooXCmdTest->new_with_options(command_chain => []);
+};
+
+like $trap->stdout, qr{\QUSAGE: moox-cmd.t [-h]\E}, 'no subcommand pass';
+
+trap {
+	local @ARGV = ('test1', '-h');
+	t::lib::MooXCmdTest->new_with_options(command_chain => [123]);
+};
+
+like $trap->stdout, qr{\QUSAGE: moox-cmd.t [-h]\E}, 'no ref params';
+
+trap {
+	local @ARGV = ('test1', '-h');
+	t::lib::MooXCmdTest->new_with_options(command_chain => [{}]);
+};
+
+like $trap->stdout, qr{\QUSAGE: moox-cmd.t [-h]\E}, 'bad ref';
+
+trap {
+	local @ARGV = ('test1', '-h');
+	t::lib::MooXCmdTest->new_with_options(command_chain => [bless {}, 'MooX::Cmd']);
+};
+
+like $trap->stdout, qr{\QUSAGE: moox-cmd.t [-h]\E}, 'bad ref';
+
+trap {
+	local @ARGV = ('test1', '-h');
+	t::lib::MooXCmdTest->new_with_options(command_chain => [t::lib::MooXCmdTest->new]);
+};
+
+like $trap->stdout, qr{\QUSAGE: moox-cmd.t [-h]\E}, 'no command_name filled';
+
+trap {
+	local @ARGV = ('test1', '-h');
+	t::lib::MooXCmdTest->new_with_options(command_chain => [t::lib::MooXCmdTest->new(command_name => 'mySub')]);
+};
+
+like $trap->stdout, qr{\QUSAGE: moox-cmd.t mySub [-h]\E}, 'subcommand with mySub name';
 
 trap {
 	local @ARGV = ('test1', 'test2', '-h');
