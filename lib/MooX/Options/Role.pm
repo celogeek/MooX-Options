@@ -156,6 +156,7 @@ sub parse_options {
     }
 
     my $prog_name = Getopt::Long::Descriptive::prog_name;
+    my $sub_commands = "";
     # support of MooX::Cmd
 	if ( ref $params{command_chain} eq 'ARRAY' ) {
 		for my $cmd (@{$params{command_chain}}) {
@@ -168,9 +169,11 @@ sub parse_options {
 		}
 	}
     my ( $opt, $usage ) = describe_options(
-        ("USAGE: $prog_name %o"), @options,
+        ("USAGE: $prog_name %o$sub_commands"), @options,
         [ 'help|h', "show this help message" ], @flavour
     );
+    $params{command_commands} and scalar %{$params{command_commands}} and
+      $usage->{avail_commands} = [ keys %{$params{command_commands}} ];
 
     my %cmdline_params = %params;
     for my $name ( keys %options_data ) {

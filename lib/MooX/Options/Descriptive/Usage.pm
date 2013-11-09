@@ -53,8 +53,19 @@ sub new {
 
 	my %self;
 	@self{qw/options leader_text/} = @$args{qw/options leader_text/};
+	$self{avail_commands} = [];
 
 	return bless \%self => $class;
+}
+
+=method text_messages
+
+Return the messages to be included in help message
+
+=cut
+
+sub text_messages {
+	return qw(leader option commands);
 }
 
 =method leader_text
@@ -72,7 +83,9 @@ Return the full text help, leader and option text.
 sub text {
 	my ($self) = @_;
 
-	return join("\n", $self->leader_text, $self->option_text);
+	my @text_messages = map { $self->can("${_}_text") and $self->can("${_}_text")->($self) } $self->text_messages;
+
+	return join("\n", @text_messages);
 }
 
 # set the column size of your terminal into the wrapper
@@ -105,6 +118,21 @@ sub option_text {
 	}
 
 	return join("\n    ", "", @message);
+}
+
+=method commands_text
+
+Return the help message for additional commands
+
+=cut
+sub commands_text {
+	my ($self) = @_;
+	my @avail_cmd = @{$self->{avail_commands}};
+
+	@avail_cmd and
+	  return "Available commands: " . join(", ", @avail_cmd);
+
+	return;
 }
 
 =method warn
