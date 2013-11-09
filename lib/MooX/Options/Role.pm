@@ -157,12 +157,11 @@ sub parse_options {
 
     my $prog_name = Getopt::Long::Descriptive::prog_name;
     # support of MooX::Cmd
-	if ( $class->can("command_chain") ) {
+	if ( ref $params{command_chain} eq 'ARRAY' ) {
         for my $cmd (@{$params{command_chain}}) {
+			next if !ref $cmd || ! $cmd->can('command_name');
             if (defined (my $cmd_name = $cmd->command_name)) {
                 $prog_name .= ' ' . $cmd_name;
-            } else {
-                $prog_name .= ' ' . join(' ', keys %{$cmd->command_commands});
             }
         }
 	}
