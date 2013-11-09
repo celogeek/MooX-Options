@@ -41,7 +41,21 @@ like $trap->stdout, qr{\QUSAGE: moox-cmd.t [-h]\E}, 'no subcommand pass';
 
 trap {
 	local @ARGV = ('test1', '-h');
+	t::lib::MooXCmdTest->new_with_options(command_chain => [123]);
+};
+
+like $trap->stdout, qr{\QUSAGE: moox-cmd.t [-h]\E}, 'no ref params';
+
+trap {
+	local @ARGV = ('test1', '-h');
 	t::lib::MooXCmdTest->new_with_options(command_chain => [{}]);
+};
+
+like $trap->stdout, qr{\QUSAGE: moox-cmd.t [-h]\E}, 'bad ref';
+
+trap {
+	local @ARGV = ('test1', '-h');
+	t::lib::MooXCmdTest->new_with_options(command_chain => [bless {}, 'MooX::Cmd']);
 };
 
 like $trap->stdout, qr{\QUSAGE: moox-cmd.t [-h]\E}, 'bad ref';
