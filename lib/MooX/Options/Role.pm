@@ -159,10 +159,10 @@ sub parse_options {
     # support of MooX::Cmd
 	if ( ref $params{command_chain} eq 'ARRAY' ) {
         for my $cmd (@{$params{command_chain}}) {
-			next if !ref $cmd || ! $cmd->can('command_name');
+			next if !ref $cmd || !UNIVERSAL::can($cmd,'isa') || ! $cmd->can('command_name');
             if (defined (my $cmd_name = $cmd->command_name)) {
                 $prog_name .= ' ' . $cmd_name;
-            }
+			}
         }
 	}
     my ( $opt, $usage ) = describe_options(
