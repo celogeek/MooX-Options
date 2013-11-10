@@ -19,6 +19,8 @@ use Regexp::Common;
 use Data::Record;
 use JSON;
 use Carp;
+use Pod::Usage qw/pod2usage/;
+use Path::Class;
 
 requires qw/_options_data _options_config/;
 
@@ -37,6 +39,9 @@ sub new_with_options {
 
     if ($cmdline_params{help}) {
         return $class->options_usage($params{help}, $cmdline_params{help});
+    }
+    if ($cmdline_params{man}) {
+        return $class->options_man($cmdline_params{man});
     }
 
     return $self
@@ -183,7 +188,9 @@ sub parse_options {
 
     my ( $opt, $usage ) = describe_options(
         ($usage_str), @options,
-        [ 'help|h', "show this help message" ], @flavour
+        [ 'help|h', "show this help message" ],
+        [ 'man', "show the manual" ],
+        ,@flavour
     );
 
     my %cmdline_params = %params;
@@ -204,8 +211,14 @@ sub parse_options {
         }
     }
 
-    if ( $opt->help() || defined $params{help} ) {
+    if (   $opt->help() || defined $params{help}
+    ) {
         $cmdline_params{help} = $usage;
+    }
+
+    if (   $opt->man() || defined $params{man}
+    ) {
+        $cmdline_params{man} = $usage;
     }
 
     return %cmdline_params;
@@ -237,5 +250,27 @@ sub options_usage {
     exit($code) if $code >= 0;
     return;
 }
+
+=method options_man
+
+Display a pod like a manuel
+
+=cut
+
+sub options_man {
+    my ($class, $usage) = @_;
+    local @ARGV = ();
+    if (!$usage) {
+        local @ARGV = ();
+        my %cmdline_params = $class->parse_options( man => -1 );
+        $usage = $cmdline_params{man};
+    }
+
+    my $man_file = file(Path::Class::tempdir(CLEANUP => 1), 'help.pod');
+    $man_file->spew($usage->option_pod($class->_options_data));
+
+    return pod2usage(-verbose => 2, -input => $man_file->stringify);
+}
+
 
 1;

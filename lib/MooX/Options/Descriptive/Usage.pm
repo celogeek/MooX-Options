@@ -107,6 +107,42 @@ sub option_text {
     return join("\n    ", "", @message);
 }
 
+=method option_pod
+
+Return the usage message in pod format
+
+=cut
+sub option_pod {
+    my ($self, %option_data) = @_;
+    my ($short_usage) = substr($self->leader_text, 7);
+
+    my @man = (
+        "=head1 NAME",
+        Getopt::Long::Descriptive::prog_name,
+        "=head1 SYNOPSIS",
+        $short_usage,
+        "=head1 OPTIONS",
+        "=over",
+    );
+
+    for my $opt(@{$self->{options}}) {
+
+        my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
+        my $format_doc_str;
+        $format_doc_str = $format_doc{$format} if defined $format;
+        
+        my $opt_name = (defined $short ? "-" . $short . " " : "") . "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name} . ":" . (defined $format_doc_str ? " " . $format_doc_str : "");
+
+        push @man, "=item B<".$opt_name.">";
+        push @man, $option_data{$opt->{name}}{long_doc} // $opt->{desc};
+
+    }
+
+    push @man, "=back";
+
+    return join("\n\n", @man);
+}
+
 =method warn
 
 Warn your options help message

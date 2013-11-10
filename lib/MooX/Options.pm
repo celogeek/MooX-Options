@@ -17,7 +17,7 @@ use Carp;
 
 # VERSION
 my @OPTIONS_ATTRIBUTES =
-  qw/format short repeatable negativable autosplit doc order json/;
+  qw/format short repeatable negativable autosplit doc long_doc order json/;
 
 sub import {
     my ( undef, @import ) = @_;
@@ -112,7 +112,7 @@ sub import {
     };
 
     my @banish_keywords =
-      qw/help option new_with_options parse_options options_usage _options_data _options_config/;
+      qw/help man option new_with_options parse_options options_usage _options_data _options_config/;
     if ( $options_config->{with_config_from_file} ) {
         push @banish_keywords, qw/config_files config_prefix config_dirs/;
     }
