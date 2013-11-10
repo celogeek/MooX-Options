@@ -1,10 +1,10 @@
-package t::lib::MooXCmdTest;
+package t::lib::MooXCmdTest::Cmd::test3;
+
 use Moo;
 use MooX::Cmd;
 use MooX::Options;
 
 sub execute {
-    die "need a sub command !";
+    die "test3";
 }
-
 1;

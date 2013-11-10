@@ -9,11 +9,11 @@ use FindBin qw/$RealBin/;
 use Try::Tiny;
 
 BEGIN {
-	eval 'use Mo 0.36';
-	if ($@) {
-    	plan skip_all => 'Need Mo (0.36) for this test';
-		exit 0;
-	}
+    eval 'use Mo 0.36';
+    if ($@) {
+        plan skip_all => 'Need Mo (0.36) for this test';
+        exit 0;
+    }
 }
 
 {

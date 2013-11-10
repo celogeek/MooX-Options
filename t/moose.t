@@ -9,11 +9,11 @@ use FindBin qw/$RealBin/;
 use Try::Tiny;
 
 BEGIN {
-	eval 'use Moose';
-	if ($@) {
-		plan skip_all => 'Need Moose for this test';
-		exit 0;
-	}
+    eval 'use Moose';
+    if ($@) {
+        plan skip_all => 'Need Moose for this test';
+        exit 0;
+    }
 }
 
 {
