@@ -267,7 +267,7 @@ sub options_man {
     }
 
     my $man_file = file(Path::Class::tempdir(CLEANUP => 1), 'help.pod');
-    $man_file->spew($usage->option_pod($class->_options_data));
+    $man_file->spew($usage->option_pod($class));
 
     return pod2usage(-verbose => 2, -input => $man_file->stringify);
 }

@@ -25,6 +25,8 @@ sub import {
         protect_argv          => 1,  flavour            => [],
         skip_options          => [], prefer_commandline => 0,
         with_config_from_file => 0,
+        #long description (manual)
+        description => undef, authors => [],
         @import
     };
 

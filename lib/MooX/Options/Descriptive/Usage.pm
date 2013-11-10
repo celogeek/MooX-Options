@@ -16,6 +16,7 @@ use warnings;
 use feature 'say';
 use Text::WrapI18N;
 use Term::Size::Any qw/chars/;
+use Getopt::Long::Descriptive;
 
 my %format_doc = (
     's'  => 'String',
@@ -113,16 +114,26 @@ Return the usage message in pod format
 
 =cut
 sub option_pod {
-    my ($self, %option_data) = @_;
+    my ($self, $options) = @_;
     my ($short_usage) = substr($self->leader_text, 7);
+
+    my %options_config = $options->_options_config;
+    my %options_data = $options->_options_data;
 
     my @man = (
         "=head1 NAME",
         Getopt::Long::Descriptive::prog_name,
+    );
+
+    if (defined (my $description = $options_config{description})) {
+        push @man, "=head1 DESCRIPTION", $description;
+    }
+
+    push @man, (
         "=head1 SYNOPSIS",
         $short_usage,
         "=head1 OPTIONS",
-        "=over",
+        "=over"
     );
 
     for my $opt(@{$self->{options}}) {
@@ -134,11 +145,23 @@ sub option_pod {
         my $opt_name = (defined $short ? "-" . $short . " " : "") . "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name} . ":" . (defined $format_doc_str ? " " . $format_doc_str : "");
 
         push @man, "=item B<".$opt_name.">";
-        push @man, $option_data{$opt->{name}}{long_doc} // $opt->{desc};
+        push @man, $options_data{$opt->{name}}{long_doc} // $opt->{desc};
 
     }
-
     push @man, "=back";
+
+    if (defined (my $authors = $options_config{authors})) {
+        push @man, (
+            "=head1 AUTHORS",
+            "=over"
+        );
+        if (ref $authors eq 'ARRAY') {
+            push @man, map { "=item B<" . $_ . ">" } @$authors;
+        } else {
+            push @man, "=item B<" . $authors . ">";
+        }
+        push @man, "=back"
+    }
 
     return join("\n\n", @man);
 }
