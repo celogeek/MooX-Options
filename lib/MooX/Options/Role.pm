@@ -167,8 +167,22 @@ sub parse_options {
             }
         }
     }
+    # list of all sub command
+    my $sub_command;
+    if (ref $params{command_commands} eq 'HASH') {
+        $sub_command = join(' | ', sort keys %{$params{command_commands}});
+        if (length($sub_command)) {
+            $sub_command = "[" . $sub_command . "]";
+        }
+    }
+    
+    # create usage str
+    my $usage_str = "USAGE: $prog_name";
+    $usage_str .= " " . $sub_command if defined $sub_command;
+    $usage_str .= " %o";
+
     my ( $opt, $usage ) = describe_options(
-        ("USAGE: $prog_name %o"), @options,
+        ($usage_str), @options,
         [ 'help|h', "show this help message" ], @flavour
     );
 
