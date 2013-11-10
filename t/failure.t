@@ -82,42 +82,42 @@ __EOF__
 }
 
 {
-	eval <<__EOF__
-	{
-		package MissingWith;
-		use MooX::Options;
-		1;
-	}
+    eval <<__EOF__
+    {
+        package MissingWith;
+        use MooX::Options;
+        1;
+    }
 __EOF__
-	;
-	like $@, qr/^\QCan't find the method <with> in <MissingWith> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/, 'missing with';
+    ;
+    like $@, qr/^\QCan't find the method <with> in <MissingWith> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/, 'missing with';
 }
 
 {
-	eval <<__EOF__
-	{
-		package MissingAround;
-		sub with {};
-		use MooX::Options;
-		1;
-	}
+    eval <<__EOF__
+    {
+        package MissingAround;
+        sub with {};
+        use MooX::Options;
+        1;
+    }
 __EOF__
-	;
-	like $@, qr/^\QCan't find the method <around> in <MissingAround> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/, 'missing with';
+    ;
+    like $@, qr/^\QCan't find the method <around> in <MissingAround> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/, 'missing with';
 }
 
 {
-	eval <<__EOF__
-	{
-		package MissingHas;
-		sub with {};
-		sub around {};
-		use MooX::Options;
-		1;
-	}
+    eval <<__EOF__
+    {
+        package MissingHas;
+        sub with {};
+        sub around {};
+        use MooX::Options;
+        1;
+    }
 __EOF__
-	;
-	like $@, qr/^\QCan't find the method <has> in <MissingHas> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/, 'missing with';
+    ;
+    like $@, qr/^\QCan't find the method <has> in <MissingHas> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/, 'missing with';
 }
 
 done_testing;

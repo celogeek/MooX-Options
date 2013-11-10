@@ -4,7 +4,7 @@ use MooX::Cmd;
 use MooX::Options;
 
 sub execute {
-	die "need a sub command !";
+    die "need a sub command !";
 }
 
 1;

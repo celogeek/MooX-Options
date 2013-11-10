@@ -5,7 +5,7 @@ use MooX::Cmd;
 use MooX::Options;
 
 sub execute {
-	die "test2";
+    die "test2";
 }
 1;
 

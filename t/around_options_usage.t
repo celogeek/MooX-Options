@@ -21,12 +21,12 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
     );
 
     around options_usage => sub {
-    	my ($orig, $self, $code, @message) = @_;
-    	$code = 0 if !defined $code;
-    	print "This is a pre message\n";
-    	$self->$orig(-1, @message);
-    	print "\nThis is a post message\n";
-    	exit($code) if $code >= 0;
+        my ($orig, $self, $code, @message) = @_;
+        $code = 0 if !defined $code;
+        print "This is a pre message\n";
+        $self->$orig(-1, @message);
+        print "\nThis is a post message\n";
+        exit($code) if $code >= 0;
     };
 
     1;

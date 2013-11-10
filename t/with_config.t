@@ -46,14 +46,14 @@ ok $t->can('config_files'),  '... config files defined';
 }
 
 eval <<EOF
-	package MyTestWithConfigRole;
-	use Moo::Role;
-	use MooX::Options with_config_from_file => 1;
+    package MyTestWithConfigRole;
+    use Moo::Role;
+    use MooX::Options with_config_from_file => 1;
 
-	option 'p1' => (is => 'ro', format => 'i', required => 1);
-	option 'p2' => (is => 'ro', format => 'i\@', required => 1);
+    option 'p1' => (is => 'ro', format => 'i', required => 1);
+    option 'p2' => (is => 'ro', format => 'i\@', required => 1);
 
-	1;
+    1;
 EOF
   ;
 like $@,
@@ -61,30 +61,30 @@ like $@,
   'error when try to include with_config_from_file into a role';
 
 eval <<EOF
-	package MyTestWithConfigFail;
-	use Moo;
-	use MooX::Options with_config_from_file => 1;
+    package MyTestWithConfigFail;
+    use Moo;
+    use MooX::Options with_config_from_file => 1;
 
-	option 'p1' => (is => 'ro', format => 'i', required => 1);
-	option 'p2' => (is => 'ro', format => 'i\@', required => 1);
-	option 'config_files' => (is => 'ro');
+    option 'p1' => (is => 'ro', format => 'i', required => 1);
+    option 'p2' => (is => 'ro', format => 'i\@', required => 1);
+    option 'config_files' => (is => 'ro');
 
-	1;
+    1;
 EOF
   ;
 like $@,
   qr/\QYou cannot use an option with the name 'config_files', it is implied by MooX::Options\E/x,
   'keywords when we use config is bannish';
 eval <<EOF
-	package MyTestWithConfigSuccess;
-	use Moo;
-	use MooX::Options with_config_from_file => 0;
+    package MyTestWithConfigSuccess;
+    use Moo;
+    use MooX::Options with_config_from_file => 0;
 
-	option 'p1' => (is => 'ro', format => 'i', required => 1);
-	option 'p2' => (is => 'ro', format => 'i\@', required => 1);
-	option 'config_files' => (is => 'ro');
+    option 'p1' => (is => 'ro', format => 'i', required => 1);
+    option 'p2' => (is => 'ro', format => 'i\@', required => 1);
+    option 'config_files' => (is => 'ro');
 
-	1;
+    1;
 EOF
   ;
 ok !$@, '... and not without the config option';

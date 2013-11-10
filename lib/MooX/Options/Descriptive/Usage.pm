@@ -49,12 +49,12 @@ The options spec of your message
 =cut
 
 sub new {
-	my ($class, $args) = @_;
+    my ($class, $args) = @_;
 
-	my %self;
-	@self{qw/options leader_text/} = @$args{qw/options leader_text/};
+    my %self;
+    @self{qw/options leader_text/} = @$args{qw/options leader_text/};
 
-	return bless \%self => $class;
+    return bless \%self => $class;
 }
 
 =method leader_text
@@ -70,18 +70,18 @@ Return the full text help, leader and option text.
 
 =cut
 sub text {
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return join("\n", $self->leader_text, $self->option_text);
+    return join("\n", $self->leader_text, $self->option_text);
 }
 
 # set the column size of your terminal into the wrapper
 sub _set_column_size {
-	my ($columns) = chars();
-	$columns //= 78;
-	$columns = $ENV{TEST_FORCE_COLUMN_SIZE} if defined $ENV{TEST_FORCE_COLUMN_SIZE};
-	$Text::WrapI18N::columns = $columns - 4;
-	return;
+    my ($columns) = chars();
+    $columns //= 78;
+    $columns = $ENV{TEST_FORCE_COLUMN_SIZE} if defined $ENV{TEST_FORCE_COLUMN_SIZE};
+    $Text::WrapI18N::columns = $columns - 4;
+    return;
 }
 
 =method option_text
@@ -90,21 +90,21 @@ Return the help message for your options
 
 =cut
 sub option_text {
-	my ($self) = @_;
-	my $options = $self->{options};
+    my ($self) = @_;
+    my $options = $self->{options};
 
-	my @message;
-	_set_column_size;
-	for my $opt(@$options) {
-		my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
-		my $format_doc_str;
-		$format_doc_str = $format_doc{$format} if defined $format;
-		push @message, (defined $short ? "-" . $short . " " : "") . "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name} . ":" . (defined $format_doc_str ? " " . $format_doc_str : "");
-		push @message, wrap("    ", "        ", $opt->{desc});
-		push @message, "";
-	}
+    my @message;
+    _set_column_size;
+    for my $opt(@$options) {
+        my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
+        my $format_doc_str;
+        $format_doc_str = $format_doc{$format} if defined $format;
+        push @message, (defined $short ? "-" . $short . " " : "") . "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name} . ":" . (defined $format_doc_str ? " " . $format_doc_str : "");
+        push @message, wrap("    ", "        ", $opt->{desc});
+        push @message, "";
+    }
 
-	return join("\n    ", "", @message);
+    return join("\n    ", "", @message);
 }
 
 =method warn
@@ -123,8 +123,8 @@ sub die  { return CORE::die  shift->text }
 
 
 use overload (
-	q{""} => "text",
-	'&{}' => sub {
+    q{""} => "text",
+    '&{}' => sub {
     my ($self) = @_;
     return sub { my ($self) = @_; return $self ? $self->text : $self->warn; };
   }
