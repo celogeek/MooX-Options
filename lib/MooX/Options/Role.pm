@@ -253,18 +253,18 @@ Display a pod like a manuel
 =cut
 
 sub options_man {
-    my ($class, $usage) = @_;
+    my ($class, $usage, $output) = @_;
     local @ARGV = ();
     if (!$usage) {
         local @ARGV = ();
-        my %cmdline_params = $class->parse_options( man => -1 );
+        my %cmdline_params = $class->parse_options( man => 1 );
         $usage = $cmdline_params{man};
     }
 
     my $man_file = file(Path::Class::tempdir(CLEANUP => 1), 'help.pod');
     $man_file->spew($usage->option_pod($class));
 
-    return pod2usage(-verbose => 2, -input => $man_file->stringify);
+    return pod2usage(-verbose => 2, -input => $man_file->stringify, -exitval => 0);
 }
 
 
