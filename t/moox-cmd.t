@@ -23,7 +23,8 @@ trap {
     t::lib::MooXCmdTest->new_with_cmd;
 };
 
-like $trap->stdout, qr{\QUSAGE: moox-cmd.t [test1 | test3] [-h]\E}, 'base command help ok';
+like $trap->stdout, qr{\QUSAGE: moox-cmd.t [-h]\E}, 'base command help ok';
+like $trap->stdout, qr{\QSUB COMMANDS AVAILABLE: test1, test3\E}, 'sub base command help ok';
 
 
 trap {
@@ -31,7 +32,8 @@ trap {
     t::lib::MooXCmdTest->new_with_cmd();
 };
 
-like $trap->stdout, qr{\QUSAGE: moox-cmd.t test1 [test2] [-h]\E}, 'subcommand 1 ok';
+like $trap->stdout, qr{\QUSAGE: moox-cmd.t test1 [-h]\E}, 'subcommand 1 help ok';
+like $trap->stdout, qr{\QSUB COMMANDS AVAILABLE: test2\E}, 'sub subcommand 1 help ok';
 
 trap {
     local @ARGV = ('test1', '-h');
@@ -73,7 +75,8 @@ trap {
     t::lib::MooXCmdTest->new_with_options(command_chain => [t::lib::MooXCmdTest->new(command_name => 'mySub')], command_commands => {a => 1, b => 2});
 };
 
-like $trap->stdout, qr{\QUSAGE: moox-cmd.t mySub [a | b] [-h]\E}, 'subcommand with mySub name';
+like $trap->stdout, qr{\QUSAGE: moox-cmd.t mySub [-h]\E}, 'subcommand with mySub name';
+like $trap->stdout, qr{\QSUB COMMANDS AVAILABLE: a, b\E}, 'sub subcommand with mySub name';
 
 trap {
     local @ARGV = ('test1', 'test2', '-h');
