@@ -164,18 +164,6 @@ sub option_pod {
         $prog_name . " [-h] [long options ...]",
     );
 
-    if (@$sub_commands) {
-        push @man, "=head1 AVAILABLE SUB COMMANDS";
-        push @man, "=over";
-        for my $sub_command(@$sub_commands) {
-            push @man, (
-                "=item B<" . $sub_command . "> :",
-                $prog_name . " " . $sub_command . " [-h] [long options ...]",
-            );
-        }
-        push @man, "=back";
-    }
-
     if (defined (my $synopsis = $options_config{synopsis})) {
         push @man, $synopsis;
     }
@@ -199,17 +187,20 @@ sub option_pod {
         my $opt_data = $options_data{$opt->{name}} // {};
         push @man, $opt_data->{long_doc} // $opt->{desc};
 
-        if ($opt_data->{repeatable}) {
-            push @man, "This option can be used multiple time :";
-            push @man, "  " . $opt_long_name . "=123" . " " . $opt_long_name . "=234";
-        }
-        if (defined (my $autosplit = $opt_data->{autosplit})) {
-            push @man, "This option support the autosplit feature with the char 'B<$autosplit>' :";
-            push @man, "  " . $opt_long_name . "=123,234";
-        }
-
     }
     push @man, "=back";
+
+    if (@$sub_commands) {
+        push @man, "=head1 AVAILABLE SUB COMMANDS";
+        push @man, "=over";
+        for my $sub_command(@$sub_commands) {
+            push @man, (
+                "=item B<" . $sub_command . "> :",
+                $prog_name . " " . $sub_command . " [-h] [long options ...]",
+            );
+        }
+        push @man, "=back";
+    }
 
     if (defined (my $authors = $options_config{authors})) {
         if (!ref $authors && length($authors)) {
