@@ -253,7 +253,7 @@ Display a pod like a manuel
 =cut
 
 sub options_man {
-    my ($class, $usage, $output) = @_;
+    my ($class, $usage) = @_;
     local @ARGV = ();
     if (!$usage) {
         local @ARGV = ();
