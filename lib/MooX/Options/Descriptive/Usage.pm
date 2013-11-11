@@ -77,6 +77,19 @@ Return the leader_text.
 =cut
 sub leader_text { return shift->{leader_text} }
 
+=method sub_commands_text
+
+Return the list of sub commands if available.
+
+=cut
+sub sub_commands_text {
+    my ($self) = @_;
+    my $sub_commands = $self->{sub_commands} //
+        [];
+    return if !@$sub_commands;
+    return "", 'SUB COMMANDS AVAILABLE: ' . join(', ', @$sub_commands), "";
+}
+
 =method text
 
 Return the full text help, leader and option text.
@@ -85,7 +98,7 @@ Return the full text help, leader and option text.
 sub text {
     my ($self) = @_;
 
-    return join("\n", $self->leader_text, $self->option_text);
+    return join("\n", $self->leader_text, $self->option_text, $self->sub_commands_text);
 }
 
 # set the column size of your terminal into the wrapper
@@ -127,7 +140,6 @@ Return the usage message in pod format
 =cut
 sub option_pod {
     my ($self, $options) = @_;
-    my ($short_usage) = substr($self->leader_text, 7);
 
     my %options_config = $options->_options_config;
     my %options_data = $options->_options_data;
@@ -149,7 +161,7 @@ sub option_pod {
 
     push @man, (
         "=head1 SYNOPSIS",
-        $short_usage,
+        $prog_name . " [-h] [long options ...]",
     );
 
     if (@$sub_commands) {
