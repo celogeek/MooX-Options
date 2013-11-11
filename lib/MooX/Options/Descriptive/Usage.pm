@@ -29,6 +29,18 @@ my %format_doc = (
     'f@' => '[Reals]',
 );
 
+my %format_long_doc = (
+    's'  => 'String',
+    's@' => 'Array of Strings',
+    'i'  => 'Integer',
+    'i@' => 'Array of Integers',
+    'o'  => 'Extended Integer',
+    'o@' => 'Array of extended integers',
+    'f'  => 'Real number',
+    'f@' => 'Array of real numbers',
+);
+
+
 =method new
 
 The object is create with L<MooX::Options::Descriptive>.
@@ -132,6 +144,13 @@ sub option_pod {
     push @man, (
         "=head1 SYNOPSIS",
         $short_usage,
+    );
+
+    if (defined (my $synopsis = $options_config{synopsis})) {
+        push @man, $synopsis;
+    }
+
+    push @man, (
         "=head1 OPTIONS",
         "=over"
     );
@@ -140,27 +159,40 @@ sub option_pod {
 
         my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
         my $format_doc_str;
-        $format_doc_str = $format_doc{$format} if defined $format;
+        $format_doc_str = $format_long_doc{$format} if defined $format;
         
-        my $opt_name = (defined $short ? "-" . $short . " " : "") . "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name} . ":" . (defined $format_doc_str ? " " . $format_doc_str : "");
+        my $opt_long_name = "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name};
+        my $opt_name = (defined $short ? "-" . $short . " " : "") . $opt_long_name . ":" . (defined $format_doc_str ? " " . $format_doc_str : "");
 
         push @man, "=item B<".$opt_name.">";
-        push @man, $options_data{$opt->{name}}{long_doc} // $opt->{desc};
+
+        my $opt_data = $options_data{$opt->{name}} // {};
+        push @man, $opt_data->{long_doc} // $opt->{desc};
+
+        if ($opt_data->{repeatable}) {
+            push @man, "This option can be used multiple time :";
+            push @man, "  " . $opt_long_name . "=123" . " " . $opt_long_name . "=234";
+        }
+        if (defined (my $autosplit = $opt_data->{autosplit})) {
+            push @man, "This option support the autosplit feature with the char 'B<$autosplit>' :";
+            push @man, "  " . $opt_long_name . "=123,234";
+        }
 
     }
     push @man, "=back";
 
     if (defined (my $authors = $options_config{authors})) {
-        push @man, (
-            "=head1 AUTHORS",
-            "=over"
-        );
-        if (ref $authors eq 'ARRAY') {
-            push @man, map { "=item B<" . $_ . ">" } @$authors;
-        } else {
-            push @man, "=item B<" . $authors . ">";
+        if (!ref $authors && length($authors)) {
+            $authors = [$authors];
         }
-        push @man, "=back"
+        if (@$authors) {
+            push @man, (
+                "=head1 AUTHORS",
+                "=over"
+            );
+            push @man, map { "=item B<" . $_ . ">" } @$authors;
+            push @man, "=back"
+        }
     }
 
     return join("\n\n", @man);

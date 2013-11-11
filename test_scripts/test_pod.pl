@@ -26,9 +26,14 @@ use lib 'lib';
 {
 	package myOpt;
 	use Moo;
-	use MooX::Options description => "Hello world !", authors => ['Celogeek <me@celogeek.com>', 'Test <me@test.com>'];
+	use MooX::Options
+	description => "Hello world !",
+	authors => ['Celogeek <me@celogeek.com>', 'Test <me@test.com>'],
+	synopsis => 
+	"This is a test. An it works !";
 
 	option 'test' => (is => 'ro', format => 's', doc => 'pouet', long_doc => 'pouet pouet');
+	option 'test2' => (is => 'ro', autosplit => ',', format => 's@', doc => 'pouet', long_doc => 'pouet pouet');
 
 	1;
 }
