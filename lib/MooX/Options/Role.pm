@@ -34,7 +34,22 @@ Check full doc L<MooX::Options> for more details.
 
 sub new_with_options {
     my ( $class, %params ) = @_;
-    my $self;
+    
+    #save subcommand
+    # TODO The Around should be call from MooX::Cmd
+    
+    # my $command_chain = delete $params{command_chain};
+    # my $command_commands = delete $params{command_commands};
+
+    # if (defined ($command_chain // $command_commands)) {
+    #     $class->can('around')->(
+    #         _options_config => sub {
+    #             my ( $orig, $self ) = ( shift, shift );
+    #             return ( $self->$orig(@_), command_chain => $command_chain, command_commands => $command_commands );
+    #         }
+    #     );
+    # }
+
     my %cmdline_params = $class->parse_options(%params);
 
     if ($cmdline_params{help}) {
@@ -44,6 +59,7 @@ sub new_with_options {
         return $class->options_man($cmdline_params{man});
     }
 
+    my $self;
     return $self
       if eval { $self = $class->new( %cmdline_params ); 1 };
     if ( $@ =~ /^Attribute\s\((.*?)\)\sis\srequired/x ) {
@@ -162,8 +178,8 @@ sub parse_options {
 
     my $prog_name = Getopt::Long::Descriptive::prog_name;
     # support of MooX::Cmd
-    if ( ref $params{command_chain} eq 'ARRAY' ) {
-        for my $cmd (@{$params{command_chain}}) {
+    if ( ref $options_config{command_chain} eq 'ARRAY' ) {
+        for my $cmd (@{$options_config{command_chain}}) {
             next if !ref $cmd;
             next if !UNIVERSAL::can($cmd,'isa');
             next if !$cmd->can('command_name');
@@ -184,8 +200,8 @@ sub parse_options {
     );
 
     $usage->{prog_name} = $prog_name;
-    if (ref $params{command_commands} eq 'HASH') {
-        $usage->{sub_commands} = [sort keys %{$params{command_commands}}];
+    if (ref $options_config{command_commands} eq 'HASH') {
+        $usage->{sub_commands} = [sort keys %{$options_config{command_commands}}];
     }
 
     my %cmdline_params = %params;
