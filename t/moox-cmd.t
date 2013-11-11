@@ -6,7 +6,7 @@ use Test::More;
 use Test::Trap;
 use Carp;
 use FindBin qw/$RealBin/;
-use Try::Tiny;
+use Capture::Tiny qw/capture_stdout/;
 
 BEGIN {
     eval 'use MooX::Cmd 0.007';
@@ -26,6 +26,15 @@ trap {
 like $trap->stdout, qr{\QUSAGE: moox-cmd.t [-h]\E}, 'base command help ok';
 like $trap->stdout, qr{\QSUB COMMANDS AVAILABLE: test1, test3\E}, 'sub base command help ok';
 
+my $pod_help = do {
+    local @ARGV = ();
+    my $m = t::lib::MooXCmdTest->new;
+    my %cmdline = $m->parse_options(man => 1);
+    $cmdline{man}->option_pod($m);
+};
+
+like $pod_help, qr{\=head1 DESCRIPTION\s+\QThis is a test sub command\E}, 'pod description ok';
+like $pod_help, qr{\=head1 AUTHORS\s+\=over\s+\Q=item B<Celogeek <me\E\@\Qcelogeek.com>>\E}, 'pod author ok';
 
 trap {
     local @ARGV = ('test1', '-h');
