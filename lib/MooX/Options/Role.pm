@@ -172,19 +172,9 @@ sub parse_options {
             }
         }
     }
-    # list of all sub command
-    my $sub_command;
-    if (ref $params{command_commands} eq 'HASH') {
-        $sub_command = join(' | ', sort keys %{$params{command_commands}});
-        if (length($sub_command)) {
-            $sub_command = "[" . $sub_command . "]";
-        }
-    }
     
     # create usage str
-    my $usage_str = "USAGE: $prog_name";
-    $usage_str .= " " . $sub_command if defined $sub_command;
-    $usage_str .= " %o";
+    my $usage_str = "USAGE: $prog_name %o";
 
     my ( $opt, $usage ) = describe_options(
         ($usage_str), @options,
@@ -192,6 +182,11 @@ sub parse_options {
         [ 'man', "show the manual" ],
         ,@flavour
     );
+
+    $usage->{prog_name} = $prog_name;
+    if (ref $params{command_commands} eq 'HASH') {
+        $usage->{sub_commands} = [sort keys %{$params{command_commands}}];
+    }
 
     my %cmdline_params = %params;
     for my $name ( keys %options_data ) {

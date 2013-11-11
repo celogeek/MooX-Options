@@ -132,9 +132,15 @@ sub option_pod {
     my %options_config = $options->_options_config;
     my %options_data = $options->_options_data;
 
+    my $prog_name = $self->{prog_name} //
+        Getopt::Long::Descriptive::prog_name;
+
+    my $sub_commands = $self->{sub_commands} //
+        [];
+
     my @man = (
         "=head1 NAME",
-        Getopt::Long::Descriptive::prog_name,
+        $prog_name,
     );
 
     if (defined (my $description = $options_config{description})) {
@@ -145,6 +151,18 @@ sub option_pod {
         "=head1 SYNOPSIS",
         $short_usage,
     );
+
+    if (@$sub_commands) {
+        push @man, "=head1 AVAILABLE SUB COMMANDS";
+        push @man, "=over";
+        for my $sub_command(@$sub_commands) {
+            push @man, (
+                "=item B<" . $sub_command . "> :",
+                $prog_name . " " . $sub_command . " [-h] [long options ...]",
+            );
+        }
+        push @man, "=back";
+    }
 
     if (defined (my $synopsis = $options_config{synopsis})) {
         push @man, $synopsis;
