@@ -21,7 +21,7 @@ use JSON;
 use Carp;
 use Pod::Usage qw/pod2usage/;
 use Path::Class;
-use feature 'state';
+use Scalar::Util qw/blessed/;
 
 requires qw/_options_data _options_config/;
 
@@ -43,9 +43,7 @@ sub new_with_options {
              _options_prog_name => sub {
                 my $prog_name = Getopt::Long::Descriptive::prog_name;
                 for my $cmd (@$command_chain) {
-                    next if !ref $cmd;
-                    next if !UNIVERSAL::can($cmd,'isa');
-                    next if !$cmd->can('command_name');
+                    next if !blessed $cmd || !$cmd->can('command_name');
                     if (defined (my $cmd_name = $cmd->command_name)) {
                         $prog_name .= ' ' . $cmd_name;
                     }
@@ -110,10 +108,10 @@ sub parse_options {
         delete @options_data{@{$options_config{skip_options}}};
     }
 
-    my ($options, $has_to_split) = $class->_options_prepare_descriptive(\%options_data);
+    my ($options, $has_to_split) = _options_prepare_descriptive(\%options_data);
 
     local @ARGV = @ARGV if $options_config{protect_argv};
-    @ARGV = $class->_options_split_with($has_to_split) if %$has_to_split;
+    @ARGV = _options_split_with($has_to_split) if %$has_to_split;
 
     my @flavour;
     if ( defined $options_config{flavour} ) {
@@ -217,7 +215,7 @@ sub options_man {
 }
 
 sub _option_name {
-    my ( $class, $name, %data ) = @_;
+    my ( $name, %data ) = @_;
     my $cmdline_name = $name;
     $cmdline_name .= '|' . $data{short} if defined $data{short};
     #dash name support
@@ -233,7 +231,7 @@ sub _option_name {
 }
 
 sub _options_prepare_descriptive {
-    my ($class, $options_data) = @_;
+    my ($options_data) = @_;
 
     my @options;
     my %has_to_split;
@@ -248,7 +246,7 @@ sub _options_prepare_descriptive {
         my $doc  = $data{doc};
         $doc = "no doc for $name" if !defined $doc;
 
-        push @options, [ $class->_option_name( $name, %data ), $doc ];
+        push @options, [ _option_name( $name, %data ), $doc ];
         
         if ( defined $data{autosplit} ) {
             $has_to_split{"--${name}"} = Data::Record->new(
@@ -267,7 +265,7 @@ sub _options_prepare_descriptive {
 }
 
 sub _options_split_with {
-    my ($class, $has_to_split) = @_;
+    my ($has_to_split) = @_;
 
     my @new_argv;
     #parse all argv
@@ -294,7 +292,7 @@ sub _options_split_with {
 }
 
 sub _options_prog_name {
-    Getopt::Long::Descriptive::prog_name;
+    return Getopt::Long::Descriptive::prog_name;
 }
 
 sub _options_sub_commands {
