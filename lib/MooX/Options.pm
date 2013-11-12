@@ -570,13 +570,46 @@ If you have a subcommand "sub1", and another subcommand "sub2" of "sub1", this :
 
   myTools sub1 sub2 -h
 
-display an usage message :
+display an usage message from myTools :
 
-  USAGE: myTools sub1 sub2 [-h] ...
+  USAGE: myTools [-h] ...
+  ...
+  SUB COMMANDS AVAILABLE: sub1
 
-=head1 no more Mouse support
+display an usage message from myTools sub1:
 
-If you are using Mouse, I'm sorry to say than the rewrite of this module has make it just incompatible. Mouse is not design to by compatible with anything else than Mouse itself. I could just suggest to use Moo instead, which is a great and compatible replacement.
+  USAGE: myTools sub1 [-h] ...
+  ...
+  SUB COMMANDS AVAILABLE: sub2
+
+=head1 Man support
+
+The option "--man" is now avaible. And you can do more than only with "--help" option.
+
+The import support those options :
+
+=over
+
+=item description
+
+The description of your tools.
+
+=item authors
+
+The list of authors of your tools. You can use ever a string or an arrayref :
+
+  use MooX::Options authors => 'Celogeek <me@celogeek.com>'
+
+  use MooX::Options authors => ['Celogeek <me@celogeek.com', 'Jens Rehsack']
+
+=item synopsis
+
+  you can define a full example in pod format. This will be placed in the synopsis section
+
+=back
+
+The "option" key also support "long_doc" which will replace the default "doc" for the "--man".
+Use it for a more explicit help message.
 
 =head1 More examples
 
