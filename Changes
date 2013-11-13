@@ -1,3 +1,6 @@
+3.99  2013-11-13 09:36:51 GMT
+    * Feature #195 : Use pod2usage for help (Celogeek San)
+
 3.98  2013-11-10 13:03:41 GMT
     * Feature #369 : Add support of List of all subcommand from MooX::Cmd (Celogeek San)
 

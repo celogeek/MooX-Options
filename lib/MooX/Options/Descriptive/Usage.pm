@@ -16,6 +16,7 @@ use warnings;
 use feature 'say';
 use Text::WrapI18N;
 use Term::Size::Any qw/chars/;
+use Getopt::Long::Descriptive;
 
 my %format_doc = (
     's'  => 'String',
@@ -27,6 +28,18 @@ my %format_doc = (
     'f'  => 'Real',
     'f@' => '[Reals]',
 );
+
+my %format_long_doc = (
+    's'  => 'String',
+    's@' => 'Array of Strings',
+    'i'  => 'Integer',
+    'i@' => 'Array of Integers',
+    'o'  => 'Extended Integer',
+    'o@' => 'Array of extended integers',
+    'f'  => 'Real number',
+    'f@' => 'Array of real numbers',
+);
+
 
 =method new
 
@@ -64,6 +77,19 @@ Return the leader_text.
 =cut
 sub leader_text { return shift->{leader_text} }
 
+=method sub_commands_text
+
+Return the list of sub commands if available.
+
+=cut
+sub sub_commands_text {
+    my ($self) = @_;
+    my $sub_commands = $self->{sub_commands} //
+        [];
+    return if !@$sub_commands;
+    return "", 'SUB COMMANDS AVAILABLE: ' . join(', ', @$sub_commands), "";
+}
+
 =method text
 
 Return the full text help, leader and option text.
@@ -72,7 +98,7 @@ Return the full text help, leader and option text.
 sub text {
     my ($self) = @_;
 
-    return join("\n", $self->leader_text, $self->option_text);
+    return join("\n", $self->leader_text, $self->option_text, $self->sub_commands_text);
 }
 
 # set the column size of your terminal into the wrapper
@@ -105,6 +131,92 @@ sub option_text {
     }
 
     return join("\n    ", "", @message);
+}
+
+=method option_pod
+
+Return the usage message in pod format
+
+=cut
+sub option_pod {
+    my ($self, $options) = @_;
+
+    my %options_config = $options->_options_config;
+    my %options_data = $options->_options_data;
+
+    my $prog_name = $self->{prog_name} //
+        Getopt::Long::Descriptive::prog_name;
+
+    my $sub_commands = $self->{sub_commands} //
+        [];
+
+    my @man = (
+        "=head1 NAME",
+        $prog_name,
+    );
+
+    if (defined (my $description = $options_config{description})) {
+        push @man, "=head1 DESCRIPTION", $description;
+    }
+
+    push @man, (
+        "=head1 SYNOPSIS",
+        $prog_name . " [-h] [long options ...]",
+    );
+
+    if (defined (my $synopsis = $options_config{synopsis})) {
+        push @man, $synopsis;
+    }
+
+    push @man, (
+        "=head1 OPTIONS",
+        "=over"
+    );
+
+    for my $opt(@{$self->{options}}) {
+
+        my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
+        my $format_doc_str;
+        $format_doc_str = $format_long_doc{$format} if defined $format;
+        
+        my $opt_long_name = "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name};
+        my $opt_name = (defined $short ? "-" . $short . " " : "") . $opt_long_name . ":" . (defined $format_doc_str ? " " . $format_doc_str : "");
+
+        push @man, "=item B<".$opt_name.">";
+
+        my $opt_data = $options_data{$opt->{name}} // {};
+        push @man, $opt_data->{long_doc} // $opt->{desc};
+
+    }
+    push @man, "=back";
+
+    if (@$sub_commands) {
+        push @man, "=head1 AVAILABLE SUB COMMANDS";
+        push @man, "=over";
+        for my $sub_command(@$sub_commands) {
+            push @man, (
+                "=item B<" . $sub_command . "> :",
+                $prog_name . " " . $sub_command . " [-h] [long options ...]",
+            );
+        }
+        push @man, "=back";
+    }
+
+    if (defined (my $authors = $options_config{authors})) {
+        if (!ref $authors && length($authors)) {
+            $authors = [$authors];
+        }
+        if (@$authors) {
+            push @man, (
+                "=head1 AUTHORS",
+                "=over"
+            );
+            push @man, map { "=item B<" . $_ . ">" } @$authors;
+            push @man, "=back"
+        }
+    }
+
+    return join("\n\n", @man);
 }
 
 =method warn
