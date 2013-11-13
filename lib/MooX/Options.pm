@@ -625,7 +625,7 @@ L<http://perltalks.celogeek.com/slides/2012/08/moox-options-slide3d.html>
 
 =item Torsten Raudssus (Getty) : to use it a lot in L<DuckDuckGo|http://duckduckgo.com> (go to see L<MooX> module also)
 
-=item Jens Rehsack (REHSACK) : to purpose the with_config_from_file idea for PKGSRC.
+=item Jens Rehsack (REHSACK) : to purpose the with_config_from_file idea for PKGSRC, and support of MooX::Cmd.
 
 =back
 
