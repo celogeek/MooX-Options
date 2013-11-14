@@ -14,7 +14,7 @@ Create a command line tools with your L<Mo>, L<Moo>, L<Moose> objects.
     use Moo;
     use MooX::Options;
     
-    option 'show_files' => (
+    option 'show_this_file' => (
         is => 'ro',
         format => 's',
         required => 1,
@@ -29,12 +29,17 @@ Create a command line tools with your L<Mo>, L<Moo>, L<Moose> objects.
     my $opt = myOptions->new_with_options;
     
     say "Content of the file : ",
-         file($opt->show_files)->slurp;
+         file($opt->show_this_file)->slurp;
 
 =cut
 
-=head1 Tutorials
+=head1 DOCUMENTATIONS
 
+=over
+
+=item * L<QuickStart|MooX::Options::Docs::QuickStart>
+
+=back
 =cut
 
 use strict;
