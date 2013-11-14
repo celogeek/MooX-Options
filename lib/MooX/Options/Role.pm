@@ -93,7 +93,7 @@ sub new_with_options {
 
 =method parse_options
 
-Parse your options, call L<Getopt::Long::Descriptve> and convert the result for the "new" method.
+Parse your options, call L<Getopt::Long::Descriptive> and convert the result for the "new" method.
 
 It is use by "new_with_options".
 

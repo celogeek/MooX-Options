@@ -4,7 +4,7 @@ package MooX::Options;
 
 =head1 DESCRIPTION
 
-Use L<Getopt::Long::Descritive> to provide command line option for your Mo/Moo/Moose Object.
+Use L<Getopt::Long::Descriptive> to provide command line option for your Mo/Moo/Moose Object.
 
 This module will add "option" which act as "has" but support additional feature for getopt.
 
@@ -201,7 +201,7 @@ The import method can take option :
 
 =item flavour
 
-pass extra arguments for Getopt::Long::Descriptive.  it is usefull if you
+pass extra arguments for L<Getopt::Long::Descriptive>.  it is usefull if you
 want to configure Getopt::Long.
 
     use MooX::Options flavour => [qw( pass_through )];
