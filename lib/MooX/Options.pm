@@ -42,6 +42,8 @@ to generate from your attribute the command line options.
 
 =item * L<QuickStart|MooX::Options::Docs::QuickStart>
 
+=item * L<Philosophy|MooX::Options::Docs::Philosophy>
+
 =item * L<Import parameters|MooX::Options::Docs::Parameters>
 
 =item * L<Option parameters|MooX::Options::Docs::Option>

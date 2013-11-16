@@ -1,0 +1,10 @@
+# PODNAME: MooX::Options::Docs::Philosophy
+# ABSTRACT: Why another option module ?
+
+=head1 DESCRIPTION
+
+I explain here the reason why I have created this module.
+
+=head1 SEE ALSO
+
+L<MooX::Options>

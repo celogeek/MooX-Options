@@ -1,0 +1,14 @@
+# PODNAME: MooX::Options::Docs::Man
+# ABSTRACT: More documentation for the man option
+
+=head1 DESCRIPTION
+
+You can add more documentation for the man option. This is the long option.
+
+=head1 PARAMETERS
+
+=head1 OPTIONS
+
+=head1 SEE ALSO
+
+L<MooX::Options>

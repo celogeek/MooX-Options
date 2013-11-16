@@ -1,0 +1,12 @@
+# PODNAME: MooX::Options::Docs::Option
+# ABSTRACT: Parameter of the option keywords
+
+=head1 DESCRIPTION
+
+The keyword B<option> extend the keyword B<has> with specific parameters for the commandline.
+
+=head1 OPTION PARAMETERS
+
+=head1 SEE ALSO
+
+L<MooX::Options>

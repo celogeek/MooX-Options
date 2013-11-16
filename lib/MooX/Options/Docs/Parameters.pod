@@ -1,6 +1,10 @@
 # PODNAME: MooX::Options::Docs::Parameters
 # ABSTRACT: Import Parameters of MooX::Options
 
+=head1 DESCRIPTION
+
+The list of parameters support by L<MooX::Options>.
+
 =head1 IMPORT PARAMETERS
 
 =over
