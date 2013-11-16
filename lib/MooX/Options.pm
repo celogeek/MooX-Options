@@ -6,6 +6,9 @@ package MooX::Options;
 
 Create a command line tools with your L<Mo>, L<Moo>, L<Moose> objects.
 
+MooX::Options pass specific parameters to L<Getopt::Long::Descriptive>
+to generate from your attribute the command line options.
+
 =cut
 
 =head1 SYNOPSIS
@@ -38,6 +41,12 @@ Create a command line tools with your L<Mo>, L<Moo>, L<Moose> objects.
 =over
 
 =item * L<QuickStart|MooX::Options::Docs::QuickStart>
+
+=item * L<Import parameters|MooX::Options::Docs::Parameters>
+
+=item * L<Option parameters|MooX::Options::Docs::Option>
+
+=item * L<Parameters and options for man|MooX::Options::Docs::Man>
 
 =back
 =cut
