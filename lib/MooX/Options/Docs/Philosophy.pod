@@ -5,6 +5,47 @@
 
 I explain here the reason why I have created this module.
 
+=head1 Why not simply used L<MooseX::Getopt>
+
+=over
+
+=item * The main issue
+
+I was building a tools, with many roles with a lots of attributes.
+Sometimes I need some of them present in the command line,
+but most of them should only be used inside the package.
+
+L<MooseX::Getopt> automatically setup all attributes to be a command line option.
+I have to check all tools, to see if I haven't forget to disable one attribute, and each
+time I add a new one, I need to go through all command line to be sure that this attribute wasn't present
+in the command line.
+
+=item * Moving to Moo
+
+I was moving to L<Moo>, and fail to find MooX::Getopt. The main reason is a simpler class system,
+fast and light.
+
+=back
+
+=head1 The idea
+
+I love to make stuff explicitly. If I want an attribute to be an option from the command line, I want to be able
+to do it explicitly. When I read the code it is obvious.
+
+=head1 The conception
+
+Then I have discuss with Matt S. Trout (mst), explain the situation, and after many release, we have made this
+module. It's clear, easy to use, and completly explicit.
+
+=head1 Keep going
+
+Since then I have keep that philosophy, and try ensure that any modules is always explicit, without any black magic.
+
+The next stuff I'm on, is L<Jedi>. I have ton of issues to make simple stuff with L<Dancer2> and because of the DSL system
+I wasn't able to do something simple and explicit. And well, also hacking this stuff was a nightmare.
+
+So on the same philosophy, L<Jedi> is an explicit Web Framework, without any DSL. Simple to understand, to hack, to maintain.
+
 =head1 SEE ALSO
 
 L<MooX::Options>
