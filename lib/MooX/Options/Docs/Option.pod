@@ -7,6 +7,39 @@ The keyword B<option> extend the keyword B<has> with specific parameters for the
 
 =head1 OPTION PARAMETERS
 
+=head2 doc | documentation
+
+Documentation for the command line option.
+
+=head2 long_doc
+
+Documentation for the man page. By default the B<doc> parameter will be used.
+
+=head2 required
+
+This attribute indicate that the parameter is mandatory.
+This attribute is not really used by L<MooX::Options> but the error message will be handle by it to
+display a consistant error message.
+
+=head2 format
+
+Format of the params. It is the same as L<Getopt::Long::Descriptive>.
+
+Example :
+
+  i : integer
+  i@: array of integer
+  s : string
+  s@: array of string
+  f : float value
+
+by default, it's a boolean value.
+
+Take a look of available format with L<Getopt::Long::Descriptive>.
+
+You need to understand that everything is explicit here. Check L<MooX::Options::Docs::Philosophy> to understand.
+So if you use L<Moose> and you attribute has B<isa => 'Array[Int]'>, that will not implied the format 'i@'.
+
 =head1 SEE ALSO
 
 L<MooX::Options>

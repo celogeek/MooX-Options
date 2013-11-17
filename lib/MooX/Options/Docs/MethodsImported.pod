@@ -5,7 +5,7 @@
 
 The list of the methods automatically imported into your class.
 
-=head1 METHODS
+=head1 IMPORTED METHODS
 
 =head2 options_usage
 

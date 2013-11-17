@@ -7,9 +7,7 @@ I explain here the reason why I have created this module.
 
 =head1 Why not simply used L<MooseX::Getopt>
 
-=over
-
-=item * The main issue
+=head2 The main issue
 
 I was building a tools, with many roles with a lots of attributes.
 Sometimes I need some of them present in the command line,
@@ -20,12 +18,10 @@ I have to check all tools, to see if I haven't forget to disable one attribute, 
 time I add a new one, I need to go through all command line to be sure that this attribute wasn't present
 in the command line.
 
-=item * Moving to Moo
+=head2 Moving to Moo
 
 I was moving to L<Moo>, and fail to find MooX::Getopt. The main reason is a simpler class system,
 fast and light.
-
-=back
 
 =head1 The idea
 

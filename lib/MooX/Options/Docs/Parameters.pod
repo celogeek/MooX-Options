@@ -7,9 +7,7 @@ The list of parameters support by L<MooX::Options>.
 
 =head1 IMPORT PARAMETERS
 
-=over
-
-=item flavour
+=head2 flavour
 
 Pass extra arguments for L<Getopt::Long::Descriptive>.  it is usefull if you
 want to configure Getopt::Long.
@@ -18,13 +16,13 @@ want to configure Getopt::Long.
 
 Any flavour is pass to L<Getopt::Long> as a configuration, check the doc to see what is possible.
 
-=item protect_argv
+=head2 protect_argv
 
 By default, argv is protected. if you want to do something else on it, use this option and it will change the real argv.
 
   use MooX::Options protect_argv => 0;
 
-=item skip_options
+=head2 skip_options
 
 You can skip some option to remove them to the terminal. In that case, the 'option' keyword will just works like an 'has'.
 
@@ -33,7 +31,7 @@ You can skip some option to remove them to the terminal. In that case, the 'opti
 If you have multiple tools that use the same Role with options, you can skip one and force his value.
 In my example, it could be a multithread option that you want to disable in some cases.
 
-=item prefer_commandline
+=head2 prefer_commandline
 
 By default, arguments to B<new_with_options> have a higher priority than the commandline options.
 
@@ -53,8 +51,6 @@ MyTools :
 In /etc/MyTools.json
 
   {"test" : 1}
-
-=back
 
 =head1 SEE ALSO
 

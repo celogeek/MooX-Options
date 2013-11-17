@@ -36,26 +36,6 @@ to generate from your attribute the command line options.
 
 =cut
 
-=head1 DOCUMENTATIONS
-
-=over
-
-=item * L<QuickStart|MooX::Options::Docs::QuickStart>
-
-=item * L<Philosophy|MooX::Options::Docs::Philosophy>
-
-=item * L<Methods imported|MooX::Options::Docs::MethodsImported>
-
-=item * L<Import parameters|MooX::Options::Docs::Parameters>
-
-=item * L<Option parameters|MooX::Options::Docs::Option>
-
-=item * L<Parameters and options for man|MooX::Options::Docs::Man>
-
-=back
-
-=cut
-
 use strict;
 use warnings;
 # VERSION
@@ -227,6 +207,25 @@ sub _validate_and_filter_options {
 }
 
 1;
+
+__END__
+=head1 DOCUMENTATIONS
+
+=over
+
+=item * L<QuickStart|MooX::Options::Docs::QuickStart>
+
+=item * L<Philosophy|MooX::Options::Docs::Philosophy>
+
+=item * L<Methods imported|MooX::Options::Docs::MethodsImported>
+
+=item * L<Import parameters|MooX::Options::Docs::Parameters>
+
+=item * L<Option parameters|MooX::Options::Docs::Option>
+
+=item * L<Parameters and options for man|MooX::Options::Docs::Man>
+
+=back
 
 =head1 THANKS
 
