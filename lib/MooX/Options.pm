@@ -44,6 +44,8 @@ to generate from your attribute the command line options.
 
 =item * L<Philosophy|MooX::Options::Docs::Philosophy>
 
+=item * L<Methods imported|MooX::Options::Docs::MethodsImported>
+
 =item * L<Import parameters|MooX::Options::Docs::Parameters>
 
 =item * L<Option parameters|MooX::Options::Docs::Option>
