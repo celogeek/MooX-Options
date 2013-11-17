@@ -51,6 +51,7 @@ to generate from your attribute the command line options.
 =item * L<Parameters and options for man|MooX::Options::Docs::Man>
 
 =back
+
 =cut
 
 use strict;
@@ -224,3 +225,17 @@ sub _validate_and_filter_options {
 }
 
 1;
+
+=head1 THANKS
+
+=over
+
+=item Matt S. Trout (mst) <mst@shadowcat.co.uk> : For his patience and advice.
+
+=item Tomas Doran (t0m) <bobtfish@bobtfish.net> : To help me release the new version, and using it :)
+
+=item Torsten Raudssus (Getty) : to use it a lot in L<DuckDuckGo|http://duckduckgo.com> (go to see L<MooX> module also)
+
+=item Jens Rehsack (REHSACK) : Use with L<PkgSrc|http://www.pkgsrc.org/>, and many really good idea (L<MooX::Cmd>, L<MooX::ConfigFromFile>, and more to come I'm sure)
+
+=back
