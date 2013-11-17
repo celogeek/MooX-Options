@@ -223,7 +223,9 @@ __END__
 
 =item * L<Option parameters|MooX::Options::Docs::Option>
 
-=item * L<Parameters and options for man|MooX::Options::Docs::Man>
+=item * L<Man parameters|MooX::Options::Docs::Man>
+
+=item * L<Using namespace::clean|MooX::Options::Docs::NamespaceClean>
 
 =back
 

@@ -1,0 +1,16 @@
+# PODNAME: MooX::Options::Docs::NamespaceClean
+# ABSTRACT: Use namespace::clean with MooX::Options
+
+=head1 DESCRIPTION
+
+L<MooX::Options> export private methods to keep track of all your options.
+You need to keep some of them to make it work.
+
+=head1 USAGE
+
+  use MooX::Options;
+  use namespace::clean -except => [qw/_options_data _options_config/];
+
+=head1 SEE ALSO
+
+L<MooX::Options>
