@@ -5,7 +5,52 @@
 
 You can add more documentation for the man option. This is the long option.
 
+=head1 SYNOPSIS
+
+  myTools --man
+
 =head1 PARAMETERS
+
+=head2 description
+
+The description of your tools.
+
+  use MooX::Options description => 'Description of your tools'
+
+=head2 authors
+
+The list of authors of your tools.
+
+  use MooX::Options authors => 'Celogeek <me@celogeek.com>'
+  use MooX::Options authors => ['Celogeek <me@celogeek.com', 'Jens Rehsack']
+
+=head2 synopsis
+
+You can define a full example in pod format. This will be placed in the synopsis section
+
+  use MooX::Options synopsis => '
+    A example of my tools
+
+      myTools --run
+  '
+
+This should not be very easy to do it this way, but you can also extract it from your own script :
+
+  use Moo;
+  use Pod::POM;
+  my $synopsis = "";
+  BEGIN {
+      my $parser = Pod::POM->new;
+      my $pom = $parser->parse(__FILE__) or die $parser->error();
+      for my $head1 ($pom->head1) {
+          if ($head1->title eq 'SYNOPSIS') {
+              $synopsis = $head1->content;
+              last;
+          }
+      }
+  }
+  use MooX::Options synopsis => $synopsis;
+
 
 =head1 OPTIONS
 
