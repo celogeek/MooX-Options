@@ -39,7 +39,7 @@ This parameter give to the commandline an higher priority.
 
   use MooX::Options prefer_commandline => 1;
 
-=item with_config_from_file
+=head2 with_config_from_file
 
 This parameter will load L<MooX::ConfigFromFile> in your module. 
 The config option will be used between the commandline and the parameters.

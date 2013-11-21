@@ -229,6 +229,14 @@ __END__
 
 =back
 
+=head1 EXTERNAL EXAMPLES
+
+=over
+
+=item * L<Slide3D about MooX::Options|http://perltalks.celogeek.com/slides/2012/08/moox-options-slide3d.html>
+
+=back
+
 =head1 THANKS
 
 =over

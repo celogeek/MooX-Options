@@ -36,3 +36,5 @@ See L<MooX::Options::Docs::Option> for the documentation.
 =head1 SEE ALSO
 
 L<MooX::Options>
+
+L<Import parameters|MooX::Options::Docs::Parameters>
