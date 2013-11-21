@@ -227,6 +227,8 @@ __END__
 
 =item * L<Using namespace::clean|MooX::Options::Docs::NamespaceClean>
 
+=item * L<Manage your tools with MooX::Cmd|MooX::Options::Docs::MooXCmd>
+
 =back
 
 =head1 EXTERNAL EXAMPLES

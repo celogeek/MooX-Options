@@ -1,0 +1,20 @@
+# PODNAME: MooX::Options::Docs::MooXCmd
+# ABSTRACT: Manage your tools with MooX::Cmd
+
+=head1 DESCRIPTION
+
+L<MooX::Cmd> give you an easy way to organize your tools into many subcommands.
+
+We can take 'git' as a example.
+
+  git checkout [params]
+  git commit [params]
+
+L<MooX::Options> support natively this tools. It improve the help message to display automatically
+the subcommands.
+
+=head1 SEE ALSO
+
+L<MooX::Options>
+
+L<MooX::Cmd>
