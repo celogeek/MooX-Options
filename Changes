@@ -1,3 +1,5 @@
+    Fix: Path::Class 0.32 needed for tempfile
+
 3.99  2013-11-13 09:36:51 GMT
     * Feature #195 : Use pod2usage for help (Celogeek San)
 

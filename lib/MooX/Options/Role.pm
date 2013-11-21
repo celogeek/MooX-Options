@@ -20,7 +20,7 @@ use Data::Record;
 use JSON;
 use Carp;
 use Pod::Usage qw/pod2usage/;
-use Path::Class;
+use Path::Class 0.32;
 use Scalar::Util qw/blessed/;
 
 requires qw/_options_data _options_config/;
