@@ -54,6 +54,16 @@ This should not be very easy to do it this way, but you can also extract it from
 
 =head1 OPTIONS
 
+=head2 long_doc
+
+If a 'long_doc' parameter is present, it will replace the 'doc' or 'documentation' to generate a long doc for the man page.
+
+  option 'foo' => (
+    is => 'ro',
+    doc => 'bar',
+    long_doc => 'this is a bar example that will appear in my man page',
+  );
+
 =head1 SEE ALSO
 
 L<MooX::Options>

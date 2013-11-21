@@ -15,6 +15,8 @@ Documentation for the command line option.
 
 Documentation for the man page. By default the B<doc> parameter will be used.
 
+See also L<Man parameters|MooX::Options::Docs::Man> for more examples to build a nice man page.
+
 =head2 required
 
 This attribute indicate that the parameter is mandatory.
