@@ -13,7 +13,6 @@ Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrad
 =cut
 
 use MRO::Compat;
-use Moo::Role;
 use MooX::Options::Descriptive;
 use Regexp::Common;
 use Data::Record;
@@ -22,6 +21,7 @@ use Carp;
 use Pod::Usage qw/pod2usage/;
 use Path::Class 0.32;
 use Scalar::Util qw/blessed/;
+use Moo::Role;
 
 requires qw/_options_data _options_config/;
 
