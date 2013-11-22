@@ -64,6 +64,17 @@ If a 'long_doc' parameter is present, it will replace the 'doc' or 'documentatio
     long_doc => 'this is a bar example that will appear in my man page',
   );
 
+The 'long_doc' will be write in place of the pod documentation. All the rules of pod, is applied.
+For instance, to add a new paragraph, you need to let a line empty.
+
+  option 'foo' => (
+    is => 'ro',
+    doc => 'bar',
+    long_doc => join("\n\n", "first paragraph", "second paragraph"),
+  );
+
+See the L<perlpod> for more explanation.
+
 =head1 SEE ALSO
 
 L<MooX::Options>
