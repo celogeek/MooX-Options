@@ -146,8 +146,7 @@ sub parse_options {
             my $val = $opt->$name();
             if ( defined $val ) {
                 if ( $data{json} ) {
-                    eval { $cmdline_params{$name} = decode_json($val) };
-                    if ($@) {
+                    if (! eval { $cmdline_params{$name} = decode_json($val); 1 }) {
                       carp $@;
                       return $class->options_usage(1, $usage);
                     }
@@ -197,7 +196,7 @@ sub options_usage {
     $message .= join( "\n", @messages, '' ) if @messages;
     $message .= $usage . "\n";
     if ($code > 0) {
-      warn $message;
+      CORE::warn $message;
     } else {
       print $message;
     }

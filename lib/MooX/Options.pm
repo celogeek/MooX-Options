@@ -70,8 +70,8 @@ sub import {
 
     if (@target_isa) { #only in the main class, not a role
 
-        ## no critic qw/ProhibitStringyEval/
         use warnings FATAL => 'redefine';
+        ## no critic (ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval, ValuesAndExpressions::ProhibitImplicitNewlines)
         eval '{
         package ' . $target . ';
 

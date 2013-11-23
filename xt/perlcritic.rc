@@ -14,3 +14,5 @@ allow = @ARGV
 [Variables::ProhibitPackageVars]
 add_packages = Text::WrapI18N
 [-Subroutines::ProhibitBuiltinHomonyms]
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+allow=_options_sub_commands
