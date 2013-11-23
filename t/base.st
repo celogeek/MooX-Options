@@ -197,12 +197,12 @@ subtest "test usage" => sub {
     my $s     = sp_str->new_with_options();
     my @r = trap { $s->options_usage( 127, 'usage work', 'usage really work' ) };
     is( $trap->exit, 127, 'exit code is correct' );
-    ok( $trap->stdout =~ /usage work/, 'custom message is present' );
-    ok( $trap->stdout =~ /usage really work/,
+    ok( $trap->stderr =~ /usage work/, 'custom message is present' );
+    ok( $trap->stderr =~ /usage really work/,
         'custom message is really present'
     );
-    ok( $trap->stdout =~ /help:\n\s+show this help message/, 'help is present' );
-    ok( $trap->stdout =~ /split_str: \[Strings\]\n\s+no doc for split_str/,
+    ok( $trap->stderr =~ /help:\n\s+show this help message/, 'help is present' );
+    ok( $trap->stderr =~ /split_str: \[Strings\]\n\s+no doc for split_str/,
         'attr no doc is present' );
 };
 
@@ -211,7 +211,7 @@ subtest "doc usage" => sub {
     my $s     = t_doc->new_with_options();
     my @r = trap { $s->options_usage(127) };
     is( $trap->exit, 127, 'exit code is correct' );
-    ok( $trap->stdout =~ /t:\n\s+this is a test/, 'doc on attribute' );
+    ok( $trap->stderr =~ /t:\n\s+this is a test/, 'doc on attribute' );
 };
 
 subtest "test short" => sub {
@@ -263,6 +263,28 @@ subtest "json" => sub {
         my $t = t_json->new_with_options();
         is_deeply($t->t, {a => 1, b => 2}, 'json properly set');
     }
+
+    {
+        local @ARGV = ("--t", "bad json");
+        my $t = trap { t_json->new_with_options };
+        ok( $trap->stderr =~ /malformed JSON string/, "decode json failed");
+        ok( $trap->stderr =~ /\-t: JSON/, "json help message properly set" );
+    }
+
+    {
+        local @ARGV = ('--help');
+        my $t = trap { t_json->new_with_options };
+        ok( $trap->stdout =~ /\-t: JSON/, "json help message properly set" );
+    }
+
+    {
+        trap {
+          t_json->new->options_man(undef, *STDOUT);
+        };
+        ok( $trap->stdout =~ /\-t: JSON/, "json help message properly set" ) or diag $trap->stdout;
+    }
+
+
 };
 
 1;

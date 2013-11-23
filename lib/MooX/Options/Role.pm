@@ -131,7 +131,11 @@ sub parse_options {
     );
 
     $usage->{prog_name} = $prog_name;
-    $usage->{sub_commands} = $class->_options_sub_commands();
+    $usage->{target} = $class;
+
+    if ($usage->{should_die}) {
+      return $class->options_usage(1, $usage);
+    }
 
     my %cmdline_params = %params;
     for my $name ( keys %options_data ) {
@@ -142,7 +146,11 @@ sub parse_options {
             my $val = $opt->$name();
             if ( defined $val ) {
                 if ( $data{json} ) {
-                    $cmdline_params{$name} = decode_json($val);
+                    eval { $cmdline_params{$name} = decode_json($val) };
+                    if ($@) {
+                      carp $@;
+                      return $class->options_usage(1, $usage);
+                    }
                 }
                 else {
                     $cmdline_params{$name} = $val;
@@ -180,13 +188,19 @@ sub options_usage {
         $usage = shift @messages;
     }
     $code = 0 if !defined $code;
-    print join( "\n", @messages, '' ) if @messages;
     if (!$usage) {
         local @ARGV = ();
         my %cmdline_params = $class->parse_options( help => $code );
         $usage = $cmdline_params{help};
     }
-    print $usage . "\n";
+    my $message = "";
+    $message .= join( "\n", @messages, '' ) if @messages;
+    $message .= $usage . "\n";
+    if ($code > 0) {
+      warn $message;
+    } else {
+      print $message;
+    }
     exit($code) if $code >= 0;
     return;
 }
@@ -207,7 +221,7 @@ sub options_man {
     }
 
     my $man_file = file(Path::Class::tempdir(CLEANUP => 1), 'help.pod');
-    $man_file->spew($usage->option_pod($class));
+    $man_file->spew($usage->option_pod);
 
     pod2usage(-verbose => 2, -input => $man_file->stringify, -exitval => 'NOEXIT', -output => $output);
 
