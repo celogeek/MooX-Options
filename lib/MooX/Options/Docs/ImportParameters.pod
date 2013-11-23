@@ -1,4 +1,4 @@
-# PODNAME: MooX::Options::Docs::Parameters
+# PODNAME: MooX::Options::Docs::ImportParameters
 # ABSTRACT: Import Parameters of MooX::Options
 
 =head1 DESCRIPTION

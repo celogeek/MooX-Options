@@ -217,9 +217,9 @@ __END__
 
 =item * L<Philosophy|MooX::Options::Docs::Philosophy>
 
-=item * L<Methods imported|MooX::Options::Docs::MethodsImported>
+=item * L<Imported methods|MooX::Options::Docs::ImportedMethods>
 
-=item * L<Import parameters|MooX::Options::Docs::Parameters>
+=item * L<Import parameters|MooX::Options::Docs::ImportParameters>
 
 =item * L<Option parameters|MooX::Options::Docs::Option>
 

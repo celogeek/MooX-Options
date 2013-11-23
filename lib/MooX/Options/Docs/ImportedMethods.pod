@@ -1,4 +1,4 @@
-# PODNAME: MooX::Options::Docs::MethodsImported
+# PODNAME: MooX::Options::Docs::ImportedMethods
 # ABSTRACT: The imported methods
 
 =head1 DESCRIPTION
@@ -37,4 +37,4 @@ See L<MooX::Options::Docs::Option> for the documentation.
 
 L<MooX::Options>
 
-L<Import parameters|MooX::Options::Docs::Parameters>
+L<Import parameters|MooX::Options::Docs::ImportParameters>
