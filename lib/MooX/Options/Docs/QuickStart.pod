@@ -1,0 +1,118 @@
+# PODNAME: MooX::Options::Docs::QuickStart
+# ABSTRACT: Fast and simple examples
+
+=head1 DESCRIPTION
+
+This is quick examples to start creating your tools on command line.
+
+=head1 QUICK START
+
+=head2 DISPLAY A FILE
+
+You can quickly create a basic command line tools, using inline package to capture the option you need.
+
+In this example (cf L<SYNOPSIS|MooX::Options/"SYNOPSIS">), we get want to get the name of the file from command line.
+
+=over
+
+=item * The script
+
+  package myOptions;
+  use Moo;
+  use MooX::Options;
+  
+  option 'show_this_file' => (
+      is => 'ro',
+      format => 's',
+      required => 1,
+      doc => 'the file to display',
+      short => 'f'
+  );
+  1;
+  
+  package main;
+  use Path::Class;
+  
+  my $opt = myOptions->new_with_options;
+  
+  print "Content of the file : ",
+       file($opt->show_this_file)->slurp;
+
+
+=item * Run it
+
+  myTools.pl --show_this_file=myDoc
+  myTools.pl --show-this-file=myDoc
+  myTools.pl --show=myDoc
+  myTools.pl -f=myDoc
+  myTools.pl -f myDoc
+
+=item * Automatic help when a required param is missing
+
+If you miss the required params, L<MooX::Options> explain the error, and show you the help message :
+
+  myTools.pl
+
+  show_this_file is missing
+  USAGE: myTools.pl [-fh] [long options...]
+  
+      --show_this_file: String
+          the file to display
+      
+      -h --help:
+          show this help message
+      
+      --man:
+          show the manual
+
+=item * Help wanted
+
+  myTools.pl --help
+  myTools.pl --man
+
+=back
+
+=head2 DISPLAY SEVERAL FILES
+
+L<MooX::Options> handle different formats of parameters almost like L<Getopt::Long::Descriptive>.
+You can create an array for files to display. A cool feature is the "autosplit" parameters.
+
+=over
+
+=item * The script
+
+  package myOptions;
+  use Moo;
+  use MooX::Options;
+  
+  option 'show_this_files' => (
+      is => 'ro',
+      format => 's@',
+      required => 1,
+      doc => 'the file to display',
+      short => 'f',
+      autosplit => ',',
+  );
+  1;
+  
+  package main;
+  use Path::Class;
+  
+  my $opt = myOptions->new_with_options;
+
+  for my $f (@{$opt->show_this_files}) {
+    print "File content of <$f> : \n\n", file($f)->slurp, "\n\n";
+  }
+
+=item * Run it
+
+To display myDoc1 and myDoc2 :
+
+  myTools.pl --show_this_files=myDoc1 --show_this_files=myDoc2
+  myTools.pl --show_this_files=myDoc1,myDoc2
+
+=back
+
+=head1 SEE ALSO
+
+L<MooX::Options>

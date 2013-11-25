@@ -8,3 +8,4 @@
 .project
 MooX-Options-*
 xt/perltidy.rc
+*.LOG

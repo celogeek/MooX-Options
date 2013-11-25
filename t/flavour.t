@@ -59,12 +59,13 @@ for my $noflavour (qw/plain plain2/) {
         {
             local @ARGV = ( '--bool', 'anarg', '--unknown_option' );
             my @r = trap { $noflavour->new_with_options() };
-            like( $trap->die, qr/USAGE:/, "died with usage message" );
+            is( $trap->exit, 1, "exit code ok" );
             like(
-                $trap->warn(0),
+                $trap->stderr,
                 qr/Unknown option: unknown_option/,
                 "and a warning from GLD"
             );
+            like( $trap->stderr, qr/USAGE:/, "died with usage message" );
         }
     };
 }
