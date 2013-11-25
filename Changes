@@ -1,3 +1,11 @@
+4.000  2013-11-25 19:01:24 GMT
+    * Feature #328 : Rewrite pod (Celogeek San)
+      Fix: Path::Class 0.32 needed for tempfile
+      Fix: import only moox options role methods, not the one need by this module
+      Fix: JSON help format
+      Feature: improve handling of errors (catch everything and display the proper usage methods)
+      Feature: full rewrite pod documentation
+
 3.99  2013-11-13 09:36:51 GMT
     * Feature #195 : Use pod2usage for help (Celogeek San)
 

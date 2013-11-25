@@ -17,6 +17,7 @@ use feature 'say';
 use Text::WrapI18N;
 use Term::Size::Any qw/chars/;
 use Getopt::Long::Descriptive;
+use Scalar::Util qw/blessed/;
 
 my %format_doc = (
     's'  => 'String',
@@ -84,8 +85,8 @@ Return the list of sub commands if available.
 =cut
 sub sub_commands_text {
     my ($self) = @_;
-    my $sub_commands = $self->{sub_commands} //
-        [];
+    my $sub_commands =  defined $self->{target} ? $self->{target}->_options_sub_commands() //
+        [] : [];
     return if !@$sub_commands;
     return "", 'SUB COMMANDS AVAILABLE: ' . join(', ', @$sub_commands), "";
 }
@@ -117,14 +118,15 @@ Return the help message for your options
 =cut
 sub option_text {
     my ($self) = @_;
-    my $options = $self->{options};
-
+    my %options_data =  defined $self->{target} ?  $self->{target}->_options_data : ();
+    my $getopt_options = $self->{options};
     my @message;
     _set_column_size;
-    for my $opt(@$options) {
+    for my $opt(@$getopt_options) {
         my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
         my $format_doc_str;
         $format_doc_str = $format_doc{$format} if defined $format;
+        $format_doc_str = 'JSON' if defined $options_data{$opt->{name}}{json};
         push @message, (defined $short ? "-" . $short . " " : "") . "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name} . ":" . (defined $format_doc_str ? " " . $format_doc_str : "");
         push @message, wrap("    ", "        ", $opt->{desc});
         push @message, "";
@@ -139,16 +141,16 @@ Return the usage message in pod format
 
 =cut
 sub option_pod {
-    my ($self, $options) = @_;
+    my ($self) = @_;
 
-    my %options_config = $options->_options_config;
-    my %options_data = $options->_options_data;
+    my %options_data = defined $self->{target} ? $self->{target}->_options_data : ();
+    my %options_config = defined $self->{target} ? $self->{target}->_options_config : ();
 
     my $prog_name = $self->{prog_name} //
         Getopt::Long::Descriptive::prog_name;
 
-    my $sub_commands = $self->{sub_commands} //
-        [];
+    my $sub_commands = defined $self->{target} ? $self->{target}->_options_sub_commands() //
+        [] : [];
 
     my @man = (
         "=head1 NAME",
@@ -178,6 +180,7 @@ sub option_pod {
         my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
         my $format_doc_str;
         $format_doc_str = $format_long_doc{$format} if defined $format;
+        $format_doc_str = 'JSON' if defined $options_data{$opt->{name}}{json};
         
         my $opt_long_name = "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name};
         my $opt_name = (defined $short ? "-" . $short . " " : "") . $opt_long_name . ":" . (defined $format_doc_str ? " " . $format_doc_str : "");
@@ -231,7 +234,11 @@ sub warn { return CORE::warn shift->text }
 Croak your options help message
 
 =cut
-sub die  { return CORE::die  shift->text }
+sub die  { 
+  my ($self) = @_;
+  $self->{should_die} = 1;
+  return;
+}
 
 
 use overload (
