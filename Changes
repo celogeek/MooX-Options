@@ -1,3 +1,5 @@
+    * Bug #377 : older version of perl has different init methods (Celogeek San)
+
 4.000  2013-11-25 19:01:24 GMT
     * Feature #328 : Rewrite pod (Celogeek San)
       Fix: Path::Class 0.32 needed for tempfile
