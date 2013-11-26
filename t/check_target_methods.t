@@ -14,13 +14,10 @@ use Test::More;
 }
 
 my $test = t->new_with_options;
-my @methods;
-{
-	no strict 'refs';
-	@methods = sort { $a cmp $b } keys %{ref($test) . "::"};
-}
 
-is_deeply(\@methods, [qw/
+my %ignore_methods;
+@ignore_methods{qw/
+	AUTOLOAD
 	BEGIN
 	BUILD
 	BUILDARGS
@@ -28,6 +25,16 @@ is_deeply(\@methods, [qw/
 	DOES
 	ISA
 	__ANON__
+	DESTROY
+/} = ();
+
+my @methods;
+{
+	no strict 'refs';
+	@methods = sort { $a cmp $b } grep { !exists $ignore_methods{$_} } keys %{ref($test) . "::"};
+}
+
+is_deeply(\@methods, [qw/
 	_option_name
 	_options_config
 	_options_data
