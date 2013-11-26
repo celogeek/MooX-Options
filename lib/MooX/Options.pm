@@ -4,7 +4,7 @@ package MooX::Options;
 
 =head1 DESCRIPTION
 
-Create a command line tools with your L<Mo>, L<Moo>, L<Moose> objects.
+Create a command line tool with your L<Mo>, L<Moo>, L<Moose> objects.
 
 MooX::Options pass specific parameters to L<Getopt::Long::Descriptive>
 to generate from your attribute the command line options.
@@ -13,27 +13,50 @@ to generate from your attribute the command line options.
 
 =head1 SYNOPSIS
 
-    package myOptions;
-    use Moo;
-    use MooX::Options;
-    
-    option 'show_this_file' => (
-        is => 'ro',
-        format => 's',
-        required => 1,
-        doc => 'the file to display'
-    );
-    1;
-    
-    package main;
-    use feature 'say';
-    use Path::Class;
-    
-    my $opt = myOptions->new_with_options;
-    
-    say "Content of the file : ",
-         file($opt->show_this_file)->slurp;
+In myOptions.pm :
 
+  package myOptions;
+  use Moo;
+  use MooX::Options;
+  
+  option 'show_this_file' => (
+      is => 'ro',
+      format => 's',
+      required => 1,
+      doc => 'the file to display'
+  );
+  1;
+
+In myTools.pl :
+
+  use feature 'say';
+  use myOptions;
+  use Path::Class;
+  
+  my $opt = myOptions->new_with_options;
+  
+  say "Content of the file : ",
+       file($opt->show_this_file)->slurp;
+
+To use it :
+
+  perl myTools.pl --show_this_file=myFile.txt
+  Content of the file: myFile content
+
+The help message :
+  
+  perl myTools.pl --help
+  USAGE: myTools.pl [-h] [long options...]
+  
+      --show_this_file: String
+          the file to display
+      
+      -h --help:
+          show this help message
+      
+      --man:
+          show the manual
+  
 =cut
 
 use strict;
