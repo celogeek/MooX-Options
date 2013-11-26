@@ -232,7 +232,7 @@ sub _validate_and_filter_options {
 1;
 
 __END__
-=head1 DOCUMENTATIONS
+=head1 MANUALS
 
 =over
 
