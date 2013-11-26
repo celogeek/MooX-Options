@@ -1,4 +1,4 @@
-# PODNAME: MooX::Options::Docs::QuickStart
+# PODNAME: MooX::Options::Manual::QuickStart
 # ABSTRACT: Fast and simple examples
 
 =head1 DESCRIPTION

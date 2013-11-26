@@ -1,4 +1,4 @@
-# PODNAME: MooX::Options::Docs::Option
+# PODNAME: MooX::Options::Manual::Option
 # ABSTRACT: Parameter of the option keywords
 
 =head1 DESCRIPTION
@@ -15,7 +15,7 @@ Documentation for the command line option.
 
 Documentation for the man page. By default the B<doc> parameter will be used.
 
-See also L<Man parameters|MooX::Options::Docs::Man> for more examples to build a nice man page.
+See also L<Man parameters|MooX::Options::Manual::Man> for more examples to build a nice man page.
 
 =head2 required
 
@@ -45,8 +45,8 @@ By default, it's a boolean value.
 
 Take a look of available format with L<Getopt::Long::Descriptive>.
 
-You need to understand that everything is explicit here. Check L<MooX::Options::Docs::Philosophy> to understand.
-So if you use L<Moose> and you attribute has B<isa => 'Array[Int]'>, that will not implied the format 'i@'.
+You need to understand that everything is explicit here. 
+If you use L<Moose> and you attribute has B<isa => 'Array[Int]'>, that will not implied the format 'i@'.
 
 =head2 format json : special format support
 

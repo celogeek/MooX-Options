@@ -1,39 +1,64 @@
 package MooX::Options;
 
-# ABSTRACT: Options eXtension for Object Class
+# ABSTRACT: Explicit Options eXtension for Object Class
 
 =head1 DESCRIPTION
 
-Create a command line tools with your L<Mo>, L<Moo>, L<Moose> objects.
+Create a command line tool with your L<Mo>, L<Moo>, L<Moose> objects.
 
 MooX::Options pass specific parameters to L<Getopt::Long::Descriptive>
 to generate from your attribute the command line options.
+
+Everything is explicit. You have an 'option' keyword to replace the usual 'has' to explicitly use your attribute into the command line.
 
 =cut
 
 =head1 SYNOPSIS
 
-    package myOptions;
-    use Moo;
-    use MooX::Options;
-    
-    option 'show_this_file' => (
-        is => 'ro',
-        format => 's',
-        required => 1,
-        doc => 'the file to display'
-    );
-    1;
-    
-    package main;
-    use feature 'say';
-    use Path::Class;
-    
-    my $opt = myOptions->new_with_options;
-    
-    say "Content of the file : ",
-         file($opt->show_this_file)->slurp;
+In myOptions.pm :
 
+  package myOptions;
+  use Moo;
+  use MooX::Options;
+  
+  option 'show_this_file' => (
+      is => 'ro',
+      format => 's',
+      required => 1,
+      doc => 'the file to display'
+  );
+  1;
+
+In myTools.pl :
+
+  use feature 'say';
+  use myOptions;
+  use Path::Class;
+  
+  my $opt = myOptions->new_with_options;
+  
+  say "Content of the file : ",
+       file($opt->show_this_file)->slurp;
+
+To use it :
+
+  perl myTools.pl --show_this_file=myFile.txt
+  Content of the file: myFile content
+
+The help message :
+  
+  perl myTools.pl --help
+  USAGE: myTools.pl [-h] [long options...]
+  
+      --show_this_file: String
+          the file to display
+      
+      -h --help:
+          show this help message
+      
+      --man:
+          show the manual
+  
 =cut
 
 use strict;
@@ -209,25 +234,23 @@ sub _validate_and_filter_options {
 1;
 
 __END__
-=head1 DOCUMENTATIONS
+=head1 MANUALS
 
 =over
 
-=item * L<QuickStart|MooX::Options::Docs::QuickStart>
+=item * L<QuickStart|MooX::Options::Manual::QuickStart>
 
-=item * L<Philosophy|MooX::Options::Docs::Philosophy>
+=item * L<Imported methods|MooX::Options::Manual::ImportedMethods>
 
-=item * L<Imported methods|MooX::Options::Docs::ImportedMethods>
+=item * L<Import parameters|MooX::Options::Manual::ImportParameters>
 
-=item * L<Import parameters|MooX::Options::Docs::ImportParameters>
+=item * L<Option parameters|MooX::Options::Manual::Option>
 
-=item * L<Option parameters|MooX::Options::Docs::Option>
+=item * L<Man parameters|MooX::Options::Manual::Man>
 
-=item * L<Man parameters|MooX::Options::Docs::Man>
+=item * L<Using namespace::clean|MooX::Options::Manual::NamespaceClean>
 
-=item * L<Using namespace::clean|MooX::Options::Docs::NamespaceClean>
-
-=item * L<Manage your tools with MooX::Cmd|MooX::Options::Docs::MooXCmd>
+=item * L<Manage your tools with MooX::Cmd|MooX::Options::Manual::MooXCmd>
 
 =back
 
