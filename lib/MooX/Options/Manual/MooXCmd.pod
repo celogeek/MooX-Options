@@ -1,4 +1,4 @@
-# PODNAME: MooX::Options::Docs::MooXCmd
+# PODNAME: MooX::Options::Manual::MooXCmd
 # ABSTRACT: Manage your tools with MooX::Cmd
 
 =head1 DESCRIPTION

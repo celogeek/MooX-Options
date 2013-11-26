@@ -1,4 +1,4 @@
-# PODNAME: MooX::Options::Docs::Man
+# PODNAME: MooX::Options::Manual::Man
 # ABSTRACT: More documentation for the man option
 
 =head1 DESCRIPTION

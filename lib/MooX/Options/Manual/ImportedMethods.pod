@@ -1,4 +1,4 @@
-# PODNAME: MooX::Options::Docs::ImportedMethods
+# PODNAME: MooX::Options::Manual::ImportedMethods
 # ABSTRACT: The imported methods
 
 =head1 DESCRIPTION
@@ -31,10 +31,10 @@ It will parse your command line params and your inline params, validate and call
 
 The option keyword replace the 'has' method, and add support special option for the command line only.
 
-See L<MooX::Options::Docs::Option> for the documentation.
+See L<MooX::Options::Manual::Option> for the documentation.
 
 =head1 SEE ALSO
 
 L<MooX::Options>
 
-L<Import parameters|MooX::Options::Docs::ImportParameters>
+L<Import parameters|MooX::Options::Manual::ImportParameters>

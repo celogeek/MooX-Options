@@ -236,21 +236,19 @@ __END__
 
 =over
 
-=item * L<QuickStart|MooX::Options::Docs::QuickStart>
+=item * L<QuickStart|MooX::Options::Manual::QuickStart>
 
-=item * L<Philosophy|MooX::Options::Docs::Philosophy>
+=item * L<Imported methods|MooX::Options::Manual::ImportedMethods>
 
-=item * L<Imported methods|MooX::Options::Docs::ImportedMethods>
+=item * L<Import parameters|MooX::Options::Manual::ImportParameters>
 
-=item * L<Import parameters|MooX::Options::Docs::ImportParameters>
+=item * L<Option parameters|MooX::Options::Manual::Option>
 
-=item * L<Option parameters|MooX::Options::Docs::Option>
+=item * L<Man parameters|MooX::Options::Manual::Man>
 
-=item * L<Man parameters|MooX::Options::Docs::Man>
+=item * L<Using namespace::clean|MooX::Options::Manual::NamespaceClean>
 
-=item * L<Using namespace::clean|MooX::Options::Docs::NamespaceClean>
-
-=item * L<Manage your tools with MooX::Cmd|MooX::Options::Docs::MooXCmd>
+=item * L<Manage your tools with MooX::Cmd|MooX::Options::Manual::MooXCmd>
 
 =back
 
