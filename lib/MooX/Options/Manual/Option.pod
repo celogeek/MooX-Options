@@ -45,8 +45,8 @@ By default, it's a boolean value.
 
 Take a look of available format with L<Getopt::Long::Descriptive>.
 
-You need to understand that everything is explicit here. Check L<MooX::Options::Manual::Philosophy> to understand.
-So if you use L<Moose> and you attribute has B<isa => 'Array[Int]'>, that will not implied the format 'i@'.
+You need to understand that everything is explicit here. 
+If you use L<Moose> and you attribute has B<isa => 'Array[Int]'>, that will not implied the format 'i@'.
 
 =head2 format json : special format support
 
