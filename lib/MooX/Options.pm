@@ -1,6 +1,6 @@
 package MooX::Options;
 
-# ABSTRACT: Options eXtension for Object Class
+# ABSTRACT: Explicit Options eXtension for Object Class
 
 =head1 DESCRIPTION
 
@@ -8,6 +8,8 @@ Create a command line tool with your L<Mo>, L<Moo>, L<Moose> objects.
 
 MooX::Options pass specific parameters to L<Getopt::Long::Descriptive>
 to generate from your attribute the command line options.
+
+Everything is explicit. You have an 'option' keyword to replace the usual 'has' to explicitly use your attribute into the command line.
 
 =cut
 
