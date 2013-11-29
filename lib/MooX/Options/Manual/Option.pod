@@ -5,7 +5,7 @@
 
 The keyword B<option> extend the keyword B<has> with specific parameters for the commandline.
 
-=head1 OPTION PARAMETERS
+=head1 PARAMETERS
 
 =head2 doc | documentation
 
@@ -15,7 +15,7 @@ Documentation for the command line option.
 
 Documentation for the man page. By default the B<doc> parameter will be used.
 
-See also L<Man parameters|MooX::Options::Manual::Man> for more examples to build a nice man page.
+See also L<Man parameters|MooX::Options::Manual::Man> to get more examples to build a nice man page.
 
 =head2 required
 
@@ -43,7 +43,7 @@ Format of the params. It is the same as L<Getopt::Long::Descriptive>.
 
 By default, it's a boolean value.
 
-Take a look of available format with L<Getopt::Long::Descriptive>.
+Take a look of available formats with L<Getopt::Long::Descriptive>.
 
 You need to understand that everything is explicit here. 
 If you use L<Moose> and you attribute has B<isa => 'Array[Int]'>, that will not implied the format 'i@'.
@@ -54,25 +54,27 @@ The parameter will be treat like a json string.
 
   option 'hash' => (is => 'ro', json => 1);
 
-  myTools --hash='{"a":1,"b":2}' # hash = { a => 1, b => 2 }
+  myTool --hash='{"a":1,"b":2}' # hash = { a => 1, b => 2 }
 
 =head2 negativable
 
 It add the negative version for the option.
 
-  myTools --verbose    # verbose = 1
-  myTools --no-verbose # verbose = 0
+  option 'verbose' => (is => 'ro', negativable => 1);
+
+  myTool --verbose    # verbose = 1
+  myTool --no-verbose # verbose = 0
 
 =head2 repeatable
 
-It append the the L</format> the array attribute B<@>.
+It append to the L</format> the array attribute B<@>.
 
 I advice to add a default value to your attribute to always have an array.
 Otherwise the default value will be an undefined value.
 
   option foo => (is => 'rw', format => 's@', default => sub { [] });
 
-  myTools --foo="abc" --foo="def" # foo = ["abc", "def"]
+  myTool --foo="abc" --foo="def" # foo = ["abc", "def"]
 
 =head2 autosplit
 
@@ -80,24 +82,36 @@ For repeatable option, you can add the autosplit feature with your specific para
 
   option test => (is => 'ro', format => 'i@', default => sub {[]}, autosplit => ',');
   
-  myTools --test=1 --test=2 # test = (1, 2)
-  myTools --test=1,2,3      # test = (1, 2, 3)
+  myTool --test=1 --test=2 # test = (1, 2)
+  myTool --test=1,2,3      # test = (1, 2, 3)
   
 It will also handle quoted params with the autosplit
 
   option testStr => (is => 'ro', format => 's@', default => sub {[]}, autosplit => ',');
 
-  myTools --testStr='a,b,"c,d",e,f' # testStr ("a", "b", "c,d", "e", "f")
+  myTool --testStr='a,b,"c,d",e,f' # testStr ("a", "b", "c,d", "e", "f")
 
 =head2 short
 
-Long option can also have short version.
+Long option can also have short version or aliased.
 
-  option 'verbose' => (is => 'ro', repeatable => 1, short => 'v');
+  option 'verbose' => (is => 'ro', short => 'v');
 
-  myTools --verbose # verbose = 1
-  myTools -v        # verbose = 1
+  myTool --verbose # verbose = 1
+  myTool -v        # verbose = 1
 
+  option 'account_id' => (is => 'ro', format => 'i', short => 'a|id');
+
+  myTool --account_id=1
+  myTool -a=1
+  myTool --id=1
+
+You can also use a shorter option without attribute :
+
+  option 'account_id' => (is => 'ro', format => 'i');
+
+  myTool --acc=1
+  myTool --account=1
 
 =head2 order
 

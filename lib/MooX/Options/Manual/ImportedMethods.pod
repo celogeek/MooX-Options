@@ -7,6 +7,21 @@ The list of the methods automatically imported into your class.
 
 =head1 IMPORTED METHODS
 
+=head2 new_with_options
+
+It will parse your command line params and your inline params, validate and call the 'new' method.
+
+  myTool --str=ko
+
+  t->new_with_options()->str # ko
+  t->new_with_options(str => 'ok')->str #ok
+
+=head2 option
+
+The option keyword replace the 'has' method, and add support specials options for the command line only.
+
+See L<MooX::Options::Manual::Option> for the documentation.
+
 =head2 options_usage
 
 It display the usage message and return the exit code
@@ -17,21 +32,6 @@ It display the usage message and return the exit code
   $t->options_usage($exit_code, $pre_message);
 
 This method is also automatically fire if the command option "--help" is passed.
-
-=head2 new_with_options
-
-It will parse your command line params and your inline params, validate and call the 'new' method.
-
-  myTools --str=ko
-
-  t->new_with_options()->str # ko
-  t->new_with_options(str => 'ok')->str #ok
-
-=head2 option
-
-The option keyword replace the 'has' method, and add support special option for the command line only.
-
-See L<MooX::Options::Manual::Option> for the documentation.
 
 =head1 SEE ALSO
 

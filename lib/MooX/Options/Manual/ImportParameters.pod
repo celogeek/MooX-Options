@@ -9,7 +9,7 @@ The list of parameters support by L<MooX::Options>.
 
 =head2 flavour
 
-Pass extra arguments for L<Getopt::Long::Descriptive>.  it is usefull if you
+Pass extra arguments for L<Getopt::Long::Descriptive>. It is usefull if you
 want to configure Getopt::Long.
 
   use MooX::Options flavour => [qw( pass_through )];
@@ -18,18 +18,16 @@ Any flavour is pass to L<Getopt::Long> as a configuration, check the doc to see 
 
 =head2 protect_argv
 
-By default, argv is protected. if you want to do something else on it, use this option and it will change the real argv.
+By default, @ARGV is protected. if you want to do something else on it, use this option and it will change the real @ARGV.
 
   use MooX::Options protect_argv => 0;
 
 =head2 skip_options
 
-You can skip some option to remove them to the terminal. In that case, the 'option' keyword will just works like an 'has'.
+If you have Role with options and your want to disactivate some of them, you can use this parameter.
+In that case, the 'option' keyword will just works like an 'has'.
 
   use MooX::Options skip_options => [qw/multi/];
-
-If you have multiple tools that use the same Role with options, you can skip one and force his value.
-In my example, it could be a multithread option that you want to disable in some cases.
 
 =head2 prefer_commandline
 
@@ -44,11 +42,11 @@ This parameter give to the commandline an higher priority.
 This parameter will load L<MooX::ConfigFromFile> in your module. 
 The config option will be used between the commandline and the parameters.
 
-MyTools :
+myTool :
 
   use MooX::Options with_config_from_file => 1;
 
-In /etc/MyTools.json
+In /etc/myTool.json
 
   {"test" : 1}
 
