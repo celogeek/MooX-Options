@@ -232,17 +232,204 @@ sub _validate_and_filter_options {
 1;
 
 __END__
-=head1 MANUALS
+
+=head1 IMPORTED METHODS
+
+The list of the methods automatically imported into your class.
+
+=head2 new_with_options
+
+It will parse your command line params and your inline params, validate and call the 'new' method.
+
+  myTool --str=ko
+
+  t->new_with_options()->str # ko
+  t->new_with_options(str => 'ok')->str #ok
+
+=head2 option
+
+The option keyword replace the 'has' method, and add support specials options for the command line only.
+
+See L<MooX::Options::Manual::Option> for the documentation.
+
+=head2 options_usage
+
+It display the usage message and return the exit code
+
+  my $t = t->new_with_options();
+  my $exit_code = 1;
+  my $pre_message = "str is not valid";
+  $t->options_usage($exit_code, $pre_message);
+
+This method is also automatically fire if the command option "--help" is passed.
+
+=head1 IMPORT PARAMETERS
+
+The list of parameters support by L<MooX::Options>.
+
+=head2 flavour
+
+Pass extra arguments for L<Getopt::Long::Descriptive>. It is usefull if you
+want to configure Getopt::Long.
+
+  use MooX::Options flavour => [qw( pass_through )];
+
+Any flavour is pass to L<Getopt::Long> as a configuration, check the doc to see what is possible.
+
+=head2 protect_argv
+
+By default, @ARGV is protected. if you want to do something else on it, use this option and it will change the real @ARGV.
+
+  use MooX::Options protect_argv => 0;
+
+=head2 skip_options
+
+If you have Role with options and your want to disactivate some of them, you can use this parameter.
+In that case, the 'option' keyword will just works like an 'has'.
+
+  use MooX::Options skip_options => [qw/multi/];
+
+=head2 prefer_commandline
+
+By default, arguments to B<new_with_options> have a higher priority than the commandline options.
+
+This parameter give to the commandline an higher priority.
+
+  use MooX::Options prefer_commandline => 1;
+
+=head2 with_config_from_file
+
+This parameter will load L<MooX::ConfigFromFile> in your module. 
+The config option will be used between the commandline and the parameters.
+
+myTool :
+
+  use MooX::Options with_config_from_file => 1;
+
+In /etc/myTool.json
+
+  {"test" : 1}
+
+=head1 OPTION PARAMETERS
+
+The keyword B<option> extend the keyword B<has> with specific parameters for the commandline.
+
+=head2 doc | documentation
+
+Documentation for the command line option.
+
+=head2 long_doc
+
+Documentation for the man page. By default the B<doc> parameter will be used.
+
+See also L<Man parameters|MooX::Options::Manual::Man> to get more examples to build a nice man page.
+
+=head2 required
+
+This attribute indicate that the parameter is mandatory.
+This attribute is not really used by L<MooX::Options> but the error message will be handle by it to
+display a consistant error message.
+
+=head2 format
+
+Format of the params. It is the same as L<Getopt::Long::Descriptive>.
 
 =over
 
-=item * L<QuickStart|MooX::Options::Manual::QuickStart>
+=item * i : integer
 
-=item * L<Imported methods|MooX::Options::Manual::ImportedMethods>
+=item * i@: array of integer
 
-=item * L<Import parameters|MooX::Options::Manual::ImportParameters>
+=item * s : string
 
-=item * L<Option parameters|MooX::Options::Manual::Option>
+=item * s@: array of string
+
+=item * f : float value
+
+=back
+
+By default, it's a boolean value.
+
+Take a look of available formats with L<Getopt::Long::Descriptive>.
+
+You need to understand that everything is explicit here. 
+If you use L<Moose> and you attribute has B<isa => 'Array[Int]'>, that will not implied the format 'i@'.
+
+=head2 format json : special format support
+
+The parameter will be treat like a json string.
+
+  option 'hash' => (is => 'ro', json => 1);
+
+  myTool --hash='{"a":1,"b":2}' # hash = { a => 1, b => 2 }
+
+=head2 negativable
+
+It add the negative version for the option.
+
+  option 'verbose' => (is => 'ro', negativable => 1);
+
+  myTool --verbose    # verbose = 1
+  myTool --no-verbose # verbose = 0
+
+=head2 repeatable
+
+It append to the L</format> the array attribute B<@>.
+
+I advice to add a default value to your attribute to always have an array.
+Otherwise the default value will be an undefined value.
+
+  option foo => (is => 'rw', format => 's@', default => sub { [] });
+
+  myTool --foo="abc" --foo="def" # foo = ["abc", "def"]
+
+=head2 autosplit
+
+For repeatable option, you can add the autosplit feature with your specific parameters.
+
+  option test => (is => 'ro', format => 'i@', default => sub {[]}, autosplit => ',');
+  
+  myTool --test=1 --test=2 # test = (1, 2)
+  myTool --test=1,2,3      # test = (1, 2, 3)
+  
+It will also handle quoted params with the autosplit
+
+  option testStr => (is => 'ro', format => 's@', default => sub {[]}, autosplit => ',');
+
+  myTool --testStr='a,b,"c,d",e,f' # testStr ("a", "b", "c,d", "e", "f")
+
+=head2 short
+
+Long option can also have short version or aliased.
+
+  option 'verbose' => (is => 'ro', short => 'v');
+
+  myTool --verbose # verbose = 1
+  myTool -v        # verbose = 1
+
+  option 'account_id' => (is => 'ro', format => 'i', short => 'a|id');
+
+  myTool --account_id=1
+  myTool -a=1
+  myTool --id=1
+
+You can also use a shorter option without attribute :
+
+  option 'account_id' => (is => 'ro', format => 'i');
+
+  myTool --acc=1
+  myTool --account=1
+
+=head2 order
+
+Specified the order of the attribute. If you want to push some attribute at the end of the list.
+By default all option has an order set to B<0>, and the option is sorted by their name.
+
+  option 'at_the_end' => (is => 'ro', order => 999);
+
+=head1 ADDITIONAL MANUALS
+
+=over
 
 =item * L<Man parameters|MooX::Options::Manual::Man>
 
