@@ -6,12 +6,10 @@ package MooX::Options;
 
 Create a command line tool with your L<Mo>, L<Moo>, L<Moose> objects.
 
-MooX::Options pass specific parameters to L<Getopt::Long::Descriptive>
-to generate from your attribute the command line options.
-
 Everything is explicit. You have an 'option' keyword to replace the usual 'has' to explicitly use your attribute into the command line.
 
-=cut
+The 'option' keyword takes additional parameters and use L<Getopt::Long::Descriptive>
+to generate a command line tool.
 
 =head1 SYNOPSIS
 
@@ -29,7 +27,7 @@ In myOptions.pm :
   );
   1;
 
-In myTools.pl :
+In myTool.pl :
 
   use feature 'say';
   use myOptions;
@@ -42,13 +40,13 @@ In myTools.pl :
 
 To use it :
 
-  perl myTools.pl --show_this_file=myFile.txt
+  perl myTool.pl --show_this_file=myFile.txt
   Content of the file: myFile content
 
 The help message :
   
-  perl myTools.pl --help
-  USAGE: myTools.pl [-h] [long options...]
+  perl myTool.pl --help
+  USAGE: myTool.pl [-h] [long options...]
   
       --show_this_file: String
           the file to display
