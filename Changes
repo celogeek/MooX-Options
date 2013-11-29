@@ -1,3 +1,8 @@
+4.002  2013-11-29 19:07:32 GMT
+    * Feature #380 : global improvement doc (Celogeek San)
+    * Bug #378 : fix pod typo (Celogeek San)
+    * Feature #379 : improve synopsis (Celogeek San)
+
 4.001  2013-11-26 09:15:14 GMT
     * Bug #377 : older version of perl has different init methods (Celogeek San)
 

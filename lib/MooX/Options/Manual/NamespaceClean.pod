@@ -1,4 +1,4 @@
-# PODNAME: MooX::Options::Docs::NamespaceClean
+# PODNAME: MooX::Options::Manual::NamespaceClean
 # ABSTRACT: Use namespace::clean with MooX::Options
 
 =head1 DESCRIPTION
