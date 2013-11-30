@@ -50,7 +50,8 @@ is_deeply(\@methods, [qw/
 	new_with_options
 	option
 	options_man
-	options_usage
+  options_short_usage
+  options_usage
 	parse_options
 	t
 	with

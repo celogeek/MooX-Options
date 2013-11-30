@@ -222,6 +222,28 @@ sub option_pod {
     return join("\n\n", @man);
 }
 
+=method option_short_usage
+
+All options message without help
+
+=cut
+sub option_short_usage {
+  my ($self) = @_;
+  my %options_data =  defined $self->{target} ?  $self->{target}->_options_data : ();
+  my $getopt_options = $self->{options};
+
+  my $prog_name = $self->{prog_name} // Getopt::Long::Descriptive::prog_name;
+
+  my @message;
+  for my $opt(@$getopt_options) {
+      my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
+      my $format_doc_str;
+      $format_doc_str = $format_doc{$format} if defined $format;
+      push @message, "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name}
+  }
+  return join(" ", $prog_name, map { "[ $_ ]"} @message);
+}
+
 =method warn
 
 Warn your options help message

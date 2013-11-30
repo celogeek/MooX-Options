@@ -153,6 +153,9 @@ sub new_with_options {
     if ($cmdline_params{man}) {
         return $class->options_man($cmdline_params{man});
     }
+    if ($cmdline_params{usage}) {
+        return $class->options_short_usage($params{usage}, $cmdline_params{usage});
+    }
 
     my $self;
     return $self
@@ -208,7 +211,8 @@ sub parse_options {
 
     my ( $opt, $usage ) = describe_options(
         ($usage_str), @$options,
-        [ 'help|h', "show this help message" ],
+        [ 'usage', 'show a short help message'],
+        [ 'help|h', "show a help message" ],
         [ 'man', "show the manual" ],
         ,@flavour
     );
@@ -251,6 +255,11 @@ sub parse_options {
         $cmdline_params{man} = $usage;
     }
 
+    if (   $opt->usage() || defined $params{usage}
+    ) {
+        $cmdline_params{usage} = $usage;
+    }
+
     return %cmdline_params;
 }
 ## use critic
@@ -278,6 +287,31 @@ sub options_usage {
     my $message = "";
     $message .= join( "\n", @messages, '' ) if @messages;
     $message .= $usage . "\n";
+    if ($code > 0) {
+      CORE::warn $message;
+    } else {
+      print $message;
+    }
+    exit($code) if $code >= 0;
+    return;
+}
+
+=method options_short_usage
+
+Display quick usage message, with only the list of options
+
+=cut
+
+sub options_short_usage {
+  my ($class, $code, $usage) = @_;
+    $code = 0 if !defined $code;
+
+    if (!defined $usage || ! ref $usage) {
+        local @ARGV = ();
+        my %cmdline_params = $class->parse_options( help => $code );
+        $usage = $cmdline_params{help};
+    };
+    my $message = "USAGE: " . $usage->option_short_usage . "\n";
     if ($code > 0) {
       CORE::warn $message;
     } else {
