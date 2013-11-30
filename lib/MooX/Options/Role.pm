@@ -21,6 +21,89 @@ use Carp;
 use Pod::Usage qw/pod2usage/;
 use Path::Class 0.32;
 use Scalar::Util qw/blessed/;
+
+### PRIVATE
+
+
+sub _option_name {
+    my ( $name, %data ) = @_;
+    my $cmdline_name = $name;
+    $cmdline_name .= '|' . $data{short} if defined $data{short};
+    #dash name support
+    my $dash_name = $name;
+    $dash_name =~ tr/_/-/;
+    if ( $dash_name ne $name ) {
+        $cmdline_name .= '|' . $dash_name;
+    }
+    $cmdline_name .= '+' if $data{repeatable} && !defined $data{format};
+    $cmdline_name .= '!' if $data{negativable};
+    $cmdline_name .= '=' . $data{format} if defined $data{format};
+    return $cmdline_name;
+}
+
+sub _options_prepare_descriptive {
+    my ($options_data) = @_;
+
+    my @options;
+    my %has_to_split;
+
+    for my $name (sort {
+            $options_data->{$a}{order} <=> $options_data->{$b}{order}    # sort by order
+              or $a cmp $b                                           # sort by attr name
+        } keys %$options_data
+      )
+    {
+        my %data = %{ $options_data->{$name} };
+        my $doc  = $data{doc};
+        $doc = "no doc for $name" if !defined $doc;
+
+        push @options, [ _option_name( $name, %data ), $doc ];
+        
+        if ( defined $data{autosplit} ) {
+            $has_to_split{"--${name}"} = Data::Record->new(
+                { split => $data{autosplit}, unless => $RE{quoted} } );
+            if ( my $short = $data{short} ) {
+                $has_to_split{"-${short}"} = $has_to_split{"--${name}"};
+            }
+            for ( my $i = 1; $i < length($name); $i++ ) {
+                my $long_short = substr( $name, 0, $i );
+                $has_to_split{"--${long_short}"} = $has_to_split{"--${name}"};
+            }
+        }
+    }
+
+    return \@options, \%has_to_split;
+}
+
+sub _options_split_with {
+    my ($has_to_split) = @_;
+
+    my @new_argv;
+    #parse all argv
+    for my $i ( 0 .. $#ARGV ) {
+        my $arg = $ARGV[$i];
+        my ( $arg_name, $arg_values ) = split( /=/x, $arg, 2 );
+        unless ( defined $arg_values ) {
+            $arg_values = $ARGV[ ++$i ];
+        }
+        if ( my $rec = $has_to_split->{$arg_name} ) {
+            foreach my $record ( $rec->records($arg_values) ) {
+                #remove the quoted if exist to chain
+                $record =~ s/^['"]|['"]$//gx;
+                push @new_argv, $arg_name, $record;
+            }
+        }
+        else {
+            push @new_argv, $arg;
+        }
+    }
+    
+    return @new_argv;
+
+}
+
+### PRIVATE
+
 use Moo::Role;
 
 requires qw/_options_data _options_config/;
@@ -227,82 +310,7 @@ sub options_man {
     exit(0);
 }
 
-sub _option_name {
-    my ( $name, %data ) = @_;
-    my $cmdline_name = $name;
-    $cmdline_name .= '|' . $data{short} if defined $data{short};
-    #dash name support
-    my $dash_name = $name;
-    $dash_name =~ tr/_/-/;
-    if ( $dash_name ne $name ) {
-        $cmdline_name .= '|' . $dash_name;
-    }
-    $cmdline_name .= '+' if $data{repeatable} && !defined $data{format};
-    $cmdline_name .= '!' if $data{negativable};
-    $cmdline_name .= '=' . $data{format} if defined $data{format};
-    return $cmdline_name;
-}
-
-sub _options_prepare_descriptive {
-    my ($options_data) = @_;
-
-    my @options;
-    my %has_to_split;
-
-    for my $name (sort {
-            $options_data->{$a}{order} <=> $options_data->{$b}{order}    # sort by order
-              or $a cmp $b                                           # sort by attr name
-        } keys %$options_data
-      )
-    {
-        my %data = %{ $options_data->{$name} };
-        my $doc  = $data{doc};
-        $doc = "no doc for $name" if !defined $doc;
-
-        push @options, [ _option_name( $name, %data ), $doc ];
-        
-        if ( defined $data{autosplit} ) {
-            $has_to_split{"--${name}"} = Data::Record->new(
-                { split => $data{autosplit}, unless => $RE{quoted} } );
-            if ( my $short = $data{short} ) {
-                $has_to_split{"-${short}"} = $has_to_split{"--${name}"};
-            }
-            for ( my $i = 1; $i < length($name); $i++ ) {
-                my $long_short = substr( $name, 0, $i );
-                $has_to_split{"--${long_short}"} = $has_to_split{"--${name}"};
-            }
-        }
-    }
-
-    return \@options, \%has_to_split;
-}
-
-sub _options_split_with {
-    my ($has_to_split) = @_;
-
-    my @new_argv;
-    #parse all argv
-    for my $i ( 0 .. $#ARGV ) {
-        my $arg = $ARGV[$i];
-        my ( $arg_name, $arg_values ) = split( /=/x, $arg, 2 );
-        unless ( defined $arg_values ) {
-            $arg_values = $ARGV[ ++$i ];
-        }
-        if ( my $rec = $has_to_split->{$arg_name} ) {
-            foreach my $record ( $rec->records($arg_values) ) {
-                #remove the quoted if exist to chain
-                $record =~ s/^['"]|['"]$//gx;
-                push @new_argv, $arg_name, $record;
-            }
-        }
-        else {
-            push @new_argv, $arg;
-        }
-    }
-    
-    return @new_argv;
-
-}
+### PRIVATE NEED TO BE EXPORTED
 
 sub _options_prog_name {
     return Getopt::Long::Descriptive::prog_name;
@@ -311,4 +319,7 @@ sub _options_prog_name {
 sub _options_sub_commands {
     return;
 }
+
+### PRIVATE NEED TO BE EXPORTED
+
 1;

@@ -35,12 +35,9 @@ my @methods;
 }
 
 is_deeply(\@methods, [qw/
-	_option_name
 	_options_config
 	_options_data
-	_options_prepare_descriptive
 	_options_prog_name
-	_options_split_with
 	_options_sub_commands
 	after
 	around
