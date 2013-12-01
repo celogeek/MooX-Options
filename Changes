@@ -1,3 +1,6 @@
+4.003  2013-12-01 00:40:22 GMT
+    * Feature #370 : Add usage, only the usage row with all the long options (Celogeek San)
+
 4.002  2013-11-29 19:07:32 GMT
     * Feature #380 : global improvement doc (Celogeek San)
     * Bug #378 : fix pod typo (Celogeek San)

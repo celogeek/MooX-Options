@@ -35,12 +35,9 @@ my @methods;
 }
 
 is_deeply(\@methods, [qw/
-	_option_name
 	_options_config
 	_options_data
-	_options_prepare_descriptive
 	_options_prog_name
-	_options_split_with
 	_options_sub_commands
 	after
 	around
@@ -53,7 +50,8 @@ is_deeply(\@methods, [qw/
 	new_with_options
 	option
 	options_man
-	options_usage
+  options_short_usage
+  options_usage
 	parse_options
 	t
 	with
