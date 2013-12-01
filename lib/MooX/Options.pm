@@ -250,7 +250,7 @@ It will parse your command line params and your inline params, validate and call
 
 The option keyword replace the 'has' method, and add support specials options for the command line only.
 
-See L<MooX::Options::Manual::Option> for the documentation.
+See L</OPTION PARAMETERS> for the documentation.
 
 =head2 options_usage | --help
 
