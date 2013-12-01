@@ -252,7 +252,7 @@ The option keyword replace the 'has' method, and add support specials options fo
 
 See L<MooX::Options::Manual::Option> for the documentation.
 
-=head2 options_usage
+=head2 options_usage | --help
 
 It display the usage message and return the exit code
 
@@ -262,6 +262,30 @@ It display the usage message and return the exit code
   $t->options_usage($exit_code, $pre_message);
 
 This method is also automatically fire if the command option "--help" is passed.
+
+  myTool --help
+
+=head2 options_man | --man
+
+It display the manual.
+
+  my $t = t->new_with_options();
+  $t->options_man();
+
+This is automatically fire if the command option "--man" is passed.
+
+  myTool --man
+
+=head2 options_short_usage | --usage
+
+It display a short version of the help message.
+
+  my $t = t->new_with_options();
+  $t->options_short_usage($exit_code);
+
+This is automatically fire if the command option "--usage" is passed.
+
+  myTool --usage
 
 =head1 IMPORT PARAMETERS
 
