@@ -114,6 +114,18 @@ subtest "test help" => sub {
     done_testing();
 };
 
+subtest "test short help" => sub {
+    note "test short help";
+    {
+        local @ARGV = ('--usage');
+        my @r = trap { r->new_with_options };
+        is( $trap->exit, 0, "help, exit 0" );
+        ok( $trap->stdout !~ /^str_req is missing/, "str_reg is missing" );
+        like $trap->stdout, qr{\QUSAGE: m\E\w+\Q.t [ --str_req=String ] [ --usage ] [ --help ] [ --man ]\E}, 'usage message ok';
+    }
+    done_testing();
+};
+
 subtest "value override" => sub {
     note "value override";
     {
@@ -201,9 +213,19 @@ subtest "test usage" => sub {
     ok( $trap->stderr =~ /usage really work/,
         'custom message is really present'
     );
-    ok( $trap->stderr =~ /help:\n\s+show this help message/, 'help is present' );
+    ok( $trap->stderr =~ /help:\n\s+show a help message/, 'help is present' );
     ok( $trap->stderr =~ /split_str: \[Strings\]\n\s+no doc for split_str/,
         'attr no doc is present' );
+};
+
+subtest "test short usage" => sub {
+    note "test usage method";
+    my $s     = sp_str->new_with_options();
+    my @r = trap { $s->options_short_usage( 127 ) };
+
+    is( $trap->exit, 127, 'exit code is correct' );
+    like $trap->stderr, qr{\QUSAGE: m\E\w+\Q.t [ --split_conflict_str1=[Strings] ] [ --split_conflict_str2=[Strings] ] [ --split_str=[Strings] ] [ --usage ] [ --help ] [ --man ]\E},
+    'short message ok';
 };
 
 subtest "doc usage" => sub {
