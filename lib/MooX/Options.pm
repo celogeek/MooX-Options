@@ -56,7 +56,16 @@ The help message :
       
       --man:
           show the manual
-  
+
+The usage message :
+
+  perl myTool.pl --usage
+  USAGE: myTool.pl [ --show_this_file=String ] [ --usage ] [ --help ] [ --man ]
+
+The manual :
+
+  perl myTool.pl --man
+
 =cut
 
 use strict;
