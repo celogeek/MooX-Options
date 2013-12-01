@@ -236,10 +236,11 @@ sub option_short_usage {
 
   my @message;
   for my $opt(@$getopt_options) {
-      my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
-      my $format_doc_str;
-      $format_doc_str = $format_doc{$format} if defined $format;
-      push @message, "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name}
+    my ($format) = $opt->{spec} =~ /(?:\|\w)?(?:=(.*?))?$/x;
+    my $format_doc_str;
+    $format_doc_str = $format_doc{$format} if defined $format;
+    $format_doc_str = 'JSON' if defined $options_data{$opt->{name}}{json};
+    push @message, "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name} . (defined $format_doc_str ? "=" . $format_doc_str : "");
   }
   return join(" ", $prog_name, map { "[ $_ ]"} @message);
 }
