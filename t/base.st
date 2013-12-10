@@ -147,9 +147,15 @@ subtest "split_complexe_str" => sub {
         local @ARGV = ("--split_str=a,b,c");
         my $t = sp_str->new_with_options();
         is_deeply( $t->split_str, [qw/a b c/], 'str req is ok' );
+        local @ARGV = ("--split-str=a,b,c");
+        my $t = sp_str->new_with_options();
+        is_deeply( $t->split_str, [qw/a b c/], 'str req is ok' );
     }
     {
         local @ARGV = ('--split_str=a,"b,c",d');
+        my $t = sp_str->new_with_options();
+        is_deeply( $t->split_str, [ 'a', 'b,c', 'd' ], 'str req is ok' );
+        local @ARGV = ('--split-str=a,"b,c",d');
         my $t = sp_str->new_with_options();
         is_deeply( $t->split_str, [ 'a', 'b,c', 'd' ], 'str req is ok' );
     }
@@ -182,6 +188,9 @@ subtest "split_str_shorter_name" => sub {
         local @ARGV = ("--split_st=a,b,c");
         my $t = sp_str->new_with_options();
         is_deeply( $t->split_str, [qw/a b c/], 'str req is ok' );
+        local @ARGV = ("--split-st=a,b,c");
+        my $t = sp_str->new_with_options();
+        is_deeply( $t->split_str, [qw/a b c/], 'str req is ok' );
     }
     note "shorter long split with conflict";
     {
@@ -190,6 +199,11 @@ subtest "split_str_shorter_name" => sub {
             sp_str->new_with_options();
         };
         ok $trap->stderr =~ qr/Option\ssplit_co\sis\sambiguous/, 'conflict detected';
+        local @ARGV = ("--split-co=a,b,c");
+        trap {
+            sp_str->new_with_options();
+        };
+        ok $trap->stderr =~ qr/Option\ssplit-co\sis\sambiguous/, 'conflict detected';
     }
     done_testing();
 };
