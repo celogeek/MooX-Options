@@ -24,17 +24,25 @@ use Scalar::Util qw/blessed/;
 
 ### PRIVATE
 
+sub _option_aliases {
+    my ( $name, %data ) = @_;
+    my @cmdline_name = $name;
+    defined $data{short} and push @cmdline_name, $data{short};
+    if(-1 != index($name, "_")) {
+        my @name_parts = split("_", $name);
+        my @name_combs;
+        foreach my $name_part (@name_parts) {
+            @name_combs and @name_combs = map { ("${_}_${name_part}", "${_}-${name_part}") } @name_combs;
+            @name_combs or @name_combs = $name_part;
+        }
+        push(@cmdline_name, @name_combs);
+    }
+    return @cmdline_name;
+}
 
 sub _option_name {
     my ( $name, %data ) = @_;
-    my $cmdline_name = $name;
-    $cmdline_name .= '|' . $data{short} if defined $data{short};
-    #dash name support
-    my $dash_name = $name;
-    $dash_name =~ tr/_/-/;
-    if ( $dash_name ne $name ) {
-        $cmdline_name .= '|' . $dash_name;
-    }
+    my $cmdline_name = join('|', _option_aliases($name, %data));
     $cmdline_name .= '+' if $data{repeatable} && !defined $data{format};
     $cmdline_name .= '!' if $data{negativable};
     $cmdline_name .= '=' . $data{format} if defined $data{format};
@@ -65,9 +73,14 @@ sub _options_prepare_descriptive {
             if ( my $short = $data{short} ) {
                 $has_to_split{"-${short}"} = $has_to_split{"--${name}"};
             }
-            for ( my $i = 1; $i < length($name); $i++ ) {
-                my $long_short = substr( $name, 0, $i );
-                $has_to_split{"--${long_short}"} = $has_to_split{"--${name}"};
+            my @name_aliases = _option_aliases($name, %data);
+            shift @name_aliases; # $name
+            shift @name_aliases if defined $data{short}; # short
+            foreach my $name_alias (@name_aliases) {
+                for ( my $i = 1; $i <= length($name_alias); $i++ ) {
+                    my $long_short = substr( $name_alias, 0, $i );
+                    $has_to_split{"--${long_short}"} = $has_to_split{"--${name}"};
+                }
             }
         }
     }
