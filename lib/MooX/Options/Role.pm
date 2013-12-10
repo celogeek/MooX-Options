@@ -68,6 +68,13 @@ sub _options_prepare_descriptive {
             for ( my $i = 1; $i < length($name); $i++ ) {
                 my $long_short = substr( $name, 0, $i );
                 $has_to_split{"--${long_short}"} = $has_to_split{"--${name}"};
+                while( $long_short =~ s/_/-/ ) {
+                    $has_to_split{"--${long_short}"} = $has_to_split{"--${name}"};
+                }
+            }
+            my $long_short = $name;
+            while( $long_short =~ s/_/-/ ) {
+                $has_to_split{"--${long_short}"} = $has_to_split{"--${name}"};
             }
         }
     }
