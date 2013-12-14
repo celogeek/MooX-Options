@@ -216,7 +216,7 @@ subtest "split_str_shorter_name" => sub {
         trap {
             sp_str->new_with_options();
         };
-        ok $trap->stderr =~ qr/Option\ssplit-co\sis\sambiguous/, 'conflict detected';
+        ok $trap->stderr =~ qr/Option\ssplit_co\sis\sambiguous/, 'conflict detected';
     }
     done_testing();
 };

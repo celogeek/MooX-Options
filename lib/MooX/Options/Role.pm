@@ -24,25 +24,9 @@ use Scalar::Util qw/blessed/;
 
 ### PRIVATE
 
-sub _option_aliases {
-    my ( $name, %data ) = @_;
-    my @cmdline_name = $name;
-    defined $data{short} and push @cmdline_name, $data{short};
-    if(-1 != index($name, "_")) {
-        my @name_parts = split("_", $name);
-        my @name_combs;
-        foreach my $name_part (@name_parts) {
-            @name_combs and @name_combs = map { ("${_}_${name_part}", "${_}-${name_part}") } @name_combs;
-            @name_combs or @name_combs = $name_part;
-        }
-        push(@cmdline_name, @name_combs);
-    }
-    return @cmdline_name;
-}
-
 sub _option_name {
     my ( $name, %data ) = @_;
-    my $cmdline_name = join('|', _option_aliases($name, %data));
+    my $cmdline_name = join('|', grep {defined} ($name, $data{short}));
     $cmdline_name .= '+' if $data{repeatable} && !defined $data{format};
     $cmdline_name .= '!' if $data{negativable};
     $cmdline_name .= '=' . $data{format} if defined $data{format};
@@ -68,19 +52,14 @@ sub _options_prepare_descriptive {
         push @options, [ _option_name( $name, %data ), $doc ];
         
         if ( defined $data{autosplit} ) {
-            $has_to_split{"--${name}"} = Data::Record->new(
+            $has_to_split{$name} = Data::Record->new(
                 { split => $data{autosplit}, unless => $RE{quoted} } );
             if ( my $short = $data{short} ) {
-                $has_to_split{"-${short}"} = $has_to_split{"--${name}"};
+                $has_to_split{$short} = $has_to_split{${name}};
             }
-            my @name_aliases = _option_aliases($name, %data);
-            shift @name_aliases; # $name
-            shift @name_aliases if defined $data{short}; # short
-            foreach my $name_alias (@name_aliases) {
-                for ( my $i = 1; $i <= length($name_alias); $i++ ) {
-                    my $long_short = substr( $name_alias, 0, $i );
-                    $has_to_split{"--${long_short}"} = $has_to_split{"--${name}"};
-                }
+            for ( my $i = 1; $i <= length($name); $i++ ) {
+                my $long_short = substr( $name, 0, $i );
+                $has_to_split{$long_short} = $has_to_split{${name}};
             }
         }
     }
@@ -88,29 +67,55 @@ sub _options_prepare_descriptive {
     return \@options, \%has_to_split;
 }
 
-sub _options_split_with {
-    my ($has_to_split) = @_;
+sub _options_fix_argv {
+    my ($option_data, $has_to_split) = @_;
 
     my @new_argv;
     #parse all argv
-    for my $i ( 0 .. $#ARGV ) {
-        my $arg = $ARGV[$i];
-        my ( $arg_name, $arg_values ) = split( /=/x, $arg, 2 );
-        unless ( defined $arg_values ) {
-            $arg_values = $ARGV[ ++$i ];
+    while(my $arg = shift @ARGV) {
+        if ($arg eq '--') {
+            push @new_argv, $arg, @ARGV;
+            last;
         }
-        if ( my $rec = $has_to_split->{$arg_name} ) {
-            foreach my $record ( $rec->records($arg_values) ) {
-                #remove the quoted if exist to chain
-                $record =~ s/^['"]|['"]$//gx;
-                push @new_argv, $arg_name, $record;
-            }
-        }
-        else {
+        if (index($arg, '-') != 0) {
             push @new_argv, $arg;
+            next;
+        }
+
+        my ( $arg_name_with_dash, $arg_values ) = split( /=/x, $arg, 2 );
+        if (index($arg_name_with_dash, '--') < 0 && !defined $arg_values) {
+          $arg_values = substr($arg_name_with_dash, 2);
+          $arg_name_with_dash = substr($arg_name_with_dash, 0, 2);
+        }
+        unshift @ARGV, $arg_values if defined $arg_values;
+
+        my ($dash, $negative, $arg_name_without_dash) = $arg_name_with_dash =~ /^(\-+)(no\-)?(.*)$/;
+        $arg_name_without_dash =~ s/\-/_/gx;
+
+        my $arg_name = $dash;
+
+        if (defined $negative) {
+          if (exists $option_data->{$arg_name_without_dash} && $option_data->{$arg_name_without_dash}{negativable}) {
+            $arg_name .= 'no-';
+          } else {
+            $arg_name .= 'no_';
+          }
+        }
+
+        $arg_name .= $arg_name_without_dash;
+
+        if ( my $rec = $has_to_split->{$arg_name_without_dash} ) {
+          $arg_values = shift @ARGV;
+          foreach my $record ( $rec->records($arg_values) ) {
+              #remove the quoted if exist to chain
+              $record =~ s/^['"]|['"]$//gx;
+              push @new_argv, $arg_name, $record;
+          }
+        } else {
+          push @new_argv, $arg_name;
         }
     }
-    
+
     return @new_argv;
 
 }
@@ -210,7 +215,7 @@ sub parse_options {
     my ($options, $has_to_split) = _options_prepare_descriptive(\%options_data);
 
     local @ARGV = @ARGV if $options_config{protect_argv};
-    @ARGV = _options_split_with($has_to_split) if %$has_to_split;
+    @ARGV = _options_fix_argv(\%options_data, $has_to_split);
 
     my @flavour;
     if ( defined $options_config{flavour} ) {
