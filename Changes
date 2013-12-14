@@ -1,3 +1,7 @@
+4.004  2013-12-14 13:00:38 GMT
+   * Bug #383: autosplit should handle all variance of "-" and "_"
+	implement a proper fix_argv method
+
 4.003  2013-12-01 00:40:22 GMT
     * Feature #370 : Add usage, only the usage row with all the long options (Celogeek San)
 

@@ -89,7 +89,7 @@ sub _options_fix_argv {
         }
         unshift @ARGV, $arg_values if defined $arg_values;
 
-        my ($dash, $negative, $arg_name_without_dash) = $arg_name_with_dash =~ /^(\-+)(no\-)?(.*)$/;
+        my ($dash, $negative, $arg_name_without_dash) = $arg_name_with_dash =~ /^(\-+)(no\-)?(.*)$/x;
         $arg_name_without_dash =~ s/\-/_/gx;
 
         my $arg_name = $dash;
