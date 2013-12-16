@@ -147,19 +147,28 @@ subtest "split_complexe_str" => sub {
         local @ARGV = ("--split_str=a,b,c");
         my $t = sp_str->new_with_options();
         is_deeply( $t->split_str, [qw/a b c/], 'str req is ok' );
+    }
+    {
         local @ARGV = ("--split-str=a,b,c");
         my $t = sp_str->new_with_options();
         is_deeply( $t->split_str, [qw/a b c/], 'str req is ok' );
-
+    }
+    {
         local @ARGV = ("--split_conflict_str1=a,b,c");
         my $t = sp_str->new_with_options();
         is_deeply( $t->split_conflict_str1, [qw/a b c/], 'str req is ok' );
+    }
+    {
         local @ARGV = ("--split_conflict-str1=a,b,c");
         my $t = sp_str->new_with_options();
         is_deeply( $t->split_conflict_str1, [qw/a b c/], 'str req is ok' );
+    }
+    {
         local @ARGV = ("--split-conflict_str1=a,b,c");
         my $t = sp_str->new_with_options();
         is_deeply( $t->split_conflict_str1, [qw/a b c/], 'str req is ok' );
+    }
+    {
         local @ARGV = ("--split-conflict-str1=a,b,c");
         my $t = sp_str->new_with_options();
         is_deeply( $t->split_conflict_str1, [qw/a b c/], 'str req is ok' );
@@ -168,6 +177,8 @@ subtest "split_complexe_str" => sub {
         local @ARGV = ('--split_str=a,"b,c",d');
         my $t = sp_str->new_with_options();
         is_deeply( $t->split_str, [ 'a', 'b,c', 'd' ], 'str req is ok' );
+    }
+    {
         local @ARGV = ('--split-str=a,"b,c",d');
         my $t = sp_str->new_with_options();
         is_deeply( $t->split_str, [ 'a', 'b,c', 'd' ], 'str req is ok' );
@@ -201,6 +212,8 @@ subtest "split_str_shorter_name" => sub {
         local @ARGV = ("--split_st=a,b,c");
         my $t = sp_str->new_with_options();
         is_deeply( $t->split_str, [qw/a b c/], 'str req is ok' );
+    }
+    {
         local @ARGV = ("--split-st=a,b,c");
         my $t = sp_str->new_with_options();
         is_deeply( $t->split_str, [qw/a b c/], 'str req is ok' );
