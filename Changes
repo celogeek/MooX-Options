@@ -1,3 +1,7 @@
+4.005  2013-12-16 12:44:02 GMT
+   * Bug #383: autosplit should handle all variance of "-" and "_"
+	Fix tests (reused vars)
+
 4.004  2013-12-14 13:00:38 GMT
    * Bug #383: autosplit should handle all variance of "-" and "_"
 	implement a proper fix_argv method
