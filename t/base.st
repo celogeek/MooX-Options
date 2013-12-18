@@ -203,6 +203,11 @@ subtest "split_complexe_str_short" => sub {
         my $t = sp_str_short->new_with_options();
         is_deeply( $t->split_str, [ 'a', 'b,c', 'd' ], 'str req is ok' );
     }
+    {
+        local @ARGV = ('-z','a,"b,c",d');
+        my $t = sp_str_short->new_with_options();
+        is_deeply( $t->split_str, [ 'a', 'b,c', 'd' ], 'str req is ok' );
+    }
     done_testing();
 };
 
