@@ -6,9 +6,9 @@ package MooX::Options;
 
 Create a command line tool with your L<Mo>, L<Moo>, L<Moose> objects.
 
-Everything is explicit. You have an 'option' keyword to replace the usual 'has' to explicitly use your attribute into the command line.
+Everything is explicit. You have an C<option> keyword to replace the usual C<has> to explicitly use your attribute into the command line.
 
-The 'option' keyword takes additional parameters and use L<Getopt::Long::Descriptive>
+The C<option> keyword takes additional parameters and uses L<Getopt::Long::Descriptive>
 to generate a command line tool.
 
 =head1 SYNOPSIS
@@ -248,7 +248,7 @@ The list of the methods automatically imported into your class.
 
 =head2 new_with_options
 
-It will parse your command line params and your inline params, validate and call the 'new' method.
+It will parse your command line params and your inline params, validate and call the C<new> method.
 
   myTool --str=ko
 
@@ -257,83 +257,83 @@ It will parse your command line params and your inline params, validate and call
 
 =head2 option
 
-The option keyword replace the 'has' method, and add support specials options for the command line only.
+The C<option> keyword replaces the C<has> method and adds support for special options for the command line only.
 
 See L</OPTION PARAMETERS> for the documentation.
 
 =head2 options_usage | --help
 
-It display the usage message and return the exit code
+It displays the usage message and returns the exit code.
 
   my $t = t->new_with_options();
   my $exit_code = 1;
   my $pre_message = "str is not valid";
   $t->options_usage($exit_code, $pre_message);
 
-This method is also automatically fire if the command option "--help" is passed.
+This method is also automatically fired if the command option "--help" is passed.
 
   myTool --help
 
 =head2 options_man | --man
 
-It display the manual.
+It displays the manual.
 
   my $t = t->new_with_options();
   $t->options_man();
 
-This is automatically fire if the command option "--man" is passed.
+This is automatically fired if the command option "--man" is passed.
 
   myTool --man
 
 =head2 options_short_usage | --usage
 
-It display a short version of the help message.
+It displays a short version of the help message.
 
   my $t = t->new_with_options();
   $t->options_short_usage($exit_code);
 
-This is automatically fire if the command option "--usage" is passed.
+This is automatically fired if the command option "--usage" is passed.
 
   myTool --usage
 
 =head1 IMPORT PARAMETERS
 
-The list of parameters support by L<MooX::Options>.
+The list of parameters supported by L<MooX::Options>.
 
 =head2 flavour
 
-Pass extra arguments for L<Getopt::Long::Descriptive>. It is usefull if you
-want to configure Getopt::Long.
+Passes extra arguments for L<Getopt::Long::Descriptive>. It is usefull if you
+want to configure L<Getopt::Long>.
 
   use MooX::Options flavour => [qw( pass_through )];
 
-Any flavour is pass to L<Getopt::Long> as a configuration, check the doc to see what is possible.
+Any flavour is passed to L<Getopt::Long> as a configuration, check the doc to see what is possible.
 
 =head2 protect_argv
 
-By default, @ARGV is protected. if you want to do something else on it, use this option and it will change the real @ARGV.
+By default, C<@ARGV> is protected. If you want to do something else on it, use this option and it will change the real C<@ARGV>.
 
   use MooX::Options protect_argv => 0;
 
 =head2 skip_options
 
-If you have Role with options and your want to disactivate some of them, you can use this parameter.
-In that case, the 'option' keyword will just works like an 'has'.
+If you have Role with options and you want to deactivate some of them, you can use this parameter.
+In that case, the C<option> keyword will just work like an C<has>.
 
   use MooX::Options skip_options => [qw/multi/];
 
 =head2 prefer_commandline
 
-By default, arguments to B<new_with_options> have a higher priority than the commandline options.
+By default, arguments passed to C<new_with_options> have a higher priority than the command line options.
 
-This parameter give to the commandline an higher priority.
+This parameter will give the command line an higher priority.
 
   use MooX::Options prefer_commandline => 1;
 
 =head2 with_config_from_file
 
 This parameter will load L<MooX::ConfigFromFile> in your module. 
-The config option will be used between the commandline and the parameters.
+The config option will be used between the command line and parameters.
 
 myTool :
 
@@ -345,7 +345,7 @@ In /etc/myTool.json
 
 =head1 OPTION PARAMETERS
 
-The keyword B<option> extend the keyword B<has> with specific parameters for the commandline.
+The keyword C<option> extend the keyword C<has> with specific parameters for the command line.
 
 =head2 doc | documentation
 
@@ -353,19 +353,18 @@ Documentation for the command line option.
 
 =head2 long_doc
 
-Documentation for the man page. By default the B<doc> parameter will be used.
+Documentation for the man page. By default the C<doc> parameter will be used.
 
-See also L<Man parameters|MooX::Options::Manual::Man> to get more examples to build a nice man page.
+See also L<Man parameters|MooX::Options::Manual::Man> to get more examples how to build a nice man page.
 
 =head2 required
 
-This attribute indicate that the parameter is mandatory.
-This attribute is not really used by L<MooX::Options> but the error message will be handle by it to
-display a consistant error message.
+This attribute indicates that the parameter is mandatory.
+This attribute is not really used by L<MooX::Options> but ensures that consistent error message will be displayed.
 
 =head2 format
 
-Format of the params. It is the same as L<Getopt::Long::Descriptive>.
+Format of the params, same as L<Getopt::Long::Descriptive>.
 
 =over
 
@@ -386,11 +385,11 @@ By default, it's a boolean value.
 Take a look of available formats with L<Getopt::Long::Descriptive>.
 
 You need to understand that everything is explicit here. 
-If you use L<Moose> and you attribute has B<isa => 'Array[Int]'>, that will not implied the format 'i@'.
+If you use L<Moose> and your attribute has C<< isa => 'Array[Int]' >>, that will B<not> imply the format C<i@>.
 
 =head2 format json : special format support
 
-The parameter will be treat like a json string.
+The parameter will be treated like a json string.
 
   option 'hash' => (is => 'ro', json => 1);
 
@@ -398,7 +397,7 @@ The parameter will be treat like a json string.
 
 =head2 negativable
 
-It add the negative version for the option.
+It adds the negative version for the option.
 
   option 'verbose' => (is => 'ro', negativable => 1);
 
@@ -407,9 +406,9 @@ It add the negative version for the option.
 
 =head2 repeatable
 
-It append to the L</format> the array attribute B<@>.
+It appends to the L</format> the array attribute C<@>.
 
-I advice to add a default value to your attribute to always have an array.
+I advise to add a default value to your attribute to always have an array.
 Otherwise the default value will be an undefined value.
 
   option foo => (is => 'rw', format => 's@', default => sub { [] });
@@ -425,7 +424,7 @@ For repeatable option, you can add the autosplit feature with your specific para
   myTool --test=1 --test=2 # test = (1, 2)
   myTool --test=1,2,3      # test = (1, 2, 3)
   
-It will also handle quoted params with the autosplit
+It will also handle quoted params with the autosplit.
 
   option testStr => (is => 'ro', format => 's@', default => sub {[]}, autosplit => ',');
 
@@ -455,8 +454,8 @@ You can also use a shorter option without attribute :
 
 =head2 order
 
-Specified the order of the attribute. If you want to push some attribute at the end of the list.
-By default all option has an order set to B<0>, and the option is sorted by their name.
+Specifies the order of the attribute. If you want to push some attributes at the end of the list.
+By default all options have an order set to C<0>, and options are sorted by their names.
 
   option 'at_the_end' => (is => 'ro', order => 999);
 
