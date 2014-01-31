@@ -302,7 +302,7 @@ The list of parameters supported by L<MooX::Options>.
 
 =head2 flavour
 
-Passes extra arguments for L<Getopt::Long::Descriptive>. It is usefull if you
+Passes extra arguments for L<Getopt::Long::Descriptive>. It is useful if you
 want to configure L<Getopt::Long>.
 
   use MooX::Options flavour => [qw( pass_through )];
