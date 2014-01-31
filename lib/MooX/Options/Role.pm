@@ -341,7 +341,7 @@ sub options_short_usage {
 
 =method options_man
 
-Display a pod like a manuel
+Display a pod like a manual
 
 =cut
 
