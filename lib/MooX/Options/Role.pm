@@ -72,7 +72,7 @@ sub _options_fix_argv {
 
     my @new_argv;
     #parse all argv
-    while(my $arg = shift @ARGV) {
+    while(defined (my $arg = shift @ARGV)) {
         if ($arg eq '--') {
             push @new_argv, $arg, @ARGV;
             last;
