@@ -14,7 +14,20 @@ use strict;
 use warnings;
 # VERSION
 use feature 'say';
-use Text::WrapI18N;
+BEGIN {
+    eval {
+        require Text::WrapI18N;
+        Text::WrapI18N->import;
+    } or do {
+        require Text::LineFold;
+        *wrap = sub {
+            my $columns = $Text::WrapI18N::columns;
+            Text::LineFold->new(
+                ($columns ? (ColMax => $columns) : ()),
+            )->fold(@_)
+        };
+    }
+}
 use Term::Size::Any qw/chars/;
 use Getopt::Long::Descriptive;
 use Scalar::Util qw/blessed/;
