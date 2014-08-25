@@ -157,6 +157,10 @@ sub option_pod {
         $prog_name,
     );
 
+    if (exists $INC{'utf8.pm'}){
+      unshift @man, "=encoding UTF-8";
+    }
+
     if (defined (my $description = $options_config{description})) {
         push @man, "=head1 DESCRIPTION", $description;
     }
