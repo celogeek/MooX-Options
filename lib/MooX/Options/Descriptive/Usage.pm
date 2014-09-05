@@ -153,6 +153,7 @@ sub option_pod {
         [] : [];
 
     my @man = (
+        "=encoding UTF-8",
         "=head1 NAME",
         $prog_name,
     );
