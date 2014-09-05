@@ -355,7 +355,7 @@ sub options_man {
     }
 
     my $man_file = file(Path::Class::tempdir(CLEANUP => 1), 'help.pod');
-    $man_file->spew($usage->option_pod);
+    $man_file->spew(iomode => '>:encoding(UTF-8)', $usage->option_pod);
 
     pod2usage(-verbose => 2, -input => $man_file->stringify, -exitval => 'NOEXIT', -output => $output);
 

@@ -13,8 +13,8 @@ This class use the full size of your terminal
 use strict;
 use warnings;
 # VERSION
-use feature 'say';
-use Text::WrapI18N;
+use feature 'say', 'state';
+use Text::LineFold;
 use Term::Size::Any qw/chars/;
 use Getopt::Long::Descriptive;
 use Scalar::Util qw/blessed/;
@@ -103,12 +103,11 @@ sub text {
 }
 
 # set the column size of your terminal into the wrapper
-sub _set_column_size {
+sub _get_line_fold {
     my ($columns) = chars();
     $columns //= 78;
     $columns = $ENV{TEST_FORCE_COLUMN_SIZE} if defined $ENV{TEST_FORCE_COLUMN_SIZE};
-    $Text::WrapI18N::columns = $columns - 4;
-    return;
+    return Text::LineFold->new(ColMax => $columns - 4);
 }
 
 =method option_text
@@ -121,14 +120,14 @@ sub option_text {
     my %options_data =  defined $self->{target} ?  $self->{target}->_options_data : ();
     my $getopt_options = $self->{options};
     my @message;
-    _set_column_size;
+    my $lf = _get_line_fold();
     for my $opt(@$getopt_options) {
         my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
         my $format_doc_str;
         $format_doc_str = $format_doc{$format} if defined $format;
         $format_doc_str = 'JSON' if defined $options_data{$opt->{name}}{json};
         push @message, (defined $short ? "-" . $short . " " : "") . "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name} . ":" . (defined $format_doc_str ? " " . $format_doc_str : "");
-        push @message, wrap("    ", "        ", $opt->{desc});
+        push @message, $lf->fold("    ", "        ", $opt->{desc});
         push @message, "";
     }
 
@@ -153,6 +152,7 @@ sub option_pod {
         [] : [];
 
     my @man = (
+        "=encoding UTF-8",
         "=head1 NAME",
         $prog_name,
     );
