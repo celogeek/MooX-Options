@@ -1,3 +1,5 @@
+    * Feature #452 : Support UTF8 source for pod and man (Celogeek San)
+
 4.009  2014-07-08 10:15:09 GMT
     * Bug #450 : options with format "s" do not accept "0" as value (Celogeek San)
 
