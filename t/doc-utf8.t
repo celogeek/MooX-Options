@@ -1,7 +1,6 @@
 #!perl
 use strict;
 use warnings;
-use utf8;
 use Test::More;
 use Test::Trap;
 use Carp;
