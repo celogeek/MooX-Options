@@ -19,6 +19,7 @@ use Try::Tiny;
     option 'empty'   => ( is => 'ro', negativable => 1 );
     option 'split'   => ( is => 'ro', format => 'i@', autosplit => ',' );
     option 'has_default' => ( is => 'ro', default => sub {'foo'} );
+    option 'range'   => ( is => 'ro', format => 'i@', autorange => 1 );
 
     1;
 }
@@ -137,6 +138,33 @@ use Try::Tiny;
     use MooX::Options;
 
     option 't' => ( is => 'ro', json => 1 );
+    1;
+}
+
+{
+
+    package rg_str;
+    use Moo;
+    use MooX::Options;
+
+    option 'range_str' => ( is => 'ro', format => 's', autorange => 1 );
+    option 'range_conflict_str1' =>
+      ( is => 'ro', format => 's', autorange => 1 );
+    option 'range_conflict_str2' =>
+      ( is => 'ro', format => 's', autorange => 1 );
+
+    1;
+}
+
+{
+
+    package rg_str_short;
+    use Moo;
+    use MooX::Options;
+
+    option 'range_str' =>
+      ( is => 'ro', format => 's', autorange => 1, short => 'r' );
+
     1;
 }
 

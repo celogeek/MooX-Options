@@ -37,7 +37,7 @@ sub _options_prepare_descriptive {
     my ($options_data) = @_;
 
     my @options;
-    my %has_to_split;
+    my %has_to_transform;
 
     for my $name (sort {
             $options_data->{$a}{order} <=> $options_data->{$b}{order}    # sort by order
@@ -50,25 +50,25 @@ sub _options_prepare_descriptive {
         $doc = "no doc for $name" if !defined $doc;
 
         push @options, [ _option_name( $name, %data ), $doc ];
-        
+
         if ( defined $data{autosplit} ) {
-            $has_to_split{$name} = Data::Record->new(
+            $has_to_transform{$name} = Data::Record->new(
                 { split => $data{autosplit}, unless => $RE{quoted} } );
             if ( my $short = $data{short} ) {
-                $has_to_split{$short} = $has_to_split{${name}};
+                $has_to_transform{$short} = $has_to_transform{${name}};
             }
             for ( my $i = 1; $i <= length($name); $i++ ) {
                 my $long_short = substr( $name, 0, $i );
-                $has_to_split{$long_short} = $has_to_split{${name}};
+                $has_to_transform{$long_short} = $has_to_transform{${name}};
             }
         }
     }
 
-    return \@options, \%has_to_split;
+    return \@options, \%has_to_transform;
 }
 
 sub _options_fix_argv {
-    my ($option_data, $has_to_split) = @_;
+    my ($option_data, $has_to_transform) = @_;
 
     my @new_argv;
     #parse all argv
@@ -104,12 +104,63 @@ sub _options_fix_argv {
 
         $arg_name .= $arg_name_without_dash;
 
-        if ( my $rec = $has_to_split->{$arg_name_without_dash} ) {
+        if ( my $rec = $has_to_transform->{$arg_name_without_dash} ) {
           $arg_values = shift @ARGV;
           foreach my $record ( $rec->records($arg_values) ) {
               #remove the quoted if exist to chain
               $record =~ s/^['"]|['"]$//gx;
-              push @new_argv, $arg_name, $record;
+
+
+              #####################################################################################
+              # These anon-subs are for fetching the long arg_name from the short arg_name or the
+              # 'shorter' (i.e. partial) arg_name. This appears neccesary as there doesn't seem to 
+              # be a way to get the contents of $option_data without the long arg_name.
+              my $long_from_short = sub {
+                  my ($arg,$data) = @_;                  
+                  foreach my $key ( keys %{$data} ) {
+                      return $key if exists $data->{$key}->{short} && $data->{$key}->{short} eq $arg;
+                  }
+
+                  return undef;
+              };
+
+              my $long_from_shorter = sub {
+                  my ($arg,$data) = @_;
+                  my ($guess_arg, $guess_abort) = (undef, 0);
+                  foreach my $key ( keys %{$data} ) {
+                      return undef if $guess_abort > 1;
+                      my $safe_arg = quotemeta($arg =~ s/-/_/gr);
+                      if($key =~ m/^$safe_arg/) {
+                        $guess_arg = $key;
+                        $guess_abort++;
+                      }
+                  }
+                  return $guess_arg;
+              };
+              #####################################################################################
+
+              ####################################################################################################################
+              # The long conditional is only looking for autorange => 1 in $option_data. It can likely be replaced
+              # with something less ugly if there is a better way to get at the keys than using the anon-subs above.
+              # If autorange => 1, then it splits on '..' and returns the eval'd range (1..4 => 1,2,3,4).
+              # It already splits the records based on autosplit value (and sets it to ',' if it is not set) so ranges only 
+              # need to be processed if they contain '..' (as no autosplit + autorange defaults autosplit => ',', the other normal 
+              # range separator). Be careful to check exists on keys as vivification can mess up test results.
+              my @records = ((  (exists $option_data->{$arg_name_without_dash} && exists $option_data->{$arg_name_without_dash}->{autorange} && $option_data->{$arg_name_without_dash}->{autorange})
+                              ||(   $long_from_short->($arg_name_without_dash, $option_data) && exists $option_data->{$long_from_short->($arg_name_without_dash,$option_data)} 
+                                    && exists $option_data->{$long_from_short->($arg_name_without_dash, $option_data)}->{autorange} && $option_data->{$long_from_short->($arg_name_without_dash, $option_data)}->{autorange})
+                              ||(   $long_from_shorter->($arg_name_without_dash, $option_data) && exists $option_data->{$long_from_shorter->($arg_name_without_dash,$option_data)} 
+                                    && exists $option_data->{$long_from_shorter->($arg_name_without_dash, $option_data)}->{autorange} && $option_data->{$long_from_shorter->($arg_name_without_dash, $option_data)}->{autorange})
+                            ) && $record =~ m/^\d+(?:\.\.\d{0,})?$/)
+                                ?(eval { 
+                                    my ($start, $end) = split(/\.\./, $record);
+                                    $end ||= $start;
+                                    return ($start =~ /^\d+$/ && $end =~ /^\d*$/)?($start .. $end):undef;
+                                })
+                                :($record);
+              ####################################################################################################################
+
+              push( @new_argv, $arg_name, $_ ) for @records;
           }
         } else {
           push @new_argv, $arg_name;
@@ -212,10 +263,10 @@ sub parse_options {
         delete @options_data{@{$options_config{skip_options}}};
     }
 
-    my ($options, $has_to_split) = _options_prepare_descriptive(\%options_data);
+    my ($options, $has_to_transform) = _options_prepare_descriptive(\%options_data);
 
     local @ARGV = @ARGV if $options_config{protect_argv};
-    @ARGV = _options_fix_argv(\%options_data, $has_to_split);
+    @ARGV = _options_fix_argv(\%options_data, $has_to_transform);
 
     my @flavour;
     if ( defined $options_config{flavour} ) {

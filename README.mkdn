@@ -250,6 +250,30 @@ It will also handle quoted params with the autosplit.
 
     myTool --testStr='a,b,"c,d",e,f' # testStr ("a", "b", "c,d", "e", "f")
 
+## autorange
+
+For another repeatable option you can add the autorange feature with your specific parameters. This 
+allows you to pass number ranges instead of passing each individual number.
+
+    option test => (is => 'ro', format => 'i@', default => sub {[]}, autorange => 1);
+  
+    myTool --test=1 --test=2 # test = (1, 2)
+    myTool --test=1,2,3      # test = (1, 2, 3)
+    myTool --test=1,2,3..6   # test = (1, 2, 3, 4, 5, 6)
+  
+It will also handle quoted params like autosplit, and will not rangify them.
+
+    option testStr => (is => 'ro', format => 's@', default => sub {[]}, autorange => 1);
+
+    myTool --testStr='1,2,"3,a,4",5' # testStr (1, 2, "3,a,4", 5)
+
+autosplit will be set to ',' if undefined. You may set autosplit to a different delimiter than ','
+for your group separation, but the range operator '..' cannot be changed. 
+
+    option testStr => (is => 'ro', format => 's@', default => sub {[]}, autorange => 1, autosplit => '-');
+
+    myTool --testStr='1-2-3-5..7' # testStr (1, 2, 3, 5, 6, 7)
+
 ## short
 
 Long option can also have short version or aliased.
