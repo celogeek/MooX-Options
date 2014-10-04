@@ -137,6 +137,11 @@ sub _options_fix_argv {
                   }
                   return $guess_arg;
               };
+
+              my $build_range = sub {
+                my ($start, $end) = split /\.\./, $_[0], 2;
+                return $start .. ($end || $start);
+              };
               #####################################################################################
 
               ####################################################################################################################
@@ -152,11 +157,7 @@ sub _options_fix_argv {
                               ||(   $long_from_shorter->($arg_name_without_dash, $option_data) && exists $option_data->{$long_from_shorter->($arg_name_without_dash,$option_data)} 
                                     && exists $option_data->{$long_from_shorter->($arg_name_without_dash, $option_data)}->{autorange} && $option_data->{$long_from_shorter->($arg_name_without_dash, $option_data)}->{autorange})
                             ) && $record =~ m/^\d+(?:\.\.\d{0,})?$/)
-                                ?(eval { 
-                                    my ($start, $end) = split(/\.\./, $record);
-                                    $end ||= $start;
-                                    return ($start =~ /^\d+$/ && $end =~ /^\d*$/)?($start .. $end):undef;
-                                })
+                                ?$build_range->($record)
                                 :($record);
               ####################################################################################################################
 
