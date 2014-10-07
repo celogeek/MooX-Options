@@ -13,12 +13,16 @@ use Test::More;
 local @ARGV = ('--opt', '--opt -y -my-options');
 my $opt = TestOptOfOpt->new_with_options;
 
-is $opt->opt, '--opt -y -my-options', 'option of option is not changed';
+is $opt->opt, '--opt -y -my-options', 'option of option is not changed for separated args';
 
 local @ARGV = ('--opt=--opt -y -my-options');
 my $opt2 = TestOptOfOpt->new_with_options;
 
-is $opt2->opt, '--opt -y -my-options', 'option of option is not changed';
+is $opt2->opt, '--opt -y -my-options', 'option of option is not changed for glued args';
 
+local @ARGV = ('--op=--opt -y -my-options');
+my $opt3 = TestOptOfOpt->new_with_options;
+
+is $opt3->opt, '--opt -y -my-options', 'option of option is not changed for shortened args';
 
 done_testing;

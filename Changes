@@ -1,3 +1,7 @@
+4.012  2014-10-07 09:42:27 GMT
+    * Bug #455 : Option of options should not be change for trait (Celogeek San)
+	handle shorter name
+
 4.011  2014-10-07 08:51:50 GMT
     * Bug #455 : Option of options should not be change for trait (Celogeek San)
 
