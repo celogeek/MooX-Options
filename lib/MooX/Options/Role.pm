@@ -114,6 +114,13 @@ sub _options_fix_argv {
         } else {
           push @new_argv, $arg_name;
         }
+
+        # if option has an argument, we keep the argument untouched
+        if (my $opt_data = $option_data->{$arg_name_without_dash}) {
+          if ($opt_data->{format}) {
+            push @new_argv, shift @ARGV;
+          }          
+        }
     }
 
     return @new_argv;
