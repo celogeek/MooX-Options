@@ -127,19 +127,10 @@ sub _options_fix_argv {
               #remove the quoted if exist to chain
               $record =~ s/^['"]|['"]$//gx;
 			  if ($autorange) {
-				  my ($left_figure, $autorange_found, $right_figure) = $record =~ /^(\d*)(\.\.)(\d*)$/;
-				  if ($autorange_found) {
-					  $left_figure = $right_figure if !defined $left_figure || !length($left_figure);
-					  $right_figure = $left_figure if !defined $right_figure || !length($right_figure);
-					  if (defined $left_figure && defined $right_figure) {
-						  for my $range_idx($left_figure..$right_figure) {
-							  push @new_argv, $arg_name, $range_idx;
-						  }
-						  next;
-					  }
-				  }
+				  push @new_argv, map { $arg_name => $_ } _expand_autorange($record);
+			  } else {
+				  push @new_argv, $arg_name, $record;
 			  }
-			  push @new_argv, $arg_name, $record;
           }
         } else {
           push @new_argv, $arg_name;
@@ -155,6 +146,21 @@ sub _options_fix_argv {
 
     return @new_argv;
 
+}
+
+sub _expand_autorange {
+	my ($arg_value) = @_;
+
+	my @expanded_arg_value;
+	my ($left_figure, $autorange_found, $right_figure) = $arg_value =~ /^(\d*)(\.\.)(\d*)$/x;
+	if ($autorange_found) {
+		$left_figure = $right_figure if !defined $left_figure || !length($left_figure);
+		$right_figure = $left_figure if !defined $right_figure || !length($right_figure);
+		if (defined $left_figure && defined $right_figure) {
+			push @expanded_arg_value, $left_figure..$right_figure;
+		}
+	}
+	return @expanded_arg_value ? @expanded_arg_value : $arg_value;
 }
 
 ### PRIVATE
