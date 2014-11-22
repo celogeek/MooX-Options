@@ -122,10 +122,24 @@ sub _options_fix_argv {
 
         if ( my $rec = $has_to_split->{$arg_name_without_dash} ) {
           $arg_values = shift @ARGV;
+		  my $autorange = defined $original_long_option && exists $option_data->{$original_long_option} && $option_data->{$original_long_option}{autorange};
           foreach my $record ( $rec->records($arg_values) ) {
               #remove the quoted if exist to chain
               $record =~ s/^['"]|['"]$//gx;
-              push @new_argv, $arg_name, $record;
+			  if ($autorange) {
+				  my ($left_figure, $autorange_found, $right_figure) = $record =~ /^(\d*)(\.\.)(\d*)$/;
+				  if ($autorange_found) {
+					  $left_figure = $right_figure if !defined $left_figure || !length($left_figure);
+					  $right_figure = $left_figure if !defined $right_figure || !length($right_figure);
+					  if (defined $left_figure && defined $right_figure) {
+						  for my $range_idx($left_figure..$right_figure) {
+							  push @new_argv, $arg_name, $range_idx;
+						  }
+						  next;
+					  }
+				  }
+			  }
+			  push @new_argv, $arg_name, $record;
           }
         } else {
           push @new_argv, $arg_name;
