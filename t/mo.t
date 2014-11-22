@@ -27,6 +27,7 @@ BEGIN {
     option 'empty'   => ( is => 'ro', negativable => 1 );
     option 'split'   => ( is => 'ro', format => 'i@', autosplit => ',' );
     option 'has_default' => ( is => 'ro', default => sub {'foo'} );
+    option 'range'   => ( is => 'ro', format => 'i@', autorange => 1 );
 
     1;
 }
@@ -260,6 +261,54 @@ BEGIN {
     use Mo;
     use Role::Tiny::With;
     with 't_jsonRole';
+    1;
+}
+
+{
+
+    package rg_strRole;
+    use Moo::Role;
+    use Mo;
+    use MooX::Options;
+
+    option 'range_str' => ( is => 'ro', format => 's', autorange => 1 );
+    option 'range_conflict_str1' =>
+      ( is => 'ro', format => 's', autorange => 1 );
+    option 'range_conflict_str2' =>
+      ( is => 'ro', format => 's', autorange => 1 );
+
+    1;
+}
+
+{
+
+    package rg_str;
+    use Mo;
+    use Role::Tiny::With;
+    with 'rg_strRole';
+
+    1;
+}
+
+{
+
+    package rg_str_shortRole;
+    use Moo::Role;
+    use Mo;
+    use MooX::Options;
+
+    option 'range_str' =>
+      ( is => 'ro', format => 's', autorange => 1, short => 'r' );
+
+    1;
+}
+{
+
+    package rg_str_short;
+    use Mo;
+    use Role::Tiny::With;
+    with 'rg_str_shortRole';
+
     1;
 }
 

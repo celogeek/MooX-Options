@@ -193,7 +193,7 @@ subtest "split_complexe_str_short" => sub {
         my $t = sp_str_short->new_with_options();
         is_deeply( $t->split_str, [qw/a/], 'str req is ok' );
     }
-    {
+    { 
         local @ARGV = ("-z=a,b,c");
         my $t = sp_str_short->new_with_options();
         is_deeply( $t->split_str, [qw/a b c/], 'str req is ok' );
@@ -350,8 +350,145 @@ subtest "json" => sub {
         };
         ok( $trap->stdout =~ /\-t: JSON/, "json help message properly set" ) or diag $trap->stdout;
     }
+};
 
+subtest "range_complexe_str" => sub {
+    note "range on complexe str";
+    {
+        local @ARGV = ('--range_str=1,2,4');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4/], 'str1 req is ok' );
+    }
+    {
+        local @ARGV = ('--range-str=1,2,4..');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4/], 'str2 req is ok' );
+    }
 
+    {
+        local @ARGV = ('--range_str=1,2,4..6');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4 5 6/], 'str3 req is ok' );
+    }
+    {
+        local @ARGV = ('--range-str=1,2,4..6');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4 5 6/], 'str4 req is ok' );
+    }
+    {
+        local @ARGV = ('--range_str=1,2,4..');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4/], 'str req5 is ok' );
+    }
+    {
+        local @ARGV = ('--range-str=1,2,4..');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4/], 'str req6 is ok' );
+    }
+    { 
+        local @ARGV = ("--range_str=1,2,4..7,10");
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4 5 6 7 10/], 'str7 req is ok' );
+    }
+    { 
+        local @ARGV = ("--range-str=1,2,4..7,10");
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4 5 6 7 10/], 'str8 req is ok' );
+    }
+    { 
+        local @ARGV = ('--range_str=1..3,10..12,20..');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 3 10 11 12 20/], 'str9 req is ok' );
+    }
+    { 
+        local @ARGV = ('--range-str=1..3,10..12,20..');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 3 10 11 12 20/], 'str10 req is ok' );
+    }
+    {
+        local @ARGV = ('--range_str=1,"2,3",4,"foo bar"');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [ 1, "2,3", 4, "foo bar" ], 'str11 req is ok' );
+    }
+    {
+        local @ARGV = ('--range-str=1,"2,3",4,"a,2,c"');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [ 1, "2,3", 4, "a,2,c" ], 'str12 req is ok' );
+    }
+    done_testing();
+};
+
+subtest "range_complexe_str_short" => sub {
+    note "range on complexe str short";
+    {
+        local @ARGV = ("-r=1");
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [qw/1/], 'str1 req is ok' );
+    }
+    { 
+        local @ARGV = ("-r=1,2,4");
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4/], 'str2 req is ok' );
+    }
+    { 
+        local @ARGV = ("-r=1..4");
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 3 4/], 'str3 req is ok' );
+    }
+    { 
+        local @ARGV = ('-r', "1..4");
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 3 4/], 'str4 req is ok' );
+    }
+    { 
+        local @ARGV = ("-r=1,2,4..7,10");
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4 5 6 7 10/], 'str5 req is ok' );
+    }
+    { 
+        local @ARGV = ('-r', '1..3,10..12,20..');
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 3 10 11 12 20/], 'str6 req is ok' );
+    }
+    {
+        local @ARGV = ('-r=1,"2,3",4');
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [ '1', "2,3", '4' ], 'str7 req is ok' );
+    }
+    {
+        local @ARGV = ('-r','1,"2,3",4..7');
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [ 1, "2,3", 4, 5, 6, 7 ], 'str8 req is ok' );
+    }
+    done_testing();
+};
+
+subtest "range_str_shorter_name" => sub {
+    note "shorter long range";
+    {
+        local @ARGV = ("--range_st=1,2,4..6");
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4 5 6/], 'str1 req is ok' );
+    }
+    {
+        local @ARGV = ("--range-st=1,2,4..6,7");
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4 5 6 7/], 'str2 req is ok' );
+    }
+    note "shorter long range with conflict";
+    {
+        local @ARGV = ("--range_co=1,2,3");
+        trap {
+            rg_str->new_with_options();
+        };
+        ok $trap->stderr =~ qr/Option\srange_co\sis\sambiguous/, 'conflict detected';
+        local @ARGV = ("--range-co=1,2,3");
+        trap {
+            rg_str->new_with_options();
+        };
+        ok $trap->stderr =~ qr/Option\srange_co\sis\sambiguous/, 'conflict detected';
+    }
+    done_testing();
 };
 
 1;
