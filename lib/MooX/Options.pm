@@ -213,10 +213,7 @@ sub _validate_and_filter_options {
     my (%options) = @_;
     $options{doc} = $options{documentation} if !defined $options{doc};
     $options{order} = 0 if !defined $options{order};
-
-    # Normally ',' is used to separate single numbers in a range, but we'll let it be set to a custom
-    # separator so behavior is consistent. 
-    $options{autosplit} = ($options{autorange} && !defined $options{autosplit})?',':$options{autosplit};
+	$options{autosplit} = ',' if !defined $options{autosplit} && $options{autorange};
 
     if ( $options{json} ) {
         delete $options{repeatable};
