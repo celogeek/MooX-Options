@@ -19,8 +19,8 @@ use Getopt::Long::Descriptive;
 use Scalar::Util qw/blessed/;
 
 BEGIN {
-   eval "use Term::Size::Any qw/chars/";
-   if ($@) {
+	## no critic (ProhibitStringyEval)
+   if (!eval "use Term::Size::Any qw/chars/") {
 	   no strict 'refs';
 	   *{"MooX::Options::Descriptive::Usage::chars"} = sub {return (80,25)};
    }
