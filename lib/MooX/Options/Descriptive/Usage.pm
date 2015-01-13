@@ -18,6 +18,11 @@ use Text::LineFold;
 use Getopt::Long::Descriptive;
 use Scalar::Util qw/blessed/;
 
+=method chars
+
+Return (Columns, Rows) of the current terminal
+
+=cut
 BEGIN {
 	## no critic (ProhibitStringyEval)
    if (!eval "use Term::Size::Any qw/chars/") {
