@@ -15,9 +15,16 @@ use warnings;
 # VERSION
 use feature 'say', 'state';
 use Text::LineFold;
-use Term::Size::Any qw/chars/;
 use Getopt::Long::Descriptive;
 use Scalar::Util qw/blessed/;
+
+BEGIN {
+   eval "use Term::Size::Any qw/chars/";
+   if ($@) {
+	   no strict 'refs';
+	   *{"MooX::Options::Descriptive::Usage::chars"} = sub {return (80,25)};
+   }
+}
 
 my %format_doc = (
     's'  => 'String',
