@@ -74,6 +74,7 @@ sub _options_prepare_descriptive {
     return \@options, \%has_to_split, \%all_options;
 }
 
+## no critic (ProhibitExcessComplexity)
 sub _options_fix_argv {
     my ($option_data, $has_to_split, $all_options) = @_;
 
@@ -145,8 +146,8 @@ sub _options_fix_argv {
     }
 
     return @new_argv;
-
 }
+## use critic
 
 sub _expand_autorange {
 	my ($arg_value) = @_;
