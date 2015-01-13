@@ -74,6 +74,7 @@ sub _options_prepare_descriptive {
     return \@options, \%has_to_split, \%all_options;
 }
 
+## no critic (ProhibitExcessComplexity)
 sub _options_fix_argv {
     my ($option_data, $has_to_split, $all_options) = @_;
 
@@ -121,17 +122,18 @@ sub _options_fix_argv {
         $arg_name .= $arg_name_without_dash;
 
         if ( my $rec = $has_to_split->{$arg_name_without_dash} ) {
-          $arg_values = shift @ARGV;
-		  my $autorange = defined $original_long_option && exists $option_data->{$original_long_option} && $option_data->{$original_long_option}{autorange};
-          foreach my $record ( $rec->records($arg_values) ) {
-              #remove the quoted if exist to chain
-              $record =~ s/^['"]|['"]$//gx;
-			  if ($autorange) {
-				  push @new_argv, map { $arg_name => $_ } _expand_autorange($record);
-			  } else {
-				  push @new_argv, $arg_name, $record;
-			  }
-          }
+			if ($arg_values = shift @ARGV) {
+				my $autorange = defined $original_long_option && exists $option_data->{$original_long_option} && $option_data->{$original_long_option}{autorange};
+				foreach my $record ( $rec->records($arg_values) ) {
+					#remove the quoted if exist to chain
+					$record =~ s/^['"]|['"]$//gx;
+					if ($autorange) {
+						push @new_argv, map { $arg_name => $_ } _expand_autorange($record);
+					} else {
+						push @new_argv, $arg_name, $record;
+					}
+				}
+			}
         } else {
           push @new_argv, $arg_name;
         }
@@ -145,8 +147,8 @@ sub _options_fix_argv {
     }
 
     return @new_argv;
-
 }
+## use critic
 
 sub _expand_autorange {
 	my ($arg_value) = @_;
