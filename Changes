@@ -1,3 +1,4 @@
+    * Bug #464 : warning generated when missing required params (Celogeek San)
     * Bug #466 : Term::Any::Size should be recommanded but optional (Celogeek San)
 
 4.013  2014-11-22 07:43:13 GMT
