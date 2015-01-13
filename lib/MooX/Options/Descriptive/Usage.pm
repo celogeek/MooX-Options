@@ -25,7 +25,7 @@ Return (Columns, Rows) of the current terminal
 =cut
 BEGIN {
 	## no critic (ProhibitStringyEval)
-   if (!eval "use Term::Size::Any qw/chars/") {
+   if (!eval "use Term::Size::Any qw/chars/; 1") {
 	   no strict 'refs';
 	   *{"MooX::Options::Descriptive::Usage::chars"} = sub {return (80,25)};
    }
