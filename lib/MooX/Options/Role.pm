@@ -230,8 +230,13 @@ sub new_with_options {
         my @missing_required = split /,\s/x, $1;
         print
           join( "\n", ( map { $_ . " is missing" } @missing_required ), '' );
-    } elsif ($@ =~ /^(.*?)\srequired/x) {
+    }
+    elsif ($@ =~ /^(.*?)\srequired/x) {
         print "$1 is missing\n";
+    }
+    elsif ($@ =~ /isa check for "(.*?)" failed: /) {
+        $@ =~ s/isa check for "(.*?)" failed: //;
+        print $@;
     }
     else {
         croak $@;
