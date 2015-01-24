@@ -1,3 +1,7 @@
+4.016  2015-01-24 12:30:10 GMT
+    * Feature #470 : Add "hidden" attribute, and doc (Celogeek San)
+    * Feature #471 : Added a better error message for isa check failures (Celogeek San)
+
 4.015  2015-01-13 16:06:52 GMT
     * Bug #466 : Term::Any::Size should be recommanded but optional (Celogeek San)
 	fix eval

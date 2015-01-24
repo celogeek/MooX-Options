@@ -49,8 +49,10 @@ sub _options_prepare_descriptive {
         my %data = %{ $options_data->{$name} };
         my $doc  = $data{doc};
         $doc = "no doc for $name" if !defined $doc;
+		my $option = {};
+		$option->{hidden} = 1 if $data{hidden};
 
-        push @options, [ _option_name( $name, %data ), $doc ];
+        push @options, [ _option_name( $name, %data ), $doc, $option ];
 
         push @{$all_options{$name}}, $name;
         for ( my $i = 1; $i <= length($name); $i++ ) {
@@ -224,17 +226,21 @@ sub new_with_options {
     return $self
       if eval { $self = $class->new( %cmdline_params ); 1 };
     if ( $@ =~ /^Attribute\s\((.*?)\)\sis\srequired/x ) {
-        print "$1 is missing\n";
+        print STDERR "$1 is missing\n";
     }
     elsif ( $@ =~ /^Missing\srequired\sarguments:\s(.*)\sat\s\(/x ) {
         my @missing_required = split /,\s/x, $1;
-        print
+        print STDERR
           join( "\n", ( map { $_ . " is missing" } @missing_required ), '' );
-    } elsif ($@ =~ /^(.*?)\srequired/x) {
-        print "$1 is missing\n";
+    }
+    elsif ($@ =~ /^(.*?)\srequired/x) {
+        print STDERR "$1 is missing\n";
+    }
+    elsif ($@ =~ /^isa check.*?failed: /) {
+		print STDERR substr($@, index($@, ':') + 2);
     }
     else {
-        croak $@;
+        print STDERR $@;
     }
     %cmdline_params = $class->parse_options( help => 1 );
     return $class->options_usage(1, $cmdline_params{help});
@@ -297,7 +303,7 @@ sub parse_options {
             if ( defined $val ) {
                 if ( $data{json} ) {
                     if (! eval { $cmdline_params{$name} = decode_json($val); 1 }) {
-                      carp $@;
+                      print STDERR $@;
                       return $class->options_usage(1, $usage);
                     }
                 }
