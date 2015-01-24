@@ -74,7 +74,7 @@ use warnings;
 use Carp;
 
 my @OPTIONS_ATTRIBUTES =
-  qw/format short repeatable negativable autosplit autorange doc long_doc order json/;
+  qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden/;
 
 sub import {
     my ( undef, @import ) = @_;
@@ -483,6 +483,16 @@ Specifies the order of the attribute. If you want to push some attributes at the
 By default all options have an order set to C<0>, and options are sorted by their names.
 
   option 'at_the_end' => (is => 'ro', order => 999);
+
+=head2 hidden
+
+Hide option from doc but still an option you can use on command line.
+
+  option 'debug' => (is => 'ro', doc => 'hidden');
+
+Or
+
+  option 'debug' => (is => 'ro', hidden => 1);
 
 =head1 ADDITIONAL MANUALS
 
