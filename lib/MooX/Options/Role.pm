@@ -224,22 +224,21 @@ sub new_with_options {
     return $self
       if eval { $self = $class->new( %cmdline_params ); 1 };
     if ( $@ =~ /^Attribute\s\((.*?)\)\sis\srequired/x ) {
-        print "$1 is missing\n";
+        print STDERR "$1 is missing\n";
     }
     elsif ( $@ =~ /^Missing\srequired\sarguments:\s(.*)\sat\s\(/x ) {
         my @missing_required = split /,\s/x, $1;
-        print
+        print STDERR
           join( "\n", ( map { $_ . " is missing" } @missing_required ), '' );
     }
     elsif ($@ =~ /^(.*?)\srequired/x) {
-        print "$1 is missing\n";
+        print STDERR "$1 is missing\n";
     }
-    elsif ($@ =~ /isa check for "(.*?)" failed: /) {
-        $@ =~ s/isa check for "(.*?)" failed: //;
-        print $@;
+    elsif ($@ =~ /^isa check.*?failed: /) {
+		print STDERR substr($@, index($@, ':') + 2);
     }
     else {
-        croak $@;
+        print STDERR $@;
     }
     %cmdline_params = $class->parse_options( help => 1 );
     return $class->options_usage(1, $cmdline_params{help});
@@ -302,7 +301,7 @@ sub parse_options {
             if ( defined $val ) {
                 if ( $data{json} ) {
                     if (! eval { $cmdline_params{$name} = decode_json($val); 1 }) {
-                      carp $@;
+                      print STDERR $@;
                       return $class->options_usage(1, $usage);
                     }
                 }
