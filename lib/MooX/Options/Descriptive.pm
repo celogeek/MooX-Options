@@ -13,7 +13,7 @@ use warnings;
 # VERSION
 
 use Getopt::Long 2.38;
-use Getopt::Long::Descriptive 0.091;
+use Getopt::Long::Descriptive 0.099;
 use MooX::Options::Descriptive::Usage;
 use parent 'Getopt::Long::Descriptive';
 
