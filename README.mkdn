@@ -4,7 +4,7 @@ MooX::Options - Explicit Options eXtension for Object Class
 
 # VERSION
 
-version 4.015
+version 4.016
 
 # DESCRIPTION
 
@@ -302,6 +302,16 @@ Specifies the order of the attribute. If you want to push some attributes at the
 By default all options have an order set to `0`, and options are sorted by their names.
 
     option 'at_the_end' => (is => 'ro', order => 999);
+
+## hidden
+
+Hide option from doc but still an option you can use on command line.
+
+    option 'debug' => (is => 'ro', doc => 'hidden');
+
+Or
+
+    option 'debug' => (is => 'ro', hidden => 1);
 
 # ADDITIONAL MANUALS
 
