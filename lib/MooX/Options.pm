@@ -74,7 +74,7 @@ use warnings;
 use Carp;
 
 my @OPTIONS_ATTRIBUTES =
-  qw/format short repeatable negativable autosplit autorange doc long_doc order json/;
+  qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden/;
 
 sub import {
     my ( undef, @import ) = @_;
