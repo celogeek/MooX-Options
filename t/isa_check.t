@@ -24,7 +24,7 @@ use Test::Trap;
 {
 	local @ARGV = (qw/--hero batman/);
     trap { my $opt = t->new_with_options(); };
-	like $trap->stdout, qr/boop/,  'stdout ok';
+	like $trap->stderr, qr/^boop/,  'stdout ok';
 	like $trap->stderr, qr/USAGE/, 'stderr ok';
 }
 
