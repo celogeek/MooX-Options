@@ -484,6 +484,16 @@ By default all options have an order set to C<0>, and options are sorted by thei
 
   option 'at_the_end' => (is => 'ro', order => 999);
 
+=head2 hidden
+
+Hide option from doc but still an option you can use on command line.
+
+  option 'debug' => (is => 'ro', doc => 'hidden');
+
+Or
+
+  option 'debug' => (is => 'ro', hidden => 1);
+
 =head1 ADDITIONAL MANUALS
 
 =over
