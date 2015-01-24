@@ -80,7 +80,7 @@ subtest "test required" => sub {
         local @ARGV = ();
         my @r = trap { r->new_with_options };
         is( $trap->exit, 1, "missing args, exit 1" );
-        ok( $trap->stdout =~ /^str_req is missing/, "str_reg is missing" );
+        ok( $trap->stderr =~ /^str_req is missing/, "str_reg is missing" );
     }
     {
         local @ARGV = ('--str_req=ok');
@@ -91,7 +91,7 @@ subtest "test required" => sub {
         local @ARGV = ();
         my @r = trap { multi_req->new_with_options };
         is( $trap->exit, 1, "missing args exit 1" );
-        my @missing = $trap->stdout =~ /(multi_\d is missing)\n/g;
+        my @missing = $trap->stderr =~ /(multi_\d is missing)\n/g;
         my @target_isa;
         { no strict 'refs'; @target_isa = @{"multi_req::ISA"} };
         if (multi_req->isa('Moose::Object') || multi_req->isa('Mo::Object')) {
@@ -241,12 +241,8 @@ subtest "split_str_shorter_name" => sub {
 
 subtest "should_die_ok" => sub {
     note "Test chain method";
-    try {
-        d->new_with_options( should_die_ok => 1 );
-    }
-    catch {
-        ok( /this\s\will\sdie\sok/, 'should die ok' );
-    };
+    trap { d->new_with_options( should_die_ok => 1 ) };
+    ok($trap->stderr =~ qr/this\s\will\sdie\sok/, 'should die ok' );
 };
 
 subtest "test usage" => sub {
