@@ -16,3 +16,5 @@ add_packages = Text::WrapI18N
 [-Subroutines::ProhibitBuiltinHomonyms]
 [Subroutines::ProhibitUnusedPrivateSubroutines]
 allow=_options_sub_commands
+[ControlStructures::ProhibitCascadingIfElse]
+max_elsif = 10
