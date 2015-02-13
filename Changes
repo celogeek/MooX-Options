@@ -1,3 +1,6 @@
+4.017  2015-02-13 07:13:03 GMT
+    * Bug #472 : Upgrade deps on Module::Build and Getopt::Long (Celogeek San)
+
 4.016  2015-01-24 12:30:10 GMT
     * Feature #470 : Add "hidden" attribute, and doc (Celogeek San)
     * Feature #471 : Added a better error message for isa check failures (Celogeek San)

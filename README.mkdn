@@ -4,7 +4,7 @@ MooX::Options - Explicit Options eXtension for Object Class
 
 # VERSION
 
-version 4.016
+version 4.017
 
 # DESCRIPTION
 

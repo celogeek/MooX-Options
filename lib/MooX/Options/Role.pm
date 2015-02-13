@@ -236,7 +236,7 @@ sub new_with_options {
     elsif ($@ =~ /^(.*?)\srequired/x) {
         print STDERR "$1 is missing\n";
     }
-    elsif ($@ =~ /^isa check.*?failed: /) {
+    elsif ($@ =~ /^isa\scheck.*?failed:\s/x) {
 		print STDERR substr($@, index($@, ':') + 2);
     }
     else {
