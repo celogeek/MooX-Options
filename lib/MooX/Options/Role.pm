@@ -276,7 +276,7 @@ sub parse_options {
     my $prog_name = $class->_options_prog_name();
 
     # create usage str
-    my $usage_str = "USAGE: $prog_name %o";
+    my $usage_str = $options_config{usage_string} // "USAGE: $prog_name %o";
 
     my ( $opt, $usage ) = describe_options(
         ($usage_str), @$options,
