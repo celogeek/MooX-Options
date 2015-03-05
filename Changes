@@ -1,3 +1,5 @@
+    * Feature #475 : Add usage_string parameters (Celogeek San)
+
 4.017  2015-02-13 07:13:03 GMT
     * Bug #472 : Upgrade deps on Module::Build and Getopt::Long (Celogeek San)
 
