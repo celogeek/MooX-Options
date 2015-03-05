@@ -82,6 +82,7 @@ sub import {
         protect_argv          => 1,  flavour            => [],
         skip_options          => [], prefer_commandline => 0,
         with_config_from_file => 0,
+        usage_string          => undef,
         #long description (manual)
         description => undef, authors => [], synopsis => undef,
         @import
@@ -343,6 +344,27 @@ myTool :
 In /etc/myTool.json
 
   {"test" : 1}
+
+=head1 usage_string
+
+This parameter is passed to Getopt::Long::Descriptive::describe_options() as
+the first parameter.  
+
+It is a "sprintf"-like string that is used in generating the first line of the
+usage message. It's a one-line summary of how the command is to be invoked. 
+The default value is "USAGE: %c %o".
+
+%c will be replaced with what Getopt::Long::Descriptive thinks is the
+program name (it's computed from $0, see "prog_name").
+
+%o will be replaced with a list of the short options, as well as the text
+"[long options...]" if any have been defined.
+
+The rest of the usage description can be used to summarize what arguments
+are expected to follow the program's options, and is entirely free-form.
+
+Literal "%" characters will need to be written as "%%", just like with
+"sprintf".
 
 =head1 OPTION PARAMETERS
 
