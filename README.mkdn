@@ -4,7 +4,7 @@ MooX::Options - Explicit Options eXtension for Object Class
 
 # VERSION
 
-version 4.017
+version 4.018
 
 # DESCRIPTION
 
@@ -170,6 +170,27 @@ myTool :
 In /etc/myTool.json
 
     {"test" : 1}
+
+# usage\_string
+
+This parameter is passed to Getopt::Long::Descriptive::describe\_options() as
+the first parameter.  
+
+It is a "sprintf"-like string that is used in generating the first line of the
+usage message. It's a one-line summary of how the command is to be invoked. 
+The default value is "USAGE: %c %o".
+
+%c will be replaced with what Getopt::Long::Descriptive thinks is the
+program name (it's computed from $0, see "prog\_name").
+
+%o will be replaced with a list of the short options, as well as the text
+"\[long options...\]" if any have been defined.
+
+The rest of the usage description can be used to summarize what arguments
+are expected to follow the program's options, and is entirely free-form.
+
+Literal "%" characters will need to be written as "%%", just like with
+"sprintf".
 
 # OPTION PARAMETERS
 
