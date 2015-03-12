@@ -83,6 +83,11 @@ sub import {
         skip_options          => [], prefer_commandline => 0,
         with_config_from_file => 0,
         usage_string          => undef,
+        usage_top             => undef,
+        usage_bottom          => undef,
+        man_option            => 1,
+        usage_option          => 1,
+        help_option           => 1,
         #long description (manual)
         description => undef, authors => [], synopsis => undef,
         @import
