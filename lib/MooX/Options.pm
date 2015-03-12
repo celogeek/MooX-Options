@@ -371,6 +371,28 @@ are expected to follow the program's options, and is entirely free-form.
 Literal "%" characters will need to be written as "%%", just like with
 "sprintf".
 
+=head1 usage_top
+
+This parameter is passed to Getopt::Long::Descriptive::describe_options() as
+the second parameter.
+
+=head1 usage_bottom
+
+This parameter is passed to Getopt::Long::Descriptive::describe_options() as
+the second to last parameter (before flavours).
+
+=head1 man_option
+
+Add a --man option.  This is true by default.
+
+=head1 help_option
+
+Add a --help option.  This is true by default.
+
+=head1 usage_option
+
+Add a --usage option.  This is true by default.
+
 =head1 OPTION PARAMETERS
 
 The keyword C<option> extend the keyword C<has> with specific parameters for the command line.
