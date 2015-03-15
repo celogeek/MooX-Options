@@ -74,7 +74,7 @@ use warnings;
 use Carp;
 
 my @OPTIONS_ATTRIBUTES =
-  qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden/;
+  qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
 
 sub import {
     my ( undef, @import ) = @_;
@@ -84,7 +84,7 @@ sub import {
         with_config_from_file => 0,
         usage_string          => undef,
         #long description (manual)
-        description => undef, authors => [], synopsis => undef,
+        description => undef, authors => [], synopsis => undef, spacer => '_',
         @import
     };
 
@@ -214,7 +214,7 @@ sub _validate_and_filter_options {
     my (%options) = @_;
     $options{doc} = $options{documentation} if !defined $options{doc};
     $options{order} = 0 if !defined $options{order};
-	$options{autosplit} = ',' if !defined $options{autosplit} && $options{autorange};
+	  $options{autosplit} = ',' if !defined $options{autosplit} && $options{autorange};
 
     if ( $options{json} || (defined $options{format} && $options{format} eq 'json')) {
         delete $options{repeatable};
@@ -237,7 +237,6 @@ sub _validate_and_filter_options {
     croak
       "Negativable params is not usable with non boolean value, don't pass format to use it !"
       if $cmdline_options{negativable} && defined $cmdline_options{format};
-
     return %cmdline_options;
 }
 
@@ -366,6 +365,18 @@ are expected to follow the program's options, and is entirely free-form.
 
 Literal "%" characters will need to be written as "%%", just like with
 "sprintf".
+
+=head2 spacer
+
+This indicate the char to use for spacer. Please only use 1 char otherwize the text will be too long.
+
+The default char is "_".
+
+  use MooX::Options space => '+'
+
+Then the "spacer_before" and "spacer_after" will use it for "man" and "help" message.
+
+  option 'x' => (is => 'ro', spacer_before => 1, spacer_after => 1);
 
 =head1 OPTION PARAMETERS
 
@@ -520,6 +531,12 @@ Hide option from doc but still an option you can use on command line.
 Or
 
   option 'debug' => (is => 'ro', hidden => 1);
+
+=head2 spacer_before, spacer_after
+
+Add spacer before or after or both the params
+
+  option 'myoption' => (is => 'ro', spacer_before => 1, spacer_after => 1);
 
 =head1 ADDITIONAL MANUALS
 

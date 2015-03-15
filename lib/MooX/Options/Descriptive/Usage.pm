@@ -130,10 +130,16 @@ Return the help message for your options
 sub option_text {
     my ($self) = @_;
     my %options_data =  defined $self->{target} ?  $self->{target}->_options_data : ();
+    my %options_config =  defined $self->{target} ?  $self->{target}->_options_config : (spacer => '_');
     my $getopt_options = $self->{options};
     my @message;
     my $lf = _get_line_fold();
     for my $opt(@$getopt_options) {
+        if ($opt->{desc} eq 'spacer') {
+          push @message, $options_config{spacer} x ($lf->config('ColMax') - 4);
+          push @message, "", "";
+          next;
+        }
         my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
         my $format_doc_str;
         $format_doc_str = $format_doc{$format} if defined $format;
@@ -155,7 +161,7 @@ sub option_pod {
     my ($self) = @_;
 
     my %options_data = defined $self->{target} ? $self->{target}->_options_data : ();
-    my %options_config = defined $self->{target} ? $self->{target}->_options_config : ();
+    my %options_config =  defined $self->{target} ?  $self->{target}->_options_config : (spacer => '_');
 
     my $prog_name = $self->{prog_name} //
         Getopt::Long::Descriptive::prog_name;
@@ -188,7 +194,12 @@ sub option_pod {
     );
 
     for my $opt(@{$self->{options}}) {
-
+        if ($opt->{desc} eq 'spacer') {
+          push @man, "=back";
+          push @man, $options_config{spacer} x 40;
+          push @man, "=over";
+          next;
+        }
         my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
         my $format_doc_str;
         $format_doc_str = $format_long_doc{$format} if defined $format;
@@ -201,7 +212,6 @@ sub option_pod {
 
         my $opt_data = $options_data{$opt->{name}} // {};
         push @man, $opt_data->{long_doc} // $opt->{desc};
-
     }
     push @man, "=back";
 
@@ -248,13 +258,17 @@ sub option_short_usage {
 
   my @message;
   for my $opt(@$getopt_options) {
+    if ($opt->{desc} eq 'spacer') {
+      push @message, '';
+      next;
+    }
     my ($format) = $opt->{spec} =~ /(?:\|\w)?(?:=(.*?))?$/x;
     my $format_doc_str;
     $format_doc_str = $format_doc{$format} if defined $format;
     $format_doc_str = 'JSON' if defined $options_data{$opt->{name}}{json};
     push @message, "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name} . (defined $format_doc_str ? "=" . $format_doc_str : "");
   }
-  return join(" ", $prog_name, map { "[ $_ ]"} @message);
+  return join(" ", $prog_name, map { $_ eq '' ? " | " : "[ $_ ]"} @message);
 }
 
 =method warn
