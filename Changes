@@ -1,3 +1,5 @@
+    * Feature #373 : use "format" => "json" instead of json => 1 (Celogeek San)
+
 4.018  2015-03-05 07:07:03 GMT
     * Feature #475 : Add usage_string parameters (kablamo)
 
