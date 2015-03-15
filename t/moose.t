@@ -152,6 +152,16 @@ BEGIN {
 
 {
 
+    package t_json_opt;
+    use Moose;
+    use MooX::Options;
+
+    option 't' => ( is => 'ro', format => 'json');
+    1;
+}
+
+{
+
     package rg_str;
     use Moose;
     use MooX::Options;

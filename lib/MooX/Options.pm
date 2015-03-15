@@ -216,11 +216,12 @@ sub _validate_and_filter_options {
     $options{order} = 0 if !defined $options{order};
 	$options{autosplit} = ',' if !defined $options{autosplit} && $options{autorange};
 
-    if ( $options{json} ) {
+    if ( $options{json} || (defined $options{format} && $options{format} eq 'json')) {
         delete $options{repeatable};
         delete $options{autosplit};
         delete $options{autorange};
         delete $options{negativable};
+        $options{json} = 1;
         $options{format} = 's';
     }
 
@@ -415,6 +416,10 @@ If you use L<Moose> and your attribute has C<< isa => 'Array[Int]' >>, that will
 The parameter will be treated like a json string.
 
   option 'hash' => (is => 'ro', json => 1);
+
+You can also use the json format
+
+  option 'hash' => (is => 'ro', format => "json");
 
   myTool --hash='{"a":1,"b":2}' # hash = { a => 1, b => 2 }
 

@@ -266,6 +266,27 @@ BEGIN {
 
 {
 
+    package t_jsonOptRole;
+    use Moo::Role;
+    use Mo;
+    use MooX::Options;
+
+    option 't' => ( is => 'ro', format => 'json');
+    1;
+
+}
+
+{
+
+    package t_json_opt;
+    use Mo;
+    use Role::Tiny::With;
+    with 't_jsonOptRole';
+    1;
+}
+
+{
+
     package rg_strRole;
     use Moo::Role;
     use Mo;
