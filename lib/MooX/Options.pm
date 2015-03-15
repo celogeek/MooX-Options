@@ -74,7 +74,7 @@ use warnings;
 use Carp;
 
 my @OPTIONS_ATTRIBUTES =
-  qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden/;
+  qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
 
 sub import {
     my ( undef, @import ) = @_;
@@ -214,7 +214,7 @@ sub _validate_and_filter_options {
     my (%options) = @_;
     $options{doc} = $options{documentation} if !defined $options{doc};
     $options{order} = 0 if !defined $options{order};
-	$options{autosplit} = ',' if !defined $options{autosplit} && $options{autorange};
+	  $options{autosplit} = ',' if !defined $options{autosplit} && $options{autorange};
 
     if ( $options{json} || (defined $options{format} && $options{format} eq 'json')) {
         delete $options{repeatable};
@@ -237,7 +237,6 @@ sub _validate_and_filter_options {
     croak
       "Negativable params is not usable with non boolean value, don't pass format to use it !"
       if $cmdline_options{negativable} && defined $cmdline_options{format};
-
     return %cmdline_options;
 }
 

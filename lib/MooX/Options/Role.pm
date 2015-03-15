@@ -49,10 +49,12 @@ sub _options_prepare_descriptive {
         my %data = %{ $options_data->{$name} };
         my $doc  = $data{doc};
         $doc = "no doc for $name" if !defined $doc;
-		my $option = {};
-		$option->{hidden} = 1 if $data{hidden};
+		    my $option = {};
+		    $option->{hidden} = 1 if $data{hidden};
 
+        push @options, [] if $data{spacer_before};
         push @options, [ _option_name( $name, %data ), $doc, $option ];
+        push @options, [] if $data{spacer_after};
 
         push @{$all_options{$name}}, $name;
         for ( my $i = 1; $i <= length($name); $i++ ) {
@@ -280,6 +282,7 @@ sub parse_options {
 
     my ( $opt, $usage ) = describe_options(
         ($usage_str), @$options,
+        [],
         [ 'usage', 'show a short help message'],
         [ 'help|h', "show a help message" ],
         [ 'man', "show the manual" ],
