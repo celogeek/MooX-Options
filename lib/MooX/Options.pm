@@ -366,6 +366,18 @@ are expected to follow the program's options, and is entirely free-form.
 Literal "%" characters will need to be written as "%%", just like with
 "sprintf".
 
+=head2 spacer
+
+This indicate the char to use for spacer. Please only use 1 char otherwize the text will be too long.
+
+The default char is "_".
+
+  use MooX::Options space => '+'
+
+Then the "spacer_before" and "spacer_after" will use it for "man" and "help" message.
+
+  option 'x' => (is => 'ro', spacer_before => 1, spacer_after => 1);
+
 =head1 OPTION PARAMETERS
 
 The keyword C<option> extend the keyword C<has> with specific parameters for the command line.
@@ -519,6 +531,12 @@ Hide option from doc but still an option you can use on command line.
 Or
 
   option 'debug' => (is => 'ro', hidden => 1);
+
+=head2 spacer_before, spacer_after
+
+Add spacer before or after or both the params
+
+  option 'myoption' => (is => 'ro', spacer_before => 1, spacer_after => 1);
 
 =head1 ADDITIONAL MANUALS
 
