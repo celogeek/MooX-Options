@@ -136,9 +136,8 @@ sub option_text {
     my $lf = _get_line_fold();
     for my $opt(@$getopt_options) {
         if ($opt->{desc} eq 'spacer') {
-          push @message, "";
           push @message, $options_config{spacer} x ($lf->config('ColMax') - 4);
-          push @message, "";
+          push @message, "", "";
           next;
         }
         my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
