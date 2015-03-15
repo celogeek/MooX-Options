@@ -348,6 +348,35 @@ subtest "json" => sub {
     }
 };
 
+subtest "json format" => sub {
+    note "json format";
+    {
+        local @ARGV = ("--t", "{\"a\":1,\"b\":2}");
+        my $t = t_json_opt->new_with_options();
+        is_deeply($t->t, {a => 1, b => 2}, 'json properly set');
+    }
+
+    {
+        local @ARGV = ("--t", "bad json");
+        my $t = trap { t_json_opt->new_with_options };
+        ok( $trap->stderr =~ /malformed JSON string/, "decode json failed");
+        ok( $trap->stderr =~ /\-t: JSON/, "json help message properly set" );
+    }
+
+    {
+        local @ARGV = ('--help');
+        my $t = trap { t_json_opt->new_with_options };
+        ok( $trap->stdout =~ /\-t: JSON/, "json help message properly set" );
+    }
+
+    {
+        trap {
+          t_json_opt->new->options_man(undef, *STDOUT);
+        };
+        ok( $trap->stdout =~ /\-t: JSON/, "json help message properly set" ) or diag $trap->stdout;
+    }
+};
+
 subtest "range_complexe_str" => sub {
     note "range on complexe str";
     {
