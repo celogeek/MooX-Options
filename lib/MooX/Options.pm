@@ -84,7 +84,7 @@ sub import {
         with_config_from_file => 0,
         usage_string          => undef,
         #long description (manual)
-        description => undef, authors => [], synopsis => undef,
+        description => undef, authors => [], synopsis => undef, spacer => '_',
         @import
     };
 

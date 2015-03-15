@@ -130,13 +130,14 @@ Return the help message for your options
 sub option_text {
     my ($self) = @_;
     my %options_data =  defined $self->{target} ?  $self->{target}->_options_data : ();
+    my %options_config =  defined $self->{target} ?  $self->{target}->_options_config : (spacer => '_');
     my $getopt_options = $self->{options};
     my @message;
     my $lf = _get_line_fold();
     for my $opt(@$getopt_options) {
         if ($opt->{desc} eq 'spacer') {
           push @message, "";
-          push @message, "-" x ($lf->config('ColMax') - 4);
+          push @message, $options_config{spacer} x ($lf->config('ColMax') - 4);
           push @message, "";
           next;
         }
@@ -161,7 +162,7 @@ sub option_pod {
     my ($self) = @_;
 
     my %options_data = defined $self->{target} ? $self->{target}->_options_data : ();
-    my %options_config = defined $self->{target} ? $self->{target}->_options_config : ();
+    my %options_config =  defined $self->{target} ?  $self->{target}->_options_config : (spacer => '_');
 
     my $prog_name = $self->{prog_name} //
         Getopt::Long::Descriptive::prog_name;
@@ -196,7 +197,7 @@ sub option_pod {
     for my $opt(@{$self->{options}}) {
         if ($opt->{desc} eq 'spacer') {
           push @man, "=back";
-          push @man, "_" x 40;
+          push @man, $options_config{spacer} x 40;
           push @man, "=over";
           next;
         }
