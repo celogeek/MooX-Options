@@ -13,7 +13,6 @@ Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrad
 =cut
 
 use MooX::Options::Descriptive;
-use JSON;
 use Scalar::Util qw/blessed/;
 
 ### PRIVATE
@@ -302,7 +301,8 @@ sub parse_options {
             my $val = $opt->$name();
             if ( defined $val ) {
                 if ( $data{json} ) {
-                    if (! eval { $cmdline_params{$name} = decode_json($val); 1 }) {
+                    require JSON;
+                    if (! eval { $cmdline_params{$name} = JSON::decode_json($val); 1 }) {
                       print STDERR $@;
                       return $class->options_usage(1, $usage);
                     }
