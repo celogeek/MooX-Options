@@ -298,8 +298,8 @@ sub parse_options {
             my $val = $opt->$name();
             if ( defined $val ) {
                 if ( $data{json} ) {
-                    require JSON;
-                    if (! eval { $cmdline_params{$name} = JSON::decode_json($val); 1 }) {
+                    require JSON::MaybeXS;
+                    if (! eval { $cmdline_params{$name} = JSON::MaybeXS::decode_json($val); 1 }) {
                       print STDERR $@;
                       return $class->options_usage(1, $usage);
                     }
