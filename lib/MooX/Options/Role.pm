@@ -13,8 +13,6 @@ Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrad
 =cut
 
 use MooX::Options::Descriptive;
-use Regexp::Common;
-use Data::Record;
 use JSON;
 use Carp;
 use Pod::Usage qw/pod2usage/;
@@ -62,8 +60,11 @@ sub _options_prepare_descriptive {
         }
 
         if ( defined $data{autosplit} ) {
+            require Data::Record;
+            require Regexp::Common;
+            Regexp::Common->import;
             $has_to_split{$name} = Data::Record->new(
-                { split => $data{autosplit}, unless => $RE{quoted} } );
+                { split => $data{autosplit}, unless => $Regexp::Common::RE{quoted} } );
             if ( my $short = $data{short} ) {
                 $has_to_split{$short} = $has_to_split{${name}};
             }
