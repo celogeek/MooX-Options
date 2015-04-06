@@ -71,7 +71,6 @@ The manual :
 use strict;
 use warnings;
 # VERSION
-use Carp;
 
 my @OPTIONS_ATTRIBUTES =
   qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
@@ -91,7 +90,8 @@ sub import {
     my $target = caller;
     for my $needed_methods(qw/with around has/) {
         next if $target->can($needed_methods);
-        croak "Can't find the method <$needed_methods> in <$target> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.";
+        require Carp;
+        Carp::croak("Can't find the method <$needed_methods> in <$target> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.");
     }
 
     my $with   = $target->can('with');
@@ -122,7 +122,10 @@ sub import {
         }';
         use warnings FATAL => qw/void/;
 
-        croak $@ if $@;
+        if (my $err = $@) {
+            require Carp;
+            Carp::croak($err);
+        }
 
         $around->(
             _options_config => sub {
@@ -135,8 +138,9 @@ sub import {
     }
     else {
         if ( $options_config->{with_config_from_file} ) {
-            croak
-              'Please, don\'t use the option <with_config_from_file> into a role.';
+            require Carp;
+            Carp::croak(
+              'Please, don\'t use the option <with_config_from_file> into a role.');
         }
     }
 
@@ -178,9 +182,10 @@ sub import {
     my $option = sub {
         my ( $name, %attributes ) = @_;
         for my $ban (@banish_keywords) {
-            croak
-              "You cannot use an option with the name '$ban', it is implied by MooX::Options"
-              if $name eq $ban;
+            next if $name ne $ban;
+            require Carp;
+            Carp::croak(
+              "You cannot use an option with the name '$ban', it is implied by MooX::Options");
         }
 
         $has->( $name => _filter_attributes(%attributes) );
@@ -234,9 +239,12 @@ sub _validate_and_filter_options {
       && defined $cmdline_options{format}
       && substr( $cmdline_options{format}, -1 ) ne '@';
 
-    croak
-      "Negativable params is not usable with non boolean value, don't pass format to use it !"
-      if $cmdline_options{negativable} && defined $cmdline_options{format};
+    if ( $cmdline_options{negativable} && defined $cmdline_options{format} ) {
+        require Carp;
+        Carp::croak(
+          "Negativable params is not usable with non boolean value, don't pass format to use it !");
+    }
+
     return %cmdline_options;
 }
 
