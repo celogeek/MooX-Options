@@ -80,7 +80,7 @@ subtest "test required" => sub {
         local @ARGV = ();
         my @r = trap { r->new_with_options };
         is( $trap->exit, 1, "missing args, exit 1" );
-        ok( $trap->stderr =~ /^str_req is missing/, "str_reg is missing" );
+        like( $trap->stderr, qr/^str_req is missing/, "str_reg is missing" );
     }
     {
         local @ARGV = ('--str_req=ok');
@@ -229,12 +229,12 @@ subtest "split_str_shorter_name" => sub {
         trap {
             sp_str->new_with_options();
         };
-        ok $trap->stderr =~ qr/Option\ssplit_co\sis\sambiguous/, 'conflict detected';
+        like $trap->stderr, qr/Option\ssplit_co\sis\sambiguous/, 'conflict detected';
         local @ARGV = ("--split-co=a,b,c");
         trap {
             sp_str->new_with_options();
         };
-        ok $trap->stderr =~ qr/Option\ssplit_co\sis\sambiguous/, 'conflict detected';
+        like $trap->stderr, qr/Option\ssplit_co\sis\sambiguous/, 'conflict detected';
     }
     done_testing();
 };
@@ -242,7 +242,7 @@ subtest "split_str_shorter_name" => sub {
 subtest "should_die_ok" => sub {
     note "Test chain method";
     trap { d->new_with_options( should_die_ok => 1 ) };
-    ok($trap->stderr =~ qr/this\s\will\sdie\sok/, 'should die ok' );
+    like($trap->stderr, qr/this\s\will\sdie\sok/, 'should die ok' );
 };
 
 subtest "test usage" => sub {
@@ -250,12 +250,12 @@ subtest "test usage" => sub {
     my $s     = sp_str->new_with_options();
     my @r = trap { $s->options_usage( 127, 'usage work', 'usage really work' ) };
     is( $trap->exit, 127, 'exit code is correct' );
-    ok( $trap->stderr =~ /usage work/, 'custom message is present' );
-    ok( $trap->stderr =~ /usage really work/,
+    like( $trap->stderr, qr/usage work/, 'custom message is present' );
+    like( $trap->stderr, qr/usage really work/,
         'custom message is really present'
     );
-    ok( $trap->stderr =~ /help:\n\s+show a help message/, 'help is present' );
-    ok( $trap->stderr =~ /split_str: \[Strings\]\n\s+no doc for split_str/,
+    like( $trap->stderr, qr/help:\n\s+show a help message/, 'help is present' );
+    like( $trap->stderr, qr/split_str: \[Strings\]\n\s+no doc for split_str/,
         'attr no doc is present' );
 };
 
@@ -274,14 +274,14 @@ subtest "doc usage" => sub {
     my $s     = t_doc->new_with_options();
     my @r = trap { $s->options_usage(127) };
     is( $trap->exit, 127, 'exit code is correct' );
-    ok( $trap->stderr =~ /t:\n\s+this is a test/, 'doc on attribute' );
+    like( $trap->stderr, qr/t:\n\s+this is a test/, 'doc on attribute' );
 };
 
 subtest "test short" => sub {
     note "test short";
     my $s     = t_short->new_with_options();
     trap { $s->options_usage };
-    ok ($trap->stdout =~ /\-v \-\-verbose/, 'short doc ok');
+    like ($trap->stdout, qr/\-v \-\-verbose/, 'short doc ok');
 };
 
 subtest "test skip_options" => sub {
@@ -330,21 +330,21 @@ subtest "json" => sub {
     {
         local @ARGV = ("--t", "bad json");
         my $t = trap { t_json->new_with_options };
-        ok( $trap->stderr =~ /malformed JSON string/, "decode json failed");
-        ok( $trap->stderr =~ /\-t: JSON/, "json help message properly set" );
+        like( $trap->stderr, qr/malformed JSON string/, "decode json failed");
+        like( $trap->stderr, qr/\-t: JSON/, "json help message properly set" );
     }
 
     {
         local @ARGV = ('--help');
         my $t = trap { t_json->new_with_options };
-        ok( $trap->stdout =~ /\-t: JSON/, "json help message properly set" );
+        like( $trap->stdout, qr/\-t: JSON/, "json help message properly set" );
     }
 
     {
         trap {
           t_json->new->options_man(undef, *STDOUT);
         };
-        ok( $trap->stdout =~ /\-t: JSON/, "json help message properly set" ) or diag $trap->stdout;
+        like( $trap->stdout, qr/\-t: JSON/, "json help message properly set" ) or diag $trap->stdout;
     }
 };
 
@@ -506,12 +506,12 @@ subtest "range_str_shorter_name" => sub {
         trap {
             rg_str->new_with_options();
         };
-        ok $trap->stderr =~ qr/Option\srange_co\sis\sambiguous/, 'conflict detected';
+        like $trap->stderr, qr/Option\srange_co\sis\sambiguous/, 'conflict detected';
         local @ARGV = ("--range-co=1,2,3");
         trap {
             rg_str->new_with_options();
         };
-        ok $trap->stderr =~ qr/Option\srange_co\sis\sambiguous/, 'conflict detected';
+        like $trap->stderr, qr/Option\srange_co\sis\sambiguous/, 'conflict detected';
     }
     done_testing();
 };
