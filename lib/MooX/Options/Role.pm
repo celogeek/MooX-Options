@@ -12,7 +12,6 @@ Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrad
 
 =cut
 
-use MRO::Compat;
 use MooX::Options::Descriptive;
 use Regexp::Common;
 use Data::Record;
