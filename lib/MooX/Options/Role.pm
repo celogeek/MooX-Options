@@ -14,7 +14,6 @@ Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrad
 
 use MooX::Options::Descriptive;
 use JSON;
-use Carp;
 use Scalar::Util qw/blessed/;
 
 ### PRIVATE
