@@ -15,7 +15,6 @@ Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrad
 use MooX::Options::Descriptive;
 use JSON;
 use Carp;
-use Pod::Usage qw/pod2usage/;
 use Scalar::Util qw/blessed/;
 
 ### PRIVATE
@@ -411,7 +410,8 @@ sub options_man {
     my $man_file = Path::Class::file(Path::Class::tempdir(CLEANUP => 1), 'help.pod');
     $man_file->spew(iomode => '>:encoding(UTF-8)', $usage->option_pod);
 
-    pod2usage(-verbose => 2, -input => $man_file->stringify, -exitval => 'NOEXIT', -output => $output);
+    require Pod::Usage;
+    Pod::Usage::pod2usage(-verbose => 2, -input => $man_file->stringify, -exitval => 'NOEXIT', -output => $output);
 
     exit(0);
 }
