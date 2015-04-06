@@ -14,7 +14,6 @@ use strict;
 use warnings;
 # VERSION
 use feature 'say', 'state';
-use Text::LineFold;
 use Getopt::Long::Descriptive;
 use Scalar::Util qw/blessed/;
 
@@ -119,6 +118,7 @@ sub _get_line_fold {
     my ($columns) = chars();
     $columns //= 78;
     $columns = $ENV{TEST_FORCE_COLUMN_SIZE} if defined $ENV{TEST_FORCE_COLUMN_SIZE};
+    require Text::LineFold;
     return Text::LineFold->new(ColMax => $columns - 4);
 }
 
