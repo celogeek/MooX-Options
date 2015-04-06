@@ -16,7 +16,6 @@ use MooX::Options::Descriptive;
 use JSON;
 use Carp;
 use Pod::Usage qw/pod2usage/;
-use Path::Class 0.32;
 use Scalar::Util qw/blessed/;
 
 ### PRIVATE
@@ -405,7 +404,8 @@ sub options_man {
         $usage = $cmdline_params{man};
     }
 
-    my $man_file = file(Path::Class::tempdir(CLEANUP => 1), 'help.pod');
+    require Path::Class;
+    my $man_file = Path::Class::file(Path::Class::tempdir(CLEANUP => 1), 'help.pod');
     $man_file->spew(iomode => '>:encoding(UTF-8)', $usage->option_pod);
 
     pod2usage(-verbose => 2, -input => $man_file->stringify, -exitval => 'NOEXIT', -output => $output);
