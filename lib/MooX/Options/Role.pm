@@ -33,6 +33,17 @@ sub _options_prepare_descriptive {
     my %all_options;
     my %has_to_split;
 
+    # The autosplit support needs these modules. Loading Regexp::Common at
+    # runtime seems to need its import method to be called, to set up its
+    # internal data structures. If we did this below, we'd naively end up
+    # calling Regexp::Common->import once for each autosplit option. So instead
+    # detect now whether it will be needed, and call it just once.
+    if ( grep { defined $_->{autosplit} } values %$options_data ) {
+        require Data::Record;
+        require Regexp::Common;
+        Regexp::Common->import;
+    }
+
     for my $name (sort {
             $options_data->{$a}{order} <=> $options_data->{$b}{order}    # sort by order
               or $a cmp $b                                           # sort by attr name
@@ -54,9 +65,6 @@ sub _options_prepare_descriptive {
         }
 
         if ( defined $data{autosplit} ) {
-            require Data::Record;
-            require Regexp::Common;
-            Regexp::Common->import;
             $has_to_split{$name} = Data::Record->new(
                 { split => $data{autosplit}, unless => $Regexp::Common::RE{quoted} } );
             if ( my $short = $data{short} ) {
