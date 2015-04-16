@@ -8,6 +8,12 @@ use Carp;
 use FindBin qw/$RealBin/;
 use Try::Tiny;
 
+use POSIX qw(setlocale LC_ALL);
+
+BEGIN {
+  setlocale LC_ALL, 'C';
+}
+
 {
 
     package t;

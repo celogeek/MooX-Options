@@ -4,6 +4,12 @@ use warnings;
 use Test::More;
 use Carp;
 
+use POSIX qw(setlocale LC_ALL);
+
+BEGIN {
+  setlocale LC_ALL, 'C';
+}
+
 local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 
 eval <<__EOF__

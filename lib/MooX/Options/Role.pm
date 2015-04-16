@@ -4,6 +4,8 @@ package MooX::Options::Role;
 use strict;
 use warnings;
 
+use Locale::TextDomain qw(MooX-Options);
+
 # VERSION
 
 =head1 USAGE
@@ -183,9 +185,9 @@ Check full doc L<MooX::Options> for more details.
 
 sub new_with_options {
     my ( $class, %params ) = @_;
-    
+
     #save subcommand
-    
+
     if (ref (my $command_chain = $params{command_chain}) eq 'ARRAY') {
         $class->can('around')->(
              _options_prog_name => sub {
@@ -196,8 +198,8 @@ sub new_with_options {
                         $prog_name .= ' ' . $cmd_name;
                     }
                 }
-                
-                return $prog_name;    
+
+                return $prog_name;
              }
          );
     }
@@ -276,13 +278,13 @@ sub parse_options {
     my $prog_name = $class->_options_prog_name();
 
     # create usage str
-    my $usage_str = $options_config{usage_string} // "USAGE: $prog_name %o";
+    my $usage_str = $options_config{usage_string} // __x("USAGE: {prog_name} %o", prog_name => $prog_name );
 
     my ( $opt, $usage ) = describe_options(
         ($usage_str), @$options,
-        [ 'usage', 'show a short help message'],
-        [ 'help|h', "show a help message" ],
-        [ 'man', "show the manual" ],
+        [ 'usage',  __"show a short help message"],
+        [ 'help|h', __"show a help message" ],
+        [ 'man',    __"show the manual" ],
         ,@flavour
     );
 
