@@ -18,7 +18,7 @@ In myOptions.pm :
   package myOptions;
   use Moo;
   use MooX::Options;
-  
+
   option 'show_this_file' => (
       is => 'ro',
       format => 's',
@@ -32,9 +32,9 @@ In myTool.pl :
   use feature 'say';
   use myOptions;
   use Path::Class;
-  
+
   my $opt = myOptions->new_with_options;
-  
+
   say "Content of the file : ",
        file($opt->show_this_file)->slurp;
 
@@ -44,16 +44,16 @@ To use it :
   Content of the file: myFile content
 
 The help message :
-  
+
   perl myTool.pl --help
   USAGE: myTool.pl [-h] [long options...]
-  
+
       --show_this_file: String
           the file to display
-      
+
       -h --help:
           show this help message
-      
+
       --man:
           show the manual
 
@@ -72,6 +72,18 @@ use strict;
 use warnings;
 
 # VERSION
+
+sub __x($@) {
+  require Locale::TextDomain;
+  Locale::TextDomain->import( qw(MooX-Options) );
+  goto &Locale::TextDomain::__x;
+}
+
+sub __($) {
+  require Locale::TextDomain;
+  Locale::TextDomain->import( qw(MooX-Options) );
+  goto &Locale::TextDomain::__;
+}
 
 my @OPTIONS_ATTRIBUTES
     = qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
@@ -97,9 +109,7 @@ sub import {
     my $target = caller;
     for my $needed_methods (qw/with around has/) {
         next if $target->can($needed_methods);
-        croak(
-            "Can't find the method <$needed_methods> in <$target> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options."
-        );
+        croak( __x("Can't find the method <{needed_methods}> in <{target}> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.", 'needed_methods' => $needed_methods, 'target' => $target) );
     }
 
     my $with   = $target->can('with');
@@ -144,7 +154,7 @@ sub import {
     else {
         if ( $options_config->{with_config_from_file} ) {
             croak(
-                'Please, don\'t use the option <with_config_from_file> into a role.'
+              __("Please, don\'t use the option <with_config_from_file> into a role.")
             );
         }
     }
@@ -188,7 +198,7 @@ sub import {
         my ( $name, %attributes ) = @_;
         for my $ban (@banish_keywords) {
             croak(
-                "You cannot use an option with the name '$ban', it is implied by MooX::Options"
+              __x("You cannot use an option with the name '{ban}', it is implied by MooX::Options", ban => $ban)
             ) if $name eq $ban;
         }
 
@@ -252,7 +262,7 @@ sub _validate_and_filter_options {
         && substr( $cmdline_options{format}, -1 ) ne '@';
 
     croak(
-        "Negativable params is not usable with non boolean value, don't pass format to use it !"
+        __("Negativable params is not usable with non boolean value, don't pass format to use it !")
         )
         if $cmdline_options{negativable} && defined $cmdline_options{format};
 

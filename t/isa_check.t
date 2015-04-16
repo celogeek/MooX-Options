@@ -4,6 +4,12 @@ use warnings;
 use Test::More;
 use Test::Trap;
 
+use POSIX qw(setlocale LC_ALL);
+
+BEGIN {
+  setlocale LC_ALL, 'C';
+}
+
 {
 
     package t;

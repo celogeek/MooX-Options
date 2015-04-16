@@ -8,7 +8,10 @@ use Carp;
 use FindBin qw/$RealBin/;
 use Capture::Tiny qw/capture/;
 
+use POSIX qw(setlocale LC_ALL);
+
 BEGIN {
+    setlocale(LC_ALL,'C');
     eval 'use MooX::Cmd 0.007';
     if ($@) {
         plan skip_all => 'Need MooX::Cmd (0.007) for this test';
