@@ -411,6 +411,7 @@ sub options_man {
     }
 
     require Path::Class;
+    Path::Class->VERSION(0.32);
     my $man_file = Path::Class::file(Path::Class::tempdir(CLEANUP => 1), 'help.pod');
     $man_file->spew(iomode => '>:encoding(UTF-8)', $usage->option_pod);
 
