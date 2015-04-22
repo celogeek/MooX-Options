@@ -67,19 +67,20 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 {
     my $opt = t->new_with_options;
     trap { $opt->options_usage };
-    ok $trap->stdout =~ /\s+\-t:\n\s+this\sis\sa\stest/x, 'documentation work';
+    like $trap->stdout, qr/\s+\-t:\n\s+this\sis\sa\stest/x,
+        'documentation work';
 }
 
 {
     my $opt = t1->new_with_options;
     trap { $opt->options_usage };
-    ok $trap->stdout =~ /\s+\-t:\n\s+this\spass\sfirst/x, 'doc pass first';
+    like $trap->stdout, qr/\s+\-t:\n\s+this\spass\sfirst/x, 'doc pass first';
 }
 
 {
     my $opt = t2->new_with_options;
     trap { $opt->options_usage };
-    ok $trap->stdout =~ /\s+\-t:\n\s+this\spass\sfirst/x, 'doc pass first';
+    like $trap->stdout, qr/\s+\-t:\n\s+this\spass\sfirst/x, 'doc pass first';
 }
 
 done_testing;

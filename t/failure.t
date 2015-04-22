@@ -19,14 +19,14 @@ eval <<__EOF__
 
     1;
 __EOF__
-  ;
+    ;
 like $@,
-  qr/^Negativable\sparams\sis\snot\susable\swith\snon\sboolean\svalue,\sdon't\spass\sformat\sto\suse\sit\s\!/x,
-  "negativable and format are incompatible";
+    qr/^Negativable\sparams\sis\snot\susable\swith\snon\sboolean\svalue,\sdon't\spass\sformat\sto\suse\sit\s\!/x,
+    "negativable and format are incompatible";
 
 for my $ban (
     qw/help man usage option new_with_options parse_options options_usage _options_data _options_config/
-  )
+    )
 {
     eval <<__EOF__
     package FailureHelp$ban;
@@ -37,10 +37,10 @@ for my $ban (
         is => 'rw',
     );
 __EOF__
-      ;
+        ;
     like $@,
-      qr/^You\scannot\suse\san\soption\swith\sthe\sname\s'$ban',\sit\sis\simplied\sby\sMooX::Options/x,
-      "$ban method can't be defined";
+        qr/^You\scannot\suse\san\soption\swith\sthe\sname\s'$ban',\sit\sis\simplied\sby\sMooX::Options/x,
+        "$ban method can't be defined";
 }
 
 {
@@ -59,10 +59,10 @@ __EOF__
         1;
     }
 __EOF__
-      ;
+        ;
     like $@,
-      qr/^Can't\sapply\sFailureRoleMyRole\sto\sFailureRole\s-\smissing\s_options_data,\s_options_config/x,
-      "role could only be apply with a MooX::Options ready package"
+        qr/^Can't\sapply\sFailureRoleMyRole\sto\sFailureRole\s-\smissing\s_options_data,\s_options_config/x,
+        "role could only be apply with a MooX::Options ready package"
 }
 
 {
@@ -76,7 +76,7 @@ __EOF__
         1;
     }
 __EOF__
-      ;
+        ;
     like $@, qr/^Subroutine\s_options_data\sredefined/x, 'redefined methods';
     ok( !t->can('new_with_options'), 't has crash' );
 }
@@ -89,8 +89,10 @@ __EOF__
         1;
     }
 __EOF__
-    ;
-    like $@, qr/^\QCan't find the method <with> in <MissingWith> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/, 'missing with';
+        ;
+    like $@,
+        qr/^\QCan't find the method <with> in <MissingWith> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/,
+        'missing with';
 }
 
 {
@@ -102,8 +104,10 @@ __EOF__
         1;
     }
 __EOF__
-    ;
-    like $@, qr/^\QCan't find the method <around> in <MissingAround> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/, 'missing with';
+        ;
+    like $@,
+        qr/^\QCan't find the method <around> in <MissingAround> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/,
+        'missing with';
 }
 
 {
@@ -116,8 +120,10 @@ __EOF__
         1;
     }
 __EOF__
-    ;
-    like $@, qr/^\QCan't find the method <has> in <MissingHas> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/, 'missing with';
+        ;
+    like $@,
+        qr/^\QCan't find the method <has> in <MissingHas> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/,
+        'missing with';
 }
 
 done_testing;

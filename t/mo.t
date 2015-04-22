@@ -17,6 +17,7 @@ BEGIN {
 }
 
 {
+
     package tRole;
     use Moo::Role;
     use Mo 'default';
@@ -27,7 +28,7 @@ BEGIN {
     option 'empty'   => ( is => 'ro', negativable => 1 );
     option 'split'   => ( is => 'ro', format => 'i@', autosplit => ',' );
     option 'has_default' => ( is => 'ro', default => sub {'foo'} );
-    option 'range'   => ( is => 'ro', format => 'i@', autorange => 1 );
+    option 'range' => ( is => 'ro', format => 'i@', autorange => 1 );
 
     1;
 }
@@ -71,9 +72,9 @@ BEGIN {
 
     option 'split_str' => ( is => 'ro', format => 's', autosplit => "," );
     option 'split_conflict_str1' =>
-      ( is => 'ro', format => 's', autosplit => "," );
+        ( is => 'ro', format => 's', autosplit => "," );
     option 'split_conflict_str2' =>
-      ( is => 'ro', format => 's', autosplit => "," );
+        ( is => 'ro', format => 's', autosplit => "," );
 
     1;
 }
@@ -95,7 +96,7 @@ BEGIN {
     use MooX::Options;
 
     option 'split_str' =>
-      ( is => 'ro', format => 's', autosplit => ",", short => 'z' );
+        ( is => 'ro', format => 's', autosplit => ",", short => 'z' );
 
     1;
 }
@@ -109,7 +110,6 @@ BEGIN {
     1;
 }
 
-
 {
 
     package dRole;
@@ -117,7 +117,7 @@ BEGIN {
     use Mo 'coerce';
     use MooX::Options;
     option 'should_die_ok' =>
-      ( is => 'ro', coerce => sub { die "this will die ok" } );
+        ( is => 'ro', coerce => sub { die "this will die ok" } );
     1;
 }
 {
@@ -271,7 +271,7 @@ BEGIN {
     use Mo;
     use MooX::Options;
 
-    option 't' => ( is => 'ro', format => 'json');
+    option 't' => ( is => 'ro', format => 'json' );
     1;
 
 }
@@ -294,9 +294,9 @@ BEGIN {
 
     option 'range_str' => ( is => 'ro', format => 's', autorange => 1 );
     option 'range_conflict_str1' =>
-      ( is => 'ro', format => 's', autorange => 1 );
+        ( is => 'ro', format => 's', autorange => 1 );
     option 'range_conflict_str2' =>
-      ( is => 'ro', format => 's', autorange => 1 );
+        ( is => 'ro', format => 's', autorange => 1 );
 
     1;
 }
@@ -319,7 +319,7 @@ BEGIN {
     use MooX::Options;
 
     option 'range_str' =>
-      ( is => 'ro', format => 's', autorange => 1, short => 'r' );
+        ( is => 'ro', format => 's', autorange => 1, short => 'r' );
 
     1;
 }
@@ -337,6 +337,5 @@ subtest "Mo" => sub {
     note "Test Mo";
     require $RealBin . '/base.st';
 };
-
 
 done_testing;

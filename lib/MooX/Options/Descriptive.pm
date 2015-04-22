@@ -10,6 +10,7 @@ This class will override the usage_class method, to customize the output of the 
 
 use strict;
 use warnings;
+
 # VERSION
 
 use Getopt::Long 2.43;
@@ -22,6 +23,7 @@ use parent 'Getopt::Long::Descriptive';
 Method to use for the descriptive build
 
 =cut
+
 sub usage_class { return 'MooX::Options::Descriptive::Usage' }
 
 1;
