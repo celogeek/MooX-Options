@@ -4,7 +4,7 @@ MooX::Options - Explicit Options eXtension for Object Class
 
 # VERSION
 
-version 4.010
+version 4.018
 
 # DESCRIPTION
 
@@ -52,14 +52,14 @@ The help message :
     perl myTool.pl --help
     USAGE: myTool.pl [-h] [long options...]
     
-      --show_this_file: String
-          the file to display
-      
-      -h --help:
-          show this help message
-      
-      --man:
-          show the manual
+        --show_this_file: String
+            the file to display
+        
+        -h --help:
+            show this help message
+        
+        --man:
+            show the manual
 
 The usage message :
 
@@ -171,6 +171,27 @@ In /etc/myTool.json
 
     {"test" : 1}
 
+# usage\_string
+
+This parameter is passed to Getopt::Long::Descriptive::describe\_options() as
+the first parameter.  
+
+It is a "sprintf"-like string that is used in generating the first line of the
+usage message. It's a one-line summary of how the command is to be invoked. 
+The default value is "USAGE: %c %o".
+
+%c will be replaced with what Getopt::Long::Descriptive thinks is the
+program name (it's computed from $0, see "prog\_name").
+
+%o will be replaced with a list of the short options, as well as the text
+"\[long options...\]" if any have been defined.
+
+The rest of the usage description can be used to summarize what arguments
+are expected to follow the program's options, and is entirely free-form.
+
+Literal "%" characters will need to be written as "%%", just like with
+"sprintf".
+
 # OPTION PARAMETERS
 
 The keyword `option` extend the keyword `has` with specific parameters for the command line.
@@ -205,7 +226,7 @@ By default, it's a boolean value.
 Take a look of available formats with [Getopt::Long::Descriptive](https://metacpan.org/pod/Getopt::Long::Descriptive).
 
 You need to understand that everything is explicit here. 
-If you use [Moose](https://metacpan.org/pod/Moose) and your attribute has `isa => 'Array[Int]'`, that will __not__ imply the format `i@`.
+If you use [Moose](https://metacpan.org/pod/Moose) and your attribute has `isa => 'Array[Int]'`, that will **not** imply the format `i@`.
 
 ## format json : special format support
 
@@ -250,6 +271,30 @@ It will also handle quoted params with the autosplit.
 
     myTool --testStr='a,b,"c,d",e,f' # testStr ("a", "b", "c,d", "e", "f")
 
+## autorange
+
+For another repeatable option you can add the autorange feature with your specific parameters. This 
+allows you to pass number ranges instead of passing each individual number.
+
+    option test => (is => 'ro', format => 'i@', default => sub {[]}, autorange => 1);
+    
+    myTool --test=1 --test=2 # test = (1, 2)
+    myTool --test=1,2,3      # test = (1, 2, 3)
+    myTool --test=1,2,3..6   # test = (1, 2, 3, 4, 5, 6)
+
+It will also handle quoted params like `autosplit`, and will not rangify them.
+
+    option testStr => (is => 'ro', format => 's@', default => sub {[]}, autorange => 1);
+
+    myTool --testStr='1,2,"3,a,4",5' # testStr (1, 2, "3,a,4", 5)
+
+`autosplit` will be set to ',' if undefined. You may set `autosplit` to a different delimiter than ','
+for your group separation, but the range operator '..' cannot be changed. 
+
+    option testStr => (is => 'ro', format => 's@', default => sub {[]}, autorange => 1, autosplit => '-');
+
+    myTool --testStr='1-2-3-5..7' # testStr (1, 2, 3, 5, 6, 7) 
+
 ## short
 
 Long option can also have short version or aliased.
@@ -278,6 +323,16 @@ Specifies the order of the attribute. If you want to push some attributes at the
 By default all options have an order set to `0`, and options are sorted by their names.
 
     option 'at_the_end' => (is => 'ro', order => 999);
+
+## hidden
+
+Hide option from doc but still an option you can use on command line.
+
+    option 'debug' => (is => 'ro', doc => 'hidden');
+
+Or
+
+    option 'debug' => (is => 'ro', hidden => 1);
 
 # ADDITIONAL MANUALS
 

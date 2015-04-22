@@ -12,14 +12,7 @@ Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrad
 
 =cut
 
-use MRO::Compat;
 use MooX::Options::Descriptive;
-use Regexp::Common;
-use Data::Record;
-use JSON;
-use Carp;
-use Pod::Usage qw/pod2usage/;
-use Path::Class 0.32;
 use Scalar::Util qw/blessed/;
 
 ### PRIVATE
@@ -40,6 +33,17 @@ sub _options_prepare_descriptive {
     my %all_options;
     my %has_to_split;
 
+    # The autosplit support needs these modules. Loading Regexp::Common at
+    # runtime seems to need its import method to be called, to set up its
+    # internal data structures. If we did this below, we'd naively end up
+    # calling Regexp::Common->import once for each autosplit option. So instead
+    # detect now whether it will be needed, and call it just once.
+    if ( grep { defined $_->{autosplit} } values %$options_data ) {
+        require Data::Record;
+        require Regexp::Common;
+        Regexp::Common->import;
+    }
+
     for my $name (sort {
             $options_data->{$a}{order} <=> $options_data->{$b}{order}    # sort by order
               or $a cmp $b                                           # sort by attr name
@@ -49,8 +53,10 @@ sub _options_prepare_descriptive {
         my %data = %{ $options_data->{$name} };
         my $doc  = $data{doc};
         $doc = "no doc for $name" if !defined $doc;
+		my $option = {};
+		$option->{hidden} = 1 if $data{hidden};
 
-        push @options, [ _option_name( $name, %data ), $doc ];
+        push @options, [ _option_name( $name, %data ), $doc, $option ];
 
         push @{$all_options{$name}}, $name;
         for ( my $i = 1; $i <= length($name); $i++ ) {
@@ -60,7 +66,7 @@ sub _options_prepare_descriptive {
 
         if ( defined $data{autosplit} ) {
             $has_to_split{$name} = Data::Record->new(
-                { split => $data{autosplit}, unless => $RE{quoted} } );
+                { split => $data{autosplit}, unless => $Regexp::Common::RE{quoted} } );
             if ( my $short = $data{short} ) {
                 $has_to_split{$short} = $has_to_split{${name}};
             }
@@ -74,6 +80,7 @@ sub _options_prepare_descriptive {
     return \@options, \%has_to_split, \%all_options;
 }
 
+## no critic (ProhibitExcessComplexity)
 sub _options_fix_argv {
     my ($option_data, $has_to_split, $all_options) = @_;
 
@@ -121,12 +128,18 @@ sub _options_fix_argv {
         $arg_name .= $arg_name_without_dash;
 
         if ( my $rec = $has_to_split->{$arg_name_without_dash} ) {
-          $arg_values = shift @ARGV;
-          foreach my $record ( $rec->records($arg_values) ) {
-              #remove the quoted if exist to chain
-              $record =~ s/^['"]|['"]$//gx;
-              push @new_argv, $arg_name, $record;
-          }
+			if ($arg_values = shift @ARGV) {
+				my $autorange = defined $original_long_option && exists $option_data->{$original_long_option} && $option_data->{$original_long_option}{autorange};
+				foreach my $record ( $rec->records($arg_values) ) {
+					#remove the quoted if exist to chain
+					$record =~ s/^['"]|['"]$//gx;
+					if ($autorange) {
+						push @new_argv, map { $arg_name => $_ } _expand_autorange($record);
+					} else {
+						push @new_argv, $arg_name, $record;
+					}
+				}
+			}
         } else {
           push @new_argv, $arg_name;
         }
@@ -140,7 +153,22 @@ sub _options_fix_argv {
     }
 
     return @new_argv;
+}
+## use critic
 
+sub _expand_autorange {
+	my ($arg_value) = @_;
+
+	my @expanded_arg_value;
+	my ($left_figure, $autorange_found, $right_figure) = $arg_value =~ /^(\d*)(\.\.)(\d*)$/x;
+	if ($autorange_found) {
+		$left_figure = $right_figure if !defined $left_figure || !length($left_figure);
+		$right_figure = $left_figure if !defined $right_figure || !length($right_figure);
+		if (defined $left_figure && defined $right_figure) {
+			push @expanded_arg_value, $left_figure..$right_figure;
+		}
+	}
+	return @expanded_arg_value ? @expanded_arg_value : $arg_value;
 }
 
 ### PRIVATE
@@ -202,17 +230,21 @@ sub new_with_options {
     return $self
       if eval { $self = $class->new( %cmdline_params ); 1 };
     if ( $@ =~ /^Attribute\s\((.*?)\)\sis\srequired/x ) {
-        print "$1 is missing\n";
+        print STDERR "$1 is missing\n";
     }
     elsif ( $@ =~ /^Missing\srequired\sarguments:\s(.*)\sat\s\(/x ) {
         my @missing_required = split /,\s/x, $1;
-        print
+        print STDERR
           join( "\n", ( map { $_ . " is missing" } @missing_required ), '' );
-    } elsif ($@ =~ /^(.*?)\srequired/x) {
-        print "$1 is missing\n";
+    }
+    elsif ($@ =~ /^(.*?)\srequired/x) {
+        print STDERR "$1 is missing\n";
+    }
+    elsif ($@ =~ /^isa\scheck.*?failed:\s/x) {
+		print STDERR substr($@, index($@, ':') + 2);
     }
     else {
-        croak $@;
+        print STDERR $@;
     }
     %cmdline_params = $class->parse_options( help => 1 );
     return $class->options_usage(1, $cmdline_params{help});
@@ -248,7 +280,7 @@ sub parse_options {
     my $prog_name = $class->_options_prog_name();
 
     # create usage str
-    my $usage_str = "USAGE: $prog_name %o";
+    my $usage_str = $options_config{usage_string} // "USAGE: $prog_name %o";
 
     my ( $opt, $usage ) = describe_options(
         ($usage_str), @$options,
@@ -274,8 +306,9 @@ sub parse_options {
             my $val = $opt->$name();
             if ( defined $val ) {
                 if ( $data{json} ) {
-                    if (! eval { $cmdline_params{$name} = decode_json($val); 1 }) {
-                      carp $@;
+                    require JSON::MaybeXS;
+                    if (! eval { $cmdline_params{$name} = JSON::MaybeXS::decode_json($val); 1 }) {
+                      print STDERR $@;
                       return $class->options_usage(1, $usage);
                     }
                 }
@@ -377,10 +410,13 @@ sub options_man {
         $usage = $cmdline_params{man};
     }
 
-    my $man_file = file(Path::Class::tempdir(CLEANUP => 1), 'help.pod');
+    require Path::Class;
+    Path::Class->VERSION(0.32);
+    my $man_file = Path::Class::file(Path::Class::tempdir(CLEANUP => 1), 'help.pod');
     $man_file->spew(iomode => '>:encoding(UTF-8)', $usage->option_pod);
 
-    pod2usage(-verbose => 2, -input => $man_file->stringify, -exitval => 'NOEXIT', -output => $output);
+    require Pod::Usage;
+    Pod::Usage::pod2usage(-verbose => 2, -input => $man_file->stringify, -exitval => 'NOEXIT', -output => $output);
 
     exit(0);
 }

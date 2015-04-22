@@ -14,10 +14,21 @@ use strict;
 use warnings;
 # VERSION
 use feature 'say', 'state';
-use Text::LineFold;
-use Term::Size::Any qw/chars/;
 use Getopt::Long::Descriptive;
 use Scalar::Util qw/blessed/;
+
+=method chars
+
+Return (Columns, Rows) of the current terminal
+
+=cut
+BEGIN {
+	## no critic (ProhibitStringyEval)
+   if (!eval "use Term::Size::Any qw/chars/; 1") {
+	   no strict 'refs';
+	   *{"MooX::Options::Descriptive::Usage::chars"} = sub {return (80,25)};
+   }
+}
 
 my %format_doc = (
     's'  => 'String',
@@ -107,6 +118,7 @@ sub _get_line_fold {
     my ($columns) = chars();
     $columns //= 78;
     $columns = $ENV{TEST_FORCE_COLUMN_SIZE} if defined $ENV{TEST_FORCE_COLUMN_SIZE};
+    require Text::LineFold;
     return Text::LineFold->new(ColMax => $columns - 4);
 }
 

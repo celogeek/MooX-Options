@@ -80,7 +80,7 @@ subtest "test required" => sub {
         local @ARGV = ();
         my @r = trap { r->new_with_options };
         is( $trap->exit, 1, "missing args, exit 1" );
-        ok( $trap->stdout =~ /^str_req is missing/, "str_reg is missing" );
+        like( $trap->stderr, qr/^str_req is missing/, "str_reg is missing" );
     }
     {
         local @ARGV = ('--str_req=ok');
@@ -91,7 +91,7 @@ subtest "test required" => sub {
         local @ARGV = ();
         my @r = trap { multi_req->new_with_options };
         is( $trap->exit, 1, "missing args exit 1" );
-        my @missing = $trap->stdout =~ /(multi_\d is missing)\n/g;
+        my @missing = $trap->stderr =~ /(multi_\d is missing)\n/g;
         my @target_isa;
         { no strict 'refs'; @target_isa = @{"multi_req::ISA"} };
         if (multi_req->isa('Moose::Object') || multi_req->isa('Mo::Object')) {
@@ -193,7 +193,7 @@ subtest "split_complexe_str_short" => sub {
         my $t = sp_str_short->new_with_options();
         is_deeply( $t->split_str, [qw/a/], 'str req is ok' );
     }
-    {
+    { 
         local @ARGV = ("-z=a,b,c");
         my $t = sp_str_short->new_with_options();
         is_deeply( $t->split_str, [qw/a b c/], 'str req is ok' );
@@ -229,24 +229,20 @@ subtest "split_str_shorter_name" => sub {
         trap {
             sp_str->new_with_options();
         };
-        ok $trap->stderr =~ qr/Option\ssplit_co\sis\sambiguous/, 'conflict detected';
+        like $trap->stderr, qr/Option\ssplit_co\sis\sambiguous/, 'conflict detected';
         local @ARGV = ("--split-co=a,b,c");
         trap {
             sp_str->new_with_options();
         };
-        ok $trap->stderr =~ qr/Option\ssplit_co\sis\sambiguous/, 'conflict detected';
+        like $trap->stderr, qr/Option\ssplit_co\sis\sambiguous/, 'conflict detected';
     }
     done_testing();
 };
 
 subtest "should_die_ok" => sub {
     note "Test chain method";
-    try {
-        d->new_with_options( should_die_ok => 1 );
-    }
-    catch {
-        ok( /this\s\will\sdie\sok/, 'should die ok' );
-    };
+    trap { d->new_with_options( should_die_ok => 1 ) };
+    like($trap->stderr, qr/this\s\will\sdie\sok/, 'should die ok' );
 };
 
 subtest "test usage" => sub {
@@ -254,12 +250,12 @@ subtest "test usage" => sub {
     my $s     = sp_str->new_with_options();
     my @r = trap { $s->options_usage( 127, 'usage work', 'usage really work' ) };
     is( $trap->exit, 127, 'exit code is correct' );
-    ok( $trap->stderr =~ /usage work/, 'custom message is present' );
-    ok( $trap->stderr =~ /usage really work/,
+    like( $trap->stderr, qr/usage work/, 'custom message is present' );
+    like( $trap->stderr, qr/usage really work/,
         'custom message is really present'
     );
-    ok( $trap->stderr =~ /help:\n\s+show a help message/, 'help is present' );
-    ok( $trap->stderr =~ /split_str: \[Strings\]\n\s+no doc for split_str/,
+    like( $trap->stderr, qr/help:\n\s+show a help message/, 'help is present' );
+    like( $trap->stderr, qr/split_str: \[Strings\]\n\s+no doc for split_str/,
         'attr no doc is present' );
 };
 
@@ -278,14 +274,14 @@ subtest "doc usage" => sub {
     my $s     = t_doc->new_with_options();
     my @r = trap { $s->options_usage(127) };
     is( $trap->exit, 127, 'exit code is correct' );
-    ok( $trap->stderr =~ /t:\n\s+this is a test/, 'doc on attribute' );
+    like( $trap->stderr, qr/t:\n\s+this is a test/, 'doc on attribute' );
 };
 
 subtest "test short" => sub {
     note "test short";
     my $s     = t_short->new_with_options();
     trap { $s->options_usage };
-    ok ($trap->stdout =~ /\-v \-\-verbose/, 'short doc ok');
+    like ($trap->stdout, qr/\-v \-\-verbose/, 'short doc ok');
 };
 
 subtest "test skip_options" => sub {
@@ -334,24 +330,161 @@ subtest "json" => sub {
     {
         local @ARGV = ("--t", "bad json");
         my $t = trap { t_json->new_with_options };
-        ok( $trap->stderr =~ /malformed JSON string/, "decode json failed");
-        ok( $trap->stderr =~ /\-t: JSON/, "json help message properly set" );
+        like( $trap->stderr, qr/malformed JSON string/, "decode json failed");
+        like( $trap->stderr, qr/\-t: JSON/, "json help message properly set" );
     }
 
     {
         local @ARGV = ('--help');
         my $t = trap { t_json->new_with_options };
-        ok( $trap->stdout =~ /\-t: JSON/, "json help message properly set" );
+        like( $trap->stdout, qr/\-t: JSON/, "json help message properly set" );
     }
 
     {
         trap {
           t_json->new->options_man(undef, *STDOUT);
         };
-        ok( $trap->stdout =~ /\-t: JSON/, "json help message properly set" ) or diag $trap->stdout;
+        like( $trap->stdout, qr/\-t: JSON/, "json help message properly set" ) or diag $trap->stdout;
+    }
+};
+
+subtest "range_complexe_str" => sub {
+    note "range on complexe str";
+    {
+        local @ARGV = ('--range_str=1,2,4');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4/], 'str1 req is ok' );
+    }
+    {
+        local @ARGV = ('--range-str=1,2,4..');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4/], 'str2 req is ok' );
     }
 
+    {
+        local @ARGV = ('--range_str=1,2,4..6');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4 5 6/], 'str3 req is ok' );
+    }
+    {
+        local @ARGV = ('--range-str=1,2,4..6');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4 5 6/], 'str4 req is ok' );
+    }
+    {
+        local @ARGV = ('--range_str=1,2,4..');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4/], 'str req5 is ok' );
+    }
+    {
+        local @ARGV = ('--range-str=1,2,4..');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4/], 'str req6 is ok' );
+    }
+    { 
+        local @ARGV = ("--range_str=1,2,4..7,10");
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4 5 6 7 10/], 'str7 req is ok' );
+    }
+    { 
+        local @ARGV = ("--range-str=1,2,4..7,10");
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4 5 6 7 10/], 'str8 req is ok' );
+    }
+    { 
+        local @ARGV = ('--range_str=1..3,10..12,20..');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 3 10 11 12 20/], 'str9 req is ok' );
+    }
+    { 
+        local @ARGV = ('--range-str=1..3,10..12,20..');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 3 10 11 12 20/], 'str10 req is ok' );
+    }
+    {
+        local @ARGV = ('--range_str=1,"2,3",4,"foo bar"');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [ 1, "2,3", 4, "foo bar" ], 'str11 req is ok' );
+    }
+    {
+        local @ARGV = ('--range-str=1,"2,3",4,"a,2,c"');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [ 1, "2,3", 4, "a,2,c" ], 'str12 req is ok' );
+    }
+    done_testing();
+};
 
+subtest "range_complexe_str_short" => sub {
+    note "range on complexe str short";
+    {
+        local @ARGV = ("-r=1");
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [qw/1/], 'str1 req is ok' );
+    }
+    { 
+        local @ARGV = ("-r=1,2,4");
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4/], 'str2 req is ok' );
+    }
+    { 
+        local @ARGV = ("-r=1..4");
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 3 4/], 'str3 req is ok' );
+    }
+    { 
+        local @ARGV = ('-r', "1..4");
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 3 4/], 'str4 req is ok' );
+    }
+    { 
+        local @ARGV = ("-r=1,2,4..7,10");
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4 5 6 7 10/], 'str5 req is ok' );
+    }
+    { 
+        local @ARGV = ('-r', '1..3,10..12,20..');
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 3 10 11 12 20/], 'str6 req is ok' );
+    }
+    {
+        local @ARGV = ('-r=1,"2,3",4');
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [ '1', "2,3", '4' ], 'str7 req is ok' );
+    }
+    {
+        local @ARGV = ('-r','1,"2,3",4..7');
+        my $t = rg_str_short->new_with_options();
+        is_deeply( $t->range_str, [ 1, "2,3", 4, 5, 6, 7 ], 'str8 req is ok' );
+    }
+    done_testing();
+};
+
+subtest "range_str_shorter_name" => sub {
+    note "shorter long range";
+    {
+        local @ARGV = ("--range_st=1,2,4..6");
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4 5 6/], 'str1 req is ok' );
+    }
+    {
+        local @ARGV = ("--range-st=1,2,4..6,7");
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 4 5 6 7/], 'str2 req is ok' );
+    }
+    note "shorter long range with conflict";
+    {
+        local @ARGV = ("--range_co=1,2,3");
+        trap {
+            rg_str->new_with_options();
+        };
+        like $trap->stderr, qr/Option\srange_co\sis\sambiguous/, 'conflict detected';
+        local @ARGV = ("--range-co=1,2,3");
+        trap {
+            rg_str->new_with_options();
+        };
+        like $trap->stderr, qr/Option\srange_co\sis\sambiguous/, 'conflict detected';
+    }
+    done_testing();
 };
 
 1;

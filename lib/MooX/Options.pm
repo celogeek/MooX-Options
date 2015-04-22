@@ -71,10 +71,9 @@ The manual :
 use strict;
 use warnings;
 # VERSION
-use Carp;
 
 my @OPTIONS_ATTRIBUTES =
-  qw/format short repeatable negativable autosplit doc long_doc order json/;
+  qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden/;
 
 sub import {
     my ( undef, @import ) = @_;
@@ -82,6 +81,7 @@ sub import {
         protect_argv          => 1,  flavour            => [],
         skip_options          => [], prefer_commandline => 0,
         with_config_from_file => 0,
+        usage_string          => undef,
         #long description (manual)
         description => undef, authors => [], synopsis => undef,
         @import
@@ -90,7 +90,7 @@ sub import {
     my $target = caller;
     for my $needed_methods(qw/with around has/) {
         next if $target->can($needed_methods);
-        croak "Can't find the method <$needed_methods> in <$target> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.";
+        croak("Can't find the method <$needed_methods> in <$target> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.");
     }
 
     my $with   = $target->can('with');
@@ -121,7 +121,7 @@ sub import {
         }';
         use warnings FATAL => qw/void/;
 
-        croak $@ if $@;
+        croak($@) if $@;
 
         $around->(
             _options_config => sub {
@@ -134,8 +134,8 @@ sub import {
     }
     else {
         if ( $options_config->{with_config_from_file} ) {
-            croak
-              'Please, don\'t use the option <with_config_from_file> into a role.';
+            croak(
+              'Please, don\'t use the option <with_config_from_file> into a role.');
         }
     }
 
@@ -177,8 +177,8 @@ sub import {
     my $option = sub {
         my ( $name, %attributes ) = @_;
         for my $ban (@banish_keywords) {
-            croak
-              "You cannot use an option with the name '$ban', it is implied by MooX::Options"
+            croak(
+              "You cannot use an option with the name '$ban', it is implied by MooX::Options")
               if $name eq $ban;
         }
 
@@ -202,6 +202,11 @@ sub import {
     return;
 }
 
+sub croak {
+    require Carp;
+    goto &Carp::croak;
+}
+
 sub _filter_attributes {
     my %attributes = @_;
     my %filter_key = map { $_ => 1 } @OPTIONS_ATTRIBUTES;
@@ -213,10 +218,12 @@ sub _validate_and_filter_options {
     my (%options) = @_;
     $options{doc} = $options{documentation} if !defined $options{doc};
     $options{order} = 0 if !defined $options{order};
+	$options{autosplit} = ',' if !defined $options{autosplit} && $options{autorange};
 
     if ( $options{json} ) {
         delete $options{repeatable};
         delete $options{autosplit};
+        delete $options{autorange};
         delete $options{negativable};
         $options{format} = 's';
     }
@@ -224,15 +231,14 @@ sub _validate_and_filter_options {
     my %cmdline_options = map { ( $_ => $options{$_} ) }
       grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
 
-
     $cmdline_options{repeatable} = 1 if $cmdline_options{autosplit};
     $cmdline_options{format} .= "@"
       if $cmdline_options{repeatable}
       && defined $cmdline_options{format}
       && substr( $cmdline_options{format}, -1 ) ne '@';
 
-    croak
-      "Negativable params is not usable with non boolean value, don't pass format to use it !"
+    croak(
+      "Negativable params is not usable with non boolean value, don't pass format to use it !")
       if $cmdline_options{negativable} && defined $cmdline_options{format};
 
     return %cmdline_options;
@@ -343,6 +349,27 @@ In /etc/myTool.json
 
   {"test" : 1}
 
+=head1 usage_string
+
+This parameter is passed to Getopt::Long::Descriptive::describe_options() as
+the first parameter.  
+
+It is a "sprintf"-like string that is used in generating the first line of the
+usage message. It's a one-line summary of how the command is to be invoked. 
+The default value is "USAGE: %c %o".
+
+%c will be replaced with what Getopt::Long::Descriptive thinks is the
+program name (it's computed from $0, see "prog_name").
+
+%o will be replaced with a list of the short options, as well as the text
+"[long options...]" if any have been defined.
+
+The rest of the usage description can be used to summarize what arguments
+are expected to follow the program's options, and is entirely free-form.
+
+Literal "%" characters will need to be written as "%%", just like with
+"sprintf".
+
 =head1 OPTION PARAMETERS
 
 The keyword C<option> extend the keyword C<has> with specific parameters for the command line.
@@ -430,6 +457,30 @@ It will also handle quoted params with the autosplit.
 
   myTool --testStr='a,b,"c,d",e,f' # testStr ("a", "b", "c,d", "e", "f")
 
+=head2 autorange
+
+For another repeatable option you can add the autorange feature with your specific parameters. This 
+allows you to pass number ranges instead of passing each individual number.
+
+  option test => (is => 'ro', format => 'i@', default => sub {[]}, autorange => 1);
+  
+  myTool --test=1 --test=2 # test = (1, 2)
+  myTool --test=1,2,3      # test = (1, 2, 3)
+  myTool --test=1,2,3..6   # test = (1, 2, 3, 4, 5, 6)
+  
+It will also handle quoted params like C<autosplit>, and will not rangify them.
+
+  option testStr => (is => 'ro', format => 's@', default => sub {[]}, autorange => 1);
+
+  myTool --testStr='1,2,"3,a,4",5' # testStr (1, 2, "3,a,4", 5)
+
+C<autosplit> will be set to ',' if undefined. You may set C<autosplit> to a different delimiter than ','
+for your group separation, but the range operator '..' cannot be changed. 
+
+  option testStr => (is => 'ro', format => 's@', default => sub {[]}, autorange => 1, autosplit => '-');
+
+  myTool --testStr='1-2-3-5..7' # testStr (1, 2, 3, 5, 6, 7) 
+
 =head2 short
 
 Long option can also have short version or aliased.
@@ -458,6 +509,16 @@ Specifies the order of the attribute. If you want to push some attributes at the
 By default all options have an order set to C<0>, and options are sorted by their names.
 
   option 'at_the_end' => (is => 'ro', order => 999);
+
+=head2 hidden
+
+Hide option from doc but still an option you can use on command line.
+
+  option 'debug' => (is => 'ro', doc => 'hidden');
+
+Or
+
+  option 'debug' => (is => 'ro', hidden => 1);
 
 =head1 ADDITIONAL MANUALS
 
