@@ -49,5 +49,4 @@ if ( defined $r ) {
     ok( $r->r3(),      'r3 set' );
 }
 
-
 done_testing;

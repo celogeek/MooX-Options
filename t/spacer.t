@@ -15,21 +15,21 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
     use Moo;
     use MooX::Options spacer => '+';
 
-    option 'a' => (is => 'ro');
-    option 'b' => (is => 'ro', spacer_before => 1, spacer_after => 1);
-    option 'c' => (is => 'ro');
+    option 'a' => ( is => 'ro' );
+    option 'b' => ( is => 'ro', spacer_before => 1, spacer_after => 1 );
+    option 'c' => ( is => 'ro' );
 
     1;
 }
 
 my $opt = t->new_with_options;
 trap { $opt->options_usage };
-my @usages = grep {/[abc]\:|\+/} split(/\n/, $trap->stdout);
+my @usages = grep {/[abc]\:|\+/} split( /\n/, $trap->stdout );
 
-like $usages[0], qr/a:/, 'a is first';
+like $usages[0], qr/a:/,  'a is first';
 like $usages[1], qr/\++/, 'then the spacer';
-like $usages[2], qr/b:/, 'b is next';
+like $usages[2], qr/b:/,  'b is next';
 like $usages[3], qr/\++/, 'then the spacer';
-like $usages[4], qr/c:/, 'c is last';
+like $usages[4], qr/c:/,  'c is last';
 
 done_testing;

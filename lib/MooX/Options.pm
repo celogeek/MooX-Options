@@ -70,27 +70,36 @@ The manual :
 
 use strict;
 use warnings;
+
 # VERSION
 
-my @OPTIONS_ATTRIBUTES =
-  qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
+my @OPTIONS_ATTRIBUTES
+    = qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
 
 sub import {
     my ( undef, @import ) = @_;
     my $options_config = {
-        protect_argv          => 1,  flavour            => [],
-        skip_options          => [], prefer_commandline => 0,
+        protect_argv          => 1,
+        flavour               => [],
+        skip_options          => [],
+        prefer_commandline    => 0,
         with_config_from_file => 0,
         usage_string          => undef,
+
         #long description (manual)
-        description => undef, authors => [], synopsis => undef, spacer => '_',
+        description => undef,
+        authors     => [],
+        synopsis    => undef,
+        spacer      => '_',
         @import
     };
 
     my $target = caller;
-    for my $needed_methods(qw/with around has/) {
+    for my $needed_methods (qw/with around has/) {
         next if $target->can($needed_methods);
-        croak("Can't find the method <$needed_methods> in <$target> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.");
+        croak(
+            "Can't find the method <$needed_methods> in <$target> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options."
+        );
     }
 
     my $with   = $target->can('with');
@@ -100,7 +109,7 @@ sub import {
     my @target_isa;
     { no strict 'refs'; @target_isa = @{"${target}::ISA"} };
 
-    if (@target_isa) { #only in the main class, not a role
+    if (@target_isa) {    #only in the main class, not a role
 
         use warnings FATAL => 'redefine';
         ## no critic (ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval, ValuesAndExpressions::ProhibitImplicitNewlines)
@@ -135,7 +144,8 @@ sub import {
     else {
         if ( $options_config->{with_config_from_file} ) {
             croak(
-              'Please, don\'t use the option <with_config_from_file> into a role.');
+                'Please, don\'t use the option <with_config_from_file> into a role.'
+            );
         }
     }
 
@@ -168,8 +178,8 @@ sub import {
         );
     };
 
-    my @banish_keywords =
-      qw/help man usage option new_with_options parse_options options_usage _options_data _options_config/;
+    my @banish_keywords
+        = qw/help man usage option new_with_options parse_options options_usage _options_data _options_config/;
     if ( $options_config->{with_config_from_file} ) {
         push @banish_keywords, qw/config_files config_prefix config_dirs/;
     }
@@ -178,14 +188,14 @@ sub import {
         my ( $name, %attributes ) = @_;
         for my $ban (@banish_keywords) {
             croak(
-              "You cannot use an option with the name '$ban', it is implied by MooX::Options")
-              if $name eq $ban;
+                "You cannot use an option with the name '$ban', it is implied by MooX::Options"
+            ) if $name eq $ban;
         }
 
         $has->( $name => _filter_attributes(%attributes) );
 
-        $options_data->{$name} =
-          { _validate_and_filter_options(%attributes) };
+        $options_data->{$name}
+            = { _validate_and_filter_options(%attributes) };
 
         $apply_modifiers->();
         return;
@@ -211,36 +221,40 @@ sub _filter_attributes {
     my %attributes = @_;
     my %filter_key = map { $_ => 1 } @OPTIONS_ATTRIBUTES;
     return map { ( $_ => $attributes{$_} ) }
-      grep { !exists $filter_key{$_} } keys %attributes;
+        grep { !exists $filter_key{$_} } keys %attributes;
 }
 
 sub _validate_and_filter_options {
     my (%options) = @_;
     $options{doc} = $options{documentation} if !defined $options{doc};
     $options{order} = 0 if !defined $options{order};
-	  $options{autosplit} = ',' if !defined $options{autosplit} && $options{autorange};
+    $options{autosplit} = ','
+        if !defined $options{autosplit} && $options{autorange};
 
-    if ( $options{json} || (defined $options{format} && $options{format} eq 'json')) {
+    if ( $options{json}
+        || ( defined $options{format} && $options{format} eq 'json' ) )
+    {
         delete $options{repeatable};
         delete $options{autosplit};
         delete $options{autorange};
         delete $options{negativable};
-        $options{json} = 1;
+        $options{json}   = 1;
         $options{format} = 's';
     }
 
     my %cmdline_options = map { ( $_ => $options{$_} ) }
-      grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
+        grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
 
     $cmdline_options{repeatable} = 1 if $cmdline_options{autosplit};
     $cmdline_options{format} .= "@"
-      if $cmdline_options{repeatable}
-      && defined $cmdline_options{format}
-      && substr( $cmdline_options{format}, -1 ) ne '@';
+        if $cmdline_options{repeatable}
+        && defined $cmdline_options{format}
+        && substr( $cmdline_options{format}, -1 ) ne '@';
 
     croak(
-      "Negativable params is not usable with non boolean value, don't pass format to use it !")
-      if $cmdline_options{negativable} && defined $cmdline_options{format};
+        "Negativable params is not usable with non boolean value, don't pass format to use it !"
+        )
+        if $cmdline_options{negativable} && defined $cmdline_options{format};
 
     return %cmdline_options;
 }

@@ -12,7 +12,6 @@ BEGIN {
 use English qw( -no_match_vars );
 local $OUTPUT_AUTOFLUSH = 1;
 
-
 use Test::More;
 use Test::Requires { 'Test::Pod' => 1.46 };
 

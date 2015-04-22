@@ -6,7 +6,8 @@ use Test::More;
 package Foo;
 use Moo;
 use MooX::Options;
-option start_from => (is => "ro", format => "s");
+option start_from => ( is => "ro", format => "s" );
+
 package main;
 local @ARGV = qw/--start_from 0/;
 my $f = Foo->new_with_options;
