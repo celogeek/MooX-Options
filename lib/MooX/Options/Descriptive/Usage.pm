@@ -17,7 +17,19 @@ use feature 'say', 'state';
 use Text::LineFold;
 use Getopt::Long::Descriptive;
 use Scalar::Util qw/blessed/;
-use Locale::TextDomain qw( MooX-Options );
+
+sub __x($@) {
+  require Locale::TextDomain;
+  Locale::TextDomain->import( qw(MooX-Options) );
+  goto &Locale::TextDomain::__x;
+}
+
+sub __($) {
+  require Locale::TextDomain;
+  Locale::TextDomain->import( qw(MooX-Options) );
+  goto &Locale::TextDomain::__;
+}
+
 =method chars
 
 Return (Columns, Rows) of the current terminal

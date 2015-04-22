@@ -73,7 +73,17 @@ use warnings;
 # VERSION
 use Carp;
 
-use Locale::TextDomain qw(MooX-Options);
+sub __x($@) {
+  require Locale::TextDomain;
+  Locale::TextDomain->import( qw(MooX-Options) );
+  goto &Locale::TextDomain::__x;
+}
+
+sub __($) {
+  require Locale::TextDomain;
+  Locale::TextDomain->import( qw(MooX-Options) );
+  goto &Locale::TextDomain::__;
+}
 
 my @OPTIONS_ATTRIBUTES =
   qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden/;

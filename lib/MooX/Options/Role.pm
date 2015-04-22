@@ -4,8 +4,6 @@ package MooX::Options::Role;
 use strict;
 use warnings;
 
-use Locale::TextDomain qw(MooX-Options);
-
 # VERSION
 
 =head1 USAGE
@@ -23,6 +21,18 @@ use Carp;
 use Pod::Usage qw/pod2usage/;
 use Path::Class 0.32;
 use Scalar::Util qw/blessed/;
+
+sub __x($@) {
+  require Locale::TextDomain;
+  Locale::TextDomain->import( qw(MooX-Options) );
+  goto &Locale::TextDomain::__x;
+}
+
+sub __($) {
+  require Locale::TextDomain;
+  Locale::TextDomain->import( qw(MooX-Options) );
+  goto &Locale::TextDomain::__;
+}
 
 ### PRIVATE
 
