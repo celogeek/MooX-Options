@@ -34,20 +34,16 @@ BEGIN {
     }
 }
 
-sub _format_doc {
-  my $format = shift;
-  my %format_doc = (
-      's'  => __("String"),
-      's@' => __("[Strings]"),
-      'i'  => __("Int"),
-      'i@' => __("[Ints]"),
-      'o'  => __("Ext. Int"),
-      'o@' => __("[Ext. Ints]"),
-      'f'  => __("Real"),
-      'f@' => __("[Reals]"),
-  );
-  return $format_doc{$format};
-}
+my %format_doc = (
+    's'  => __("String"),
+    's@' => __("[Strings]"),
+    'i'  => __("Int"),
+    'i@' => __("[Ints]"),
+    'o'  => __("Ext. Int"),
+    'o@' => __("[Ext. Ints]"),
+    'f'  => __("Real"),
+    'f@' => __("[Reals]"),
+);
 
 sub _format_long_doc {
   my $format = shift;
@@ -166,7 +162,7 @@ sub option_text {
         }
         my ( $short, $format ) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
         my $format_doc_str;
-        $format_doc_str = _format_doc($format) if defined $format;
+        $format_doc_str = $format_doc{$format} if defined $format;
         $format_doc_str = 'JSON'
             if defined $options_data{ $opt->{name} }{json};
         push @message,
@@ -297,7 +293,7 @@ sub option_short_usage {
         }
         my ($format) = $opt->{spec} =~ /(?:\|\w)?(?:=(.*?))?$/x;
         my $format_doc_str;
-        $format_doc_str = _format_doc($format) if defined $format;
+        $format_doc_str = $format_doc{$format} if defined $format;
         $format_doc_str = 'JSON'
             if defined $options_data{ $opt->{name} }{json};
         push @message,
