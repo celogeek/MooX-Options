@@ -208,7 +208,7 @@ sub option_pod {
     }
 
     push @man,
-        ( "=head1 SYNOPSIS", $prog_name . __(" [-h] [long options ...]"), );
+        ( "=head1 SYNOPSIS", $prog_name . " [-h] [" . __("long options ...") ."]"), );
 
     if ( defined( my $synopsis = $options_config{synopsis} ) ) {
         push @man, $synopsis;
