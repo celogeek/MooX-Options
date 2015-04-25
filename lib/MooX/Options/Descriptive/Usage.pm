@@ -17,18 +17,7 @@ use warnings;
 use feature 'say', 'state';
 use Getopt::Long::Descriptive;
 use Scalar::Util qw/blessed/;
-
-sub __x($@) {
-  require Locale::TextDomain;
-  Locale::TextDomain->import( qw(MooX-Options) );
-  goto &Locale::TextDomain::__x;
-}
-
-sub __($) {
-  require Locale::TextDomain;
-  Locale::TextDomain->import( qw(MooX-Options) );
-  goto &Locale::TextDomain::__;
-}
+use Locale::TextDomain 'MooX-Options';
 
 =method chars
 

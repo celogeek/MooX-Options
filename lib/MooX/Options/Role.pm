@@ -14,18 +14,7 @@ Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrad
 
 use MooX::Options::Descriptive;
 use Scalar::Util qw/blessed/;
-
-sub __x($@) {
-  require Locale::TextDomain;
-  Locale::TextDomain->import( qw(MooX-Options) );
-  goto &Locale::TextDomain::__x;
-}
-
-sub __($) {
-  require Locale::TextDomain;
-  Locale::TextDomain->import( qw(MooX-Options) );
-  goto &Locale::TextDomain::__;
-}
+use Locale::TextDomain 'MooX-Options';
 
 ### PRIVATE
 

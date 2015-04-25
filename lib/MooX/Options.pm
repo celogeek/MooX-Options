@@ -73,17 +73,7 @@ use warnings;
 
 # VERSION
 
-sub __x($@) {
-  require Locale::TextDomain;
-  Locale::TextDomain->import( qw(MooX-Options) );
-  goto &Locale::TextDomain::__x;
-}
-
-sub __($) {
-  require Locale::TextDomain;
-  Locale::TextDomain->import( qw(MooX-Options) );
-  goto &Locale::TextDomain::__;
-}
+use Locale::TextDomain 'MooX-Options';
 
 my @OPTIONS_ATTRIBUTES
     = qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
@@ -222,11 +212,6 @@ sub import {
     return;
 }
 
-sub croak {
-    require Carp;
-    goto &Carp::croak;
-}
-
 sub _filter_attributes {
     my %attributes = @_;
     my %filter_key = map { $_ => 1 } @OPTIONS_ATTRIBUTES;
@@ -267,6 +252,11 @@ sub _validate_and_filter_options {
         if $cmdline_options{negativable} && defined $cmdline_options{format};
 
     return %cmdline_options;
+}
+
+sub croak {
+    require Carp;
+    goto &Carp::croak;
 }
 
 1;
