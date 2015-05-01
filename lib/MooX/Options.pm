@@ -577,16 +577,60 @@ Add spacer before or after or both the params
 
 =back
 
+=head1 Translation
+
+Translation is now supported.
+
+Use the dzil command to update the pot and merge into the po files.
+
+=over
+
+=item * dzil msg-init
+
+Create a new language po
+
+=item * dzil msg-scan
+
+Scan and generate or update the pot file
+
+=item * dzil msg-merge
+
+Update all languages using the pot file
+
+=back
+
+=head2 THANKS
+
+=over
+
+=item * sschober
+
+For implementation and German translation.
+
+=back
+
 =head1 THANKS
 
 =over
 
-=item Matt S. Trout (mst) <mst@shadowcat.co.uk> : For his patience and advice.
+=item * Matt S. Trout (mst) <mst@shadowcat.co.uk>
 
-=item Tomas Doran (t0m) <bobtfish@bobtfish.net> : To help me release the new version, and using it :)
+For his patience and advice.
 
-=item Torsten Raudssus (Getty) : to use it a lot in L<DuckDuckGo|http://duckduckgo.com> (go to see L<MooX> module also)
+=item * Tomas Doran (t0m) <bobtfish@bobtfish.net>
 
-=item Jens Rehsack (REHSACK) : Use with L<PkgSrc|http://www.pkgsrc.org/>, and many really good idea (L<MooX::Cmd>, L<MooX::ConfigFromFile>, and more to come I'm sure)
+To help me release the new version, and using it :)
+
+=item * Torsten Raudssus (Getty)
+
+to use it a lot in L<DuckDuckGo|http://duckduckgo.com> (go to see L<MooX> module also)
+
+=item * Jens Rehsack (REHSACK)
+
+Use with L<PkgSrc|http://www.pkgsrc.org/>, and many really good idea (L<MooX::Cmd>, L<MooX::ConfigFromFile>, and more to come I'm sure)
+
+=item * All contributors
+
+For improving and add more feature to MooX::Options
 
 =back
