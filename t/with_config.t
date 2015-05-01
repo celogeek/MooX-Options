@@ -3,6 +3,12 @@ use Test::More;
 use Test::Trap;
 use feature 'say';
 
+use POSIX qw(setlocale LC_ALL);
+
+BEGIN {
+  setlocale LC_ALL, 'C';
+}
+
 local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 
 {

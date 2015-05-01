@@ -17,6 +17,7 @@ use warnings;
 use feature 'say', 'state';
 use Getopt::Long::Descriptive;
 use Scalar::Util qw/blessed/;
+use Locale::TextDomain 'MooX-Options';
 
 =method chars
 
@@ -34,26 +35,30 @@ BEGIN {
 }
 
 my %format_doc = (
-    's'  => 'String',
-    's@' => '[Strings]',
-    'i'  => 'Int',
-    'i@' => '[Ints]',
-    'o'  => 'Ext. Int',
-    'o@' => '[Ext. Ints]',
-    'f'  => 'Real',
-    'f@' => '[Reals]',
+    's'  => __("String"),
+    's@' => __("[Strings]"),
+    'i'  => __("Int"),
+    'i@' => __("[Ints]"),
+    'o'  => __("Ext. Int"),
+    'o@' => __("[Ext. Ints]"),
+    'f'  => __("Real"),
+    'f@' => __("[Reals]"),
 );
 
-my %format_long_doc = (
-    's'  => 'String',
-    's@' => 'Array of Strings',
-    'i'  => 'Integer',
-    'i@' => 'Array of Integers',
-    'o'  => 'Extended Integer',
-    'o@' => 'Array of extended integers',
-    'f'  => 'Real number',
-    'f@' => 'Array of real numbers',
-);
+sub _format_long_doc {
+  my $format = shift;
+  my %format_long_doc = (
+      's'  => __("String"),
+      's@' => __("Array of Strings"),
+      'i'  => __("Integer"),
+      'i@' => __("Array of Integers"),
+      'o'  => __("Extended Integer"),
+      'o@' => __("Array of extended integers"),
+      'f'  => __("Real number"),
+      'f@' => __("Array of real numbers"),
+  );
+  return $format_long_doc{$format};
+}
 
 =method new
 
@@ -105,7 +110,7 @@ sub sub_commands_text {
         ? $self->{target}->_options_sub_commands() // []
         : [];
     return if !@$sub_commands;
-    return "", 'SUB COMMANDS AVAILABLE: ' . join( ', ', @$sub_commands ), "";
+    return "", __("SUB COMMANDS AVAILABLE: ") . join(', ', @$sub_commands), "";
 }
 
 =method text
@@ -203,7 +208,7 @@ sub option_pod {
     }
 
     push @man,
-        ( "=head1 SYNOPSIS", $prog_name . " [-h] [long options ...]", );
+        ( "=head1 SYNOPSIS", $prog_name . " [-h] [" . __("long options ...") ."]");
 
     if ( defined( my $synopsis = $options_config{synopsis} ) ) {
         push @man, $synopsis;
@@ -220,7 +225,7 @@ sub option_pod {
         }
         my ( $short, $format ) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
         my $format_doc_str;
-        $format_doc_str = $format_long_doc{$format} if defined $format;
+        $format_doc_str = _format_long_doc($format) if defined $format;
         $format_doc_str = 'JSON'
             if defined $options_data{ $opt->{name} }{json};
 
@@ -242,11 +247,7 @@ sub option_pod {
         push @man, "=head1 AVAILABLE SUB COMMANDS";
         push @man, "=over";
         for my $sub_command (@$sub_commands) {
-            push @man,
-                (
-                "=item B<" . $sub_command . "> :",
-                $prog_name . " " . $sub_command . " [-h] [long options ...]",
-                );
+            push @man, ( "=item B<" . $sub_command . "> :", $prog_name . " " . $sub_command ." [-h] [" . __("long options ...") ."]");
         }
         push @man, "=back";
     }

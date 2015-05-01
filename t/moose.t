@@ -8,7 +8,10 @@ use Carp;
 use FindBin qw/$RealBin/;
 use Try::Tiny;
 
+use POSIX qw(setlocale LC_ALL);
+
 BEGIN {
+    setlocale LC_ALL, 'C';
     eval 'use Moose';
     if ($@) {
         plan skip_all => 'Need Moose for this test';
