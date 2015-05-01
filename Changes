@@ -1,4 +1,4 @@
-    * Bug #486 : Reduce runtime dependency footprint (arc) (Celogeek San)
+    * Feature #486 : Reduce runtime dependency footprint (arc)
     * Feature #481 : add spacer option (Celogeek San)
     * Feature #373 : use "format" => "json" instead of json => 1 (Celogeek San)
 
