@@ -15,30 +15,54 @@ use warnings;
 # VERSION
 use feature 'say', 'state';
 use Text::LineFold;
-use Term::Size::Any qw/chars/;
 use Getopt::Long::Descriptive;
 use Scalar::Util qw/blessed/;
 
+sub __x($@) {
+  require Locale::TextDomain;
+  Locale::TextDomain->import( qw(MooX-Options) );
+  goto &Locale::TextDomain::__x;
+}
+
+sub __($) {
+  require Locale::TextDomain;
+  Locale::TextDomain->import( qw(MooX-Options) );
+  goto &Locale::TextDomain::__;
+}
+
+=method chars
+
+Return (Columns, Rows) of the current terminal
+
+=cut
+BEGIN {
+	## no critic (ProhibitStringyEval)
+   if (!eval "use Term::Size::Any qw/chars/; 1") {
+	   no strict 'refs';
+	   *{"MooX::Options::Descriptive::Usage::chars"} = sub {return (80,25)};
+   }
+}
+
 my %format_doc = (
-    's'  => 'String',
-    's@' => '[Strings]',
-    'i'  => 'Int',
-    'i@' => '[Ints]',
-    'o'  => 'Ext. Int',
-    'o@' => '[Ext. Ints]',
-    'f'  => 'Real',
-    'f@' => '[Reals]',
+    's'  => __("String"),
+    's@' => __("[Strings]"),
+    'i'  => __("Int"),
+    'i@' => __("[Ints]"),
+    'o'  => __("Ext. Int"),
+    'o@' => __("[Ext. Ints]"),
+    'f'  => __("Real"),
+    'f@' => __("[Reals]"),
 );
 
 my %format_long_doc = (
-    's'  => 'String',
-    's@' => 'Array of Strings',
-    'i'  => 'Integer',
-    'i@' => 'Array of Integers',
-    'o'  => 'Extended Integer',
-    'o@' => 'Array of extended integers',
-    'f'  => 'Real number',
-    'f@' => 'Array of real numbers',
+    's'  => __("String"),
+    's@' => __("Array of Strings"),
+    'i'  => __("Integer"),
+    'i@' => __("Array of Integers"),
+    'o'  => __("Extended Integer"),
+    'o@' => __("Array of extended integers"),
+    'f'  => __("Real number"),
+    'f@' => __("Array of real numbers"),
 );
 
 
@@ -88,7 +112,7 @@ sub sub_commands_text {
     my $sub_commands =  defined $self->{target} ? $self->{target}->_options_sub_commands() //
         [] : [];
     return if !@$sub_commands;
-    return "", 'SUB COMMANDS AVAILABLE: ' . join(', ', @$sub_commands), "";
+    return "", __("SUB COMMANDS AVAILABLE: ") . join(', ', @$sub_commands), "";
 }
 
 =method text
@@ -163,7 +187,7 @@ sub option_pod {
 
     push @man, (
         "=head1 SYNOPSIS",
-        $prog_name . " [-h] [long options ...]",
+        $prog_name . __(" [-h] [long options ...]"),
     );
 
     if (defined (my $synopsis = $options_config{synopsis})) {
@@ -181,7 +205,7 @@ sub option_pod {
         my $format_doc_str;
         $format_doc_str = $format_long_doc{$format} if defined $format;
         $format_doc_str = 'JSON' if defined $options_data{$opt->{name}}{json};
-        
+
         my $opt_long_name = "-" . (length($opt->{name}) > 1 ? "-" : "") . $opt->{name};
         my $opt_name = (defined $short ? "-" . $short . " " : "") . $opt_long_name . ":" . (defined $format_doc_str ? " " . $format_doc_str : "");
 
@@ -199,7 +223,7 @@ sub option_pod {
         for my $sub_command(@$sub_commands) {
             push @man, (
                 "=item B<" . $sub_command . "> :",
-                $prog_name . " " . $sub_command . " [-h] [long options ...]",
+                $prog_name . " " . $sub_command . __(" [-h] [long options ...]"),
             );
         }
         push @man, "=back";
@@ -257,7 +281,7 @@ sub warn { return CORE::warn shift->text }
 Croak your options help message
 
 =cut
-sub die  { 
+sub die  {
   my ($self) = @_;
   $self->{should_die} = 1;
   return;

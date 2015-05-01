@@ -1,3 +1,24 @@
+4.018  2015-03-05 07:07:03 GMT
+    * Feature #475 : Add usage_string parameters (kablamo)
+
+4.017  2015-02-13 07:13:03 GMT
+    * Bug #472 : Upgrade deps on Module::Build and Getopt::Long (Celogeek San)
+
+4.016  2015-01-24 12:30:10 GMT
+    * Feature #470 : Add "hidden" attribute, and doc (Celogeek San)
+    * Feature #471 : Added a better error message for isa check failures (Celogeek San)
+
+4.015  2015-01-13 16:06:52 GMT
+    * Bug #466 : Term::Any::Size should be recommanded but optional (Celogeek San)
+	fix eval
+
+4.014  2015-01-13 15:51:32 GMT
+    * Bug #464 : warning generated when missing required params (Celogeek San)
+    * Bug #466 : Term::Any::Size should be recommanded but optional (Celogeek San)
+
+4.013  2014-11-22 07:43:13 GMT
+    * Feature #462 : Autorange (Celogeek San)
+
 4.012  2014-10-07 09:42:27 GMT
     * Bug #455 : Option of options should not be change for trait (Celogeek San)
 	handle shorter name

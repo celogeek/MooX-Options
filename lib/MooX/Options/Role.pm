@@ -22,6 +22,18 @@ use Pod::Usage qw/pod2usage/;
 use Path::Class 0.32;
 use Scalar::Util qw/blessed/;
 
+sub __x($@) {
+  require Locale::TextDomain;
+  Locale::TextDomain->import( qw(MooX-Options) );
+  goto &Locale::TextDomain::__x;
+}
+
+sub __($) {
+  require Locale::TextDomain;
+  Locale::TextDomain->import( qw(MooX-Options) );
+  goto &Locale::TextDomain::__;
+}
+
 ### PRIVATE
 
 sub _option_name {
@@ -49,8 +61,10 @@ sub _options_prepare_descriptive {
         my %data = %{ $options_data->{$name} };
         my $doc  = $data{doc};
         $doc = "no doc for $name" if !defined $doc;
+		my $option = {};
+		$option->{hidden} = 1 if $data{hidden};
 
-        push @options, [ _option_name( $name, %data ), $doc ];
+        push @options, [ _option_name( $name, %data ), $doc, $option ];
 
         push @{$all_options{$name}}, $name;
         for ( my $i = 1; $i <= length($name); $i++ ) {
@@ -74,6 +88,7 @@ sub _options_prepare_descriptive {
     return \@options, \%has_to_split, \%all_options;
 }
 
+## no critic (ProhibitExcessComplexity)
 sub _options_fix_argv {
     my ($option_data, $has_to_split, $all_options) = @_;
 
@@ -121,12 +136,18 @@ sub _options_fix_argv {
         $arg_name .= $arg_name_without_dash;
 
         if ( my $rec = $has_to_split->{$arg_name_without_dash} ) {
-          $arg_values = shift @ARGV;
-          foreach my $record ( $rec->records($arg_values) ) {
-              #remove the quoted if exist to chain
-              $record =~ s/^['"]|['"]$//gx;
-              push @new_argv, $arg_name, $record;
-          }
+			if ($arg_values = shift @ARGV) {
+				my $autorange = defined $original_long_option && exists $option_data->{$original_long_option} && $option_data->{$original_long_option}{autorange};
+				foreach my $record ( $rec->records($arg_values) ) {
+					#remove the quoted if exist to chain
+					$record =~ s/^['"]|['"]$//gx;
+					if ($autorange) {
+						push @new_argv, map { $arg_name => $_ } _expand_autorange($record);
+					} else {
+						push @new_argv, $arg_name, $record;
+					}
+				}
+			}
         } else {
           push @new_argv, $arg_name;
         }
@@ -140,7 +161,22 @@ sub _options_fix_argv {
     }
 
     return @new_argv;
+}
+## use critic
 
+sub _expand_autorange {
+	my ($arg_value) = @_;
+
+	my @expanded_arg_value;
+	my ($left_figure, $autorange_found, $right_figure) = $arg_value =~ /^(\d*)(\.\.)(\d*)$/x;
+	if ($autorange_found) {
+		$left_figure = $right_figure if !defined $left_figure || !length($left_figure);
+		$right_figure = $left_figure if !defined $right_figure || !length($right_figure);
+		if (defined $left_figure && defined $right_figure) {
+			push @expanded_arg_value, $left_figure..$right_figure;
+		}
+	}
+	return @expanded_arg_value ? @expanded_arg_value : $arg_value;
 }
 
 ### PRIVATE
@@ -159,9 +195,9 @@ Check full doc L<MooX::Options> for more details.
 
 sub new_with_options {
     my ( $class, %params ) = @_;
-    
+
     #save subcommand
-    
+
     if (ref (my $command_chain = $params{command_chain}) eq 'ARRAY') {
         $class->can('around')->(
              _options_prog_name => sub {
@@ -172,8 +208,8 @@ sub new_with_options {
                         $prog_name .= ' ' . $cmd_name;
                     }
                 }
-                
-                return $prog_name;    
+
+                return $prog_name;
              }
          );
     }
@@ -202,17 +238,21 @@ sub new_with_options {
     return $self
       if eval { $self = $class->new( %cmdline_params ); 1 };
     if ( $@ =~ /^Attribute\s\((.*?)\)\sis\srequired/x ) {
-        print "$1 is missing\n";
+        print STDERR "$1 is missing\n";
     }
     elsif ( $@ =~ /^Missing\srequired\sarguments:\s(.*)\sat\s\(/x ) {
         my @missing_required = split /,\s/x, $1;
-        print
+        print STDERR
           join( "\n", ( map { $_ . " is missing" } @missing_required ), '' );
-    } elsif ($@ =~ /^(.*?)\srequired/x) {
-        print "$1 is missing\n";
+    }
+    elsif ($@ =~ /^(.*?)\srequired/x) {
+        print STDERR "$1 is missing\n";
+    }
+    elsif ($@ =~ /^isa\scheck.*?failed:\s/x) {
+		print STDERR substr($@, index($@, ':') + 2);
     }
     else {
-        croak $@;
+        print STDERR $@;
     }
     %cmdline_params = $class->parse_options( help => 1 );
     return $class->options_usage(1, $cmdline_params{help});
@@ -248,13 +288,13 @@ sub parse_options {
     my $prog_name = $class->_options_prog_name();
 
     # create usage str
-    my $usage_str = "USAGE: $prog_name %o";
+    my $usage_str = $options_config{usage_string} // __x("USAGE: {prog_name} %o", prog_name => $prog_name );
 
     my ( $opt, $usage ) = describe_options(
         ($usage_str), @$options,
-        [ 'usage', 'show a short help message'],
-        [ 'help|h', "show a help message" ],
-        [ 'man', "show the manual" ],
+        [ 'usage',  __"show a short help message"],
+        [ 'help|h', __"show a help message" ],
+        [ 'man',    __"show the manual" ],
         ,@flavour
     );
 
@@ -275,7 +315,7 @@ sub parse_options {
             if ( defined $val ) {
                 if ( $data{json} ) {
                     if (! eval { $cmdline_params{$name} = decode_json($val); 1 }) {
-                      carp $@;
+                      print STDERR $@;
                       return $class->options_usage(1, $usage);
                     }
                 }
