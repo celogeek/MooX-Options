@@ -208,7 +208,7 @@ sub option_pod {
     }
 
     push @man,
-        ( "=head1 SYNOPSIS", $prog_name . " [-h] [" . __("long options ...") ."]"), );
+        ( "=head1 SYNOPSIS", $prog_name . " [-h] [" . __("long options ...") ."]");
 
     if ( defined( my $synopsis = $options_config{synopsis} ) ) {
         push @man, $synopsis;
@@ -247,11 +247,7 @@ sub option_pod {
         push @man, "=head1 AVAILABLE SUB COMMANDS";
         push @man, "=over";
         for my $sub_command (@$sub_commands) {
-            push @man,
-                (
-                "=item B<" . $sub_command . "> :",
-                $prog_name . " " . $sub_command . __(" [-h] [long options ...]"),
-                );
+            push @man, ( "=item B<" . $sub_command . "> :", $prog_name . " " . $sub_command ." [-h] [" . __("long options ...") ."]");
         }
         push @man, "=back";
     }
