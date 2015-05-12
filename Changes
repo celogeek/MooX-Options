@@ -1,3 +1,4 @@
+    * Feature #489 : add compact help (Celogeek San)
     * Feature #487 : Translate using Locale::TextDomain (sschober)
     * Feature #486 : Reduce runtime dependency footprint (arc)
     * Feature #481 : add spacer option (Celogeek San)
