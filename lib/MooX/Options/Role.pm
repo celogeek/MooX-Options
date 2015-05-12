@@ -323,7 +323,7 @@ sub parse_options {
         [],
         [ 'usage',  __"show a short help message"],
         [ 'h', __"show a compact help message" ],
-        [ 'help', __"show long help message"],
+        [ 'help', __"show a long help message"],
         [ 'man',    __"show the manual" ],
         ,
         @flavour
