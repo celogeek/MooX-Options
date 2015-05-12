@@ -55,6 +55,7 @@ is_deeply(
             new
             new_with_options
             option
+            options_help
             options_man
             options_short_usage
             options_usage
