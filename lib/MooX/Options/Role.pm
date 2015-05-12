@@ -244,8 +244,11 @@ sub new_with_options {
 
     my %cmdline_params = $class->parse_options(%params);
 
+    if ($cmdline_params{h}) {
+        return $class->options_usage( $params{h}, $cmdline_params{h} );
+    }
     if ( $cmdline_params{help} ) {
-        return $class->options_usage( $params{help}, $cmdline_params{help} );
+        return $class->options_help( $params{help}, $cmdline_params{help} );
     }
     if ( $cmdline_params{man} ) {
         return $class->options_man( $cmdline_params{man} );
@@ -276,8 +279,8 @@ sub new_with_options {
     else {
         print STDERR $@;
     }
-    %cmdline_params = $class->parse_options( help => 1 );
-    return $class->options_usage( 1, $cmdline_params{help} );
+    %cmdline_params = $class->parse_options( h => 1 );
+    return $class->options_usage( 1, $cmdline_params{h} );
 }
 
 =method parse_options
@@ -311,14 +314,16 @@ sub parse_options {
     my $prog_name = $class->_options_prog_name();
 
     # create usage str
-    my $usage_str = $options_config{usage_string} // __x("USAGE: {prog_name} %o", prog_name => $prog_name );
+    my $usage_str = $options_config{usage_string};
+    $usage_str = __x("USAGE: {prog_name} %o", prog_name => $prog_name ) if !defined $usage_str;
 
     my ( $opt, $usage ) = describe_options(
         ($usage_str),
         @$options,
         [],
         [ 'usage',  __"show a short help message"],
-        [ 'help|h', __"show a help message" ],
+        [ 'h', __"show a compact help message" ],
+        [ 'help', __"show long help message"],
         [ 'man',    __"show the manual" ],
         ,
         @flavour
@@ -357,6 +362,10 @@ sub parse_options {
                 }
             }
         }
+    }
+
+    if ( $opt->h() || defined $params{h} ) {
+        $cmdline_params{h} = $usage;
     }
 
     if ( $opt->help() || defined $params{help} ) {
@@ -400,6 +409,32 @@ sub options_usage {
     my $message = "";
     $message .= join( "\n", @messages, '' ) if @messages;
     $message .= $usage . "\n";
+    if ( $code > 0 ) {
+        CORE::warn $message;
+    }
+    else {
+        print $message;
+    }
+    exit($code) if $code >= 0;
+    return;
+}
+
+=method options_help
+
+Display long usage message
+
+=cut
+
+sub options_help {
+    my ( $class, $code, $usage ) = @_;
+    $code = 0 if !defined $code;
+
+    if ( !defined $usage || !ref $usage ) {
+        local @ARGV = ();
+        my %cmdline_params = $class->parse_options( help => $code );
+        $usage = $cmdline_params{help};
+    }
+    my $message = $usage->option_help . "\n";
     if ( $code > 0 ) {
         CORE::warn $message;
     }
