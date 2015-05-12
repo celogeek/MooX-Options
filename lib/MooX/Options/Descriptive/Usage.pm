@@ -136,15 +136,15 @@ sub option_text {
     my %options_config
         = defined $self->{target}
         ? $self->{target}->_options_config
-        : ( spacer => '_' );
+        : ( spacer => " " );
     my $getopt_options = $self->{options};
     my @message;
     my $lf = _get_line_fold();
     for my $opt (@$getopt_options) {
         if ( $opt->{desc} eq 'spacer' ) {
-            push @message,
-                $options_config{spacer} x ( $lf->config('ColMax') - 4 );
-            push @message, "", "";
+            push @message, $options_config{spacer} x ( $lf->config('ColMax') - 4 );
+            push @message, "";
+            push @message, "";
             next;
         }
         my ( $short, $format ) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
@@ -178,7 +178,7 @@ sub option_pod {
     my %options_config
         = defined $self->{target}
         ? $self->{target}->_options_config
-        : ( spacer => '_' );
+        : ( spacer => " " );
 
     my $prog_name = $self->{prog_name}
         // Getopt::Long::Descriptive::prog_name;
@@ -203,10 +203,11 @@ sub option_pod {
 
     push @man, ( "=head1 OPTIONS", "=over" );
 
+    my $spacer_escape = "E<" . ord($options_config{spacer}) . ">";
     for my $opt ( @{ $self->{options} } ) {
         if ( $opt->{desc} eq 'spacer' ) {
             push @man, "=back";
-            push @man, $options_config{spacer} x 40;
+            push @man, $spacer_escape x 40;
             push @man, "=over";
             next;
         }

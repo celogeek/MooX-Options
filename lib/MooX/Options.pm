@@ -92,7 +92,7 @@ sub import {
         description => undef,
         authors     => [],
         synopsis    => undef,
-        spacer      => '_',
+        spacer      => " ",
         @import
     };
 
@@ -389,7 +389,7 @@ Literal "%" characters will need to be written as "%%", just like with
 
 This indicate the char to use for spacer. Please only use 1 char otherwize the text will be too long.
 
-The default char is "_".
+The default char is " ".
 
   use MooX::Options space => '+'
 
