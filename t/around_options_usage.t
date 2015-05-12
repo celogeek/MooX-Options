@@ -26,7 +26,7 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
         documentation => 'this is a test',
     );
 
-    around options_usage => sub {
+    around ['options_usage','options_help'] => sub {
         my ( $orig, $self, $code, @message ) = @_;
         $code = 0 if !defined $code;
         print "This is a pre message\n";
@@ -38,10 +38,19 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
     1;
 }
 
-trap { t->new_with_options( help => 1 ) };
-my @messages = split( /\n/, $trap->stdout );
+my @messages;
+
+trap { t->new_with_options( h => 1 ) };
+@messages = split( /\n/, $trap->stdout );
 is $messages[0],   'This is a pre message',  'Pre message ok';
 like $messages[1], qr{^USAGE},               'Usage ok';
 is $messages[-1],  'This is a post message', 'Post message ok';
+
+trap { t->new_with_options( help => 1 ) };
+@messages = split( /\n/, $trap->stdout );
+is $messages[0],   'This is a pre message',  'Pre message ok';
+like $messages[1], qr{^USAGE},               'Usage ok';
+is $messages[-1],  'This is a post message', 'Post message ok';
+
 
 done_testing;

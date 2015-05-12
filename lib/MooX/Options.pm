@@ -92,7 +92,7 @@ sub import {
         description => undef,
         authors     => [],
         synopsis    => undef,
-        spacer      => '_',
+        spacer      => " ",
         @import
     };
 
@@ -179,7 +179,7 @@ sub import {
     };
 
     my @banish_keywords
-        = qw/help man usage option new_with_options parse_options options_usage _options_data _options_config/;
+        = qw/h help man usage option new_with_options parse_options options_usage _options_data _options_config/;
     if ( $options_config->{with_config_from_file} ) {
         push @banish_keywords, qw/config_files config_prefix config_dirs/;
     }
@@ -389,7 +389,7 @@ Literal "%" characters will need to be written as "%%", just like with
 
 This indicate the char to use for spacer. Please only use 1 char otherwize the text will be too long.
 
-The default char is "_".
+The default char is " ".
 
   use MooX::Options space => '+'
 

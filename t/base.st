@@ -130,7 +130,7 @@ subtest "test short help" => sub {
         is( $trap->exit, 0, "help, exit 0" );
         ok( $trap->stdout !~ /^str_req is missing/, "str_reg is missing" );
         like $trap->stdout,
-            qr{\QUSAGE: m\E\w+\Q.t [ --str_req=String ]  |  [ --usage ] [ --help ] [ --man ]\E},
+            qr{\QUSAGE: m\E\w+\Q.t [ --str_req=String ]  |  [ --usage ] [ -h ] [ --help ] [ --man ]\E},
             'usage message ok';
     }
     done_testing();
@@ -271,12 +271,12 @@ subtest "test usage" => sub {
     );
     like(
         $trap->stderr,
-        qr/help:\n\s+show a help message/,
+        qr/help\s+show a long help message/,
         'help is present'
     );
     like(
         $trap->stderr,
-        qr/split_str: \[Strings\]\n\s+no doc for split_str/,
+        qr/split_str=\[Strings\]\s+no doc for split_str/,
         'attr no doc is present'
     );
 };
@@ -288,7 +288,7 @@ subtest "test short usage" => sub {
 
     is( $trap->exit, 127, 'exit code is correct' );
     like $trap->stderr,
-        qr{\QUSAGE: m\E\w+\Q.t [ --split_conflict_str1=[Strings] ] [ --split_conflict_str2=[Strings] ] [ --split_str=[Strings] ]  |  [ --usage ] [ --help ] [ --man ]\E},
+        qr{\QUSAGE: m\E\w+\Q.t [ --split_conflict_str1=[Strings] ] [ --split_conflict_str2=[Strings] ] [ --split_str=[Strings] ]  |  [ --usage ] [ -h ] [ --help ] [ --man ]\E},
         'short message ok';
 };
 
@@ -297,7 +297,7 @@ subtest "doc usage" => sub {
     my $s = t_doc->new_with_options();
     my @r = trap { $s->options_usage(127) };
     is( $trap->exit, 127, 'exit code is correct' );
-    like( $trap->stderr, qr/t:\n\s+this is a test/, 'doc on attribute' );
+    like( $trap->stderr, qr/t\s+this is a test/, 'doc on attribute' );
 };
 
 subtest "test short" => sub {
@@ -355,14 +355,15 @@ subtest "json" => sub {
         my $t = trap { t_json->new_with_options };
         like( $trap->stderr, qr/malformed JSON string/,
             "decode json failed" );
-        like( $trap->stderr, qr/\-t: JSON/,
+        like( $trap->stderr, qr/\-t=JSON/,
             "json help message properly set" );
     }
 
     {
         local @ARGV = ('--help');
         my $t = trap { t_json->new_with_options };
-        like( $trap->stdout, qr/\-t: JSON/,
+        note $trap->stdout;
+        like( $trap->stdout, qr/\-t:\sJSON/,
             "json help message properly set" );
     }
 
@@ -370,7 +371,7 @@ subtest "json" => sub {
         trap {
             t_json->new->options_man( undef, *STDOUT );
         };
-        like( $trap->stdout, qr/\-t: JSON/, "json help message properly set" )
+        like( $trap->stdout, qr/\-t: JSON/, "json man message properly set" )
             or diag $trap->stdout;
     }
 };
@@ -387,7 +388,7 @@ subtest "json format" => sub {
         local @ARGV = ( "--t", "bad json" );
         my $t = trap { t_json_opt->new_with_options };
         ok( $trap->stderr =~ /malformed JSON string/, "decode json failed" );
-        ok( $trap->stderr =~ /\-t: JSON/, "json help message properly set" );
+        ok( $trap->stderr =~ /\-t=JSON/, "json help message properly set" );
     }
 
     {
