@@ -179,7 +179,7 @@ sub import {
     };
 
     my @banish_keywords
-        = qw/help man usage option new_with_options parse_options options_usage _options_data _options_config/;
+        = qw/h help man usage option new_with_options parse_options options_usage _options_data _options_config/;
     if ( $options_config->{with_config_from_file} ) {
         push @banish_keywords, qw/config_files config_prefix config_dirs/;
     }
