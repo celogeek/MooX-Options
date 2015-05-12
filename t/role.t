@@ -63,7 +63,7 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
     };
     like(
         $trap->stdout,
-        qr/\-\-multi:\n\s+multi\sthreading\smode/x,
+        qr/\-\-multi\s+multi\sthreading\smode/x,
         "usage method is properly set"
     );
 }
@@ -83,7 +83,7 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
     };
     like(
         $trap->stdout,
-        qr/\-\-multi:\n\s+multi\sthreading\smode/x,
+        qr/\-\-multi\s+multi\sthreading\smode/x,
         "usage method is properly set"
     );
 }
