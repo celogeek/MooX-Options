@@ -325,7 +325,6 @@ sub die {
 use overload (
     q{""} => "text",
     '&{}' => sub {
-        my ($self) = @_;
         return
             sub { my ($self) = @_; return $self ? $self->text : $self->warn; };
     }
