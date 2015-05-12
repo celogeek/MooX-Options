@@ -19,21 +19,6 @@ use Getopt::Long::Descriptive;
 use Scalar::Util qw/blessed/;
 use Locale::TextDomain 'MooX-Options';
 
-=method chars
-
-Return (Columns, Rows) of the current terminal
-
-=cut
-
-BEGIN {
-    ## no critic (ProhibitStringyEval)
-    if ( !eval "use Term::Size::Any qw/chars/; 1" ) {
-        no strict 'refs';
-        *{"MooX::Options::Descriptive::Usage::chars"}
-            = sub { return ( 80, 25 ) };
-    }
-}
-
 my %format_doc = (
     's'  => __("String"),
     's@' => __("[Strings]"),
@@ -128,12 +113,14 @@ sub text {
 
 # set the column size of your terminal into the wrapper
 sub _get_line_fold {
-    my ($columns) = chars();
-    $columns //= 78;
-    $columns = $ENV{TEST_FORCE_COLUMN_SIZE}
-        if defined $ENV{TEST_FORCE_COLUMN_SIZE};
-    require Text::LineFold;
-    return Text::LineFold->new( ColMax => $columns - 4 );
+  my $columns = $ENV{TEST_FORCE_COLUMN_SIZE}
+  || eval {
+        require Term::Size::Any;
+        [Term::Size::Any::chars()]->[0];
+  } || 80;
+
+  require Text::LineFold;
+  return Text::LineFold->new( ColMax => $columns - 4 );
 }
 
 =method option_text
