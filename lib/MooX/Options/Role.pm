@@ -165,16 +165,16 @@ sub _options_fix_argv {
         }
         else {
             push @new_argv, $arg_name;
-        }
-
-        # if option has an argument, we keep the argument untouched
-        if ( defined $original_long_option
-            && ( my $opt_data = $option_data->{$original_long_option} ) )
-        {
-            if ( $opt_data->{format} ) {
-                push @new_argv, shift @ARGV;
+            # if option has an argument, we keep the argument untouched
+            if ( defined $original_long_option
+                && ( my $opt_data = $option_data->{$original_long_option} ) )
+            {
+                if ( $opt_data->{format} ) {
+                    push @new_argv, shift @ARGV;
+                }
             }
         }
+
     }
 
     return @new_argv;
