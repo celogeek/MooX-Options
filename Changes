@@ -1,3 +1,4 @@
+    * Bug #496 : Handle multiple autosplit options correctly (Celogeek San)
     * Feature #489 : add compact help (Celogeek San)
     * Feature #487 : Translate using Locale::TextDomain (sschober)
     * Feature #486 : Reduce runtime dependency footprint (arc)
