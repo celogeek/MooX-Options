@@ -278,13 +278,13 @@ sub parse_options {
     # create usage str
     my $usage_str = $options_config{usage_string} // "USAGE: $prog_name %o";
 
-    my ( $opt, $usage ) = describe_options(
-        ($usage_str), @$options,
-        [ 'usage', 'show a short help message'],
-        [ 'help|h', "show a help message" ],
-        [ 'man', "show the manual" ],
-        ,@flavour
-    );
+    unshift @$options, $options_config{usage_top}          if $options_config{usage_top};
+    push @$options, ['usage', 'show a short help message'] if $options_config{usage_option};
+    push @$options, ['help|h', 'show a help message']      if $options_config{help_option};
+    push @$options, ['man', 'show the manual']             if $options_config{man_option};
+    push @$options, $options_config{usage_bottom}          if $options_config{usage_bottom};
+
+    my ( $opt, $usage ) = describe_options($usage_str, @$options, @flavour);
 
     $usage->{prog_name} = $prog_name;
     $usage->{target} = $class;
@@ -314,18 +314,15 @@ sub parse_options {
         }
     }
 
-    if (   $opt->help() || defined $params{help}
-    ) {
+    if ($opt->can('help') && $opt->help() || defined $params{help}) {
         $cmdline_params{help} = $usage;
     }
 
-    if (   $opt->man() || defined $params{man}
-    ) {
+    if ($opt->can('man') && $opt->man() || defined $params{man}) {
         $cmdline_params{man} = $usage;
     }
 
-    if (   $opt->usage() || defined $params{usage}
-    ) {
+    if ($opt->can('usage') && $opt->usage() || defined $params{usage}) {
         $cmdline_params{usage} = $usage;
     }
 

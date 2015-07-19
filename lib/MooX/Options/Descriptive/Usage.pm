@@ -134,6 +134,10 @@ sub option_text {
     my @message;
     my $lf = _get_line_fold();
     for my $opt(@$getopt_options) {
+        if ($opt->{desc} eq 'spacer') {
+            push @message, $opt->{spec};
+            next;
+        }
         my ($short, $format) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
         my $format_doc_str;
         $format_doc_str = $format_doc{$format} if defined $format;
@@ -247,7 +251,8 @@ sub option_short_usage {
   my $prog_name = $self->{prog_name} // Getopt::Long::Descriptive::prog_name;
 
   my @message;
-  for my $opt(@$getopt_options) {
+  for my $opt (@$getopt_options) {
+    next if $opt->{desc} eq 'spacer';
     my ($format) = $opt->{spec} =~ /(?:\|\w)?(?:=(.*?))?$/x;
     my $format_doc_str;
     $format_doc_str = $format_doc{$format} if defined $format;

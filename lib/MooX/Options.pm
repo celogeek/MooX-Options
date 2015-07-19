@@ -83,6 +83,11 @@ sub import {
         skip_options          => [], prefer_commandline => 0,
         with_config_from_file => 0,
         usage_string          => undef,
+        usage_top             => undef,
+        usage_bottom          => undef,
+        man_option            => 1,
+        usage_option          => 1,
+        help_option           => 1,
         #long description (manual)
         description => undef, authors => [], synopsis => undef,
         @import
@@ -365,6 +370,28 @@ are expected to follow the program's options, and is entirely free-form.
 
 Literal "%" characters will need to be written as "%%", just like with
 "sprintf".
+
+=head1 usage_top
+
+This parameter is passed to Getopt::Long::Descriptive::describe_options() as
+the second parameter.
+
+=head1 usage_bottom
+
+This parameter is passed to Getopt::Long::Descriptive::describe_options() as
+the second to last parameter (before flavours).
+
+=head1 man_option
+
+Add a --man option.  This is true by default.
+
+=head1 help_option
+
+Add a --help option.  This is true by default.
+
+=head1 usage_option
+
+Add a --usage option.  This is true by default.
 
 =head1 OPTION PARAMETERS
 
