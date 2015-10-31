@@ -4,7 +4,7 @@ MooX::Options - Explicit Options eXtension for Object Class
 
 # VERSION
 
-version 4.018
+version 4.019
 
 # DESCRIPTION
 
@@ -22,7 +22,7 @@ In myOptions.pm :
     package myOptions;
     use Moo;
     use MooX::Options;
-    
+
     option 'show_this_file' => (
         is => 'ro',
         format => 's',
@@ -36,9 +36,9 @@ In myTool.pl :
     use feature 'say';
     use myOptions;
     use Path::Class;
-    
+
     my $opt = myOptions->new_with_options;
-    
+
     say "Content of the file : ",
          file($opt->show_this_file)->slurp;
 
@@ -51,13 +51,13 @@ The help message :
 
     perl myTool.pl --help
     USAGE: myTool.pl [-h] [long options...]
-    
+
         --show_this_file: String
             the file to display
-        
+
         -h --help:
             show this help message
-        
+
         --man:
             show the manual
 
@@ -192,6 +192,18 @@ are expected to follow the program's options, and is entirely free-form.
 Literal "%" characters will need to be written as "%%", just like with
 "sprintf".
 
+## spacer
+
+This indicate the char to use for spacer. Please only use 1 char otherwize the text will be too long.
+
+The default char is " ".
+
+    use MooX::Options space => '+'
+
+Then the "spacer\_before" and "spacer\_after" will use it for "man" and "help" message.
+
+    option 'x' => (is => 'ro', spacer_before => 1, spacer_after => 1);
+
 # OPTION PARAMETERS
 
 The keyword `option` extend the keyword `has` with specific parameters for the command line.
@@ -233,6 +245,10 @@ If you use [Moose](https://metacpan.org/pod/Moose) and your attribute has `isa =
 The parameter will be treated like a json string.
 
     option 'hash' => (is => 'ro', json => 1);
+
+You can also use the json format
+
+    option 'hash' => (is => 'ro', format => "json");
 
     myTool --hash='{"a":1,"b":2}' # hash = { a => 1, b => 2 }
 
@@ -334,6 +350,12 @@ Or
 
     option 'debug' => (is => 'ro', hidden => 1);
 
+## spacer\_before, spacer\_after
+
+Add spacer before or after or both the params
+
+    option 'myoption' => (is => 'ro', spacer_before => 1, spacer_after => 1);
+
 # ADDITIONAL MANUALS
 
 - [Man parameters](https://metacpan.org/pod/MooX::Options::Manual::Man)
@@ -344,12 +366,51 @@ Or
 
 - [Slide3D about MooX::Options](http://perltalks.celogeek.com/slides/2012/08/moox-options-slide3d.html)
 
+# Translation
+
+Translation is now supported.
+
+Use the dzil command to update the pot and merge into the po files.
+
+- dzil msg-init
+
+    Create a new language po
+
+- dzil msg-scan
+
+    Scan and generate or update the pot file
+
+- dzil msg-merge
+
+    Update all languages using the pot file
+
+## THANKS
+
+- sschober
+
+    For implementation and German translation.
+
 # THANKS
 
-- Matt S. Trout (mst) <mst@shadowcat.co.uk> : For his patience and advice.
-- Tomas Doran (t0m) <bobtfish@bobtfish.net> : To help me release the new version, and using it :)
-- Torsten Raudssus (Getty) : to use it a lot in [DuckDuckGo](http://duckduckgo.com) (go to see [MooX](https://metacpan.org/pod/MooX) module also)
-- Jens Rehsack (REHSACK) : Use with [PkgSrc](http://www.pkgsrc.org/), and many really good idea ([MooX::Cmd](https://metacpan.org/pod/MooX::Cmd), [MooX::ConfigFromFile](https://metacpan.org/pod/MooX::ConfigFromFile), and more to come I'm sure)
+- Matt S. Trout (mst) &lt;mst@shadowcat.co.uk>
+
+    For his patience and advice.
+
+- Tomas Doran (t0m) &lt;bobtfish@bobtfish.net>
+
+    To help me release the new version, and using it :)
+
+- Torsten Raudssus (Getty)
+
+    to use it a lot in [DuckDuckGo](http://duckduckgo.com) (go to see [MooX](https://metacpan.org/pod/MooX) module also)
+
+- Jens Rehsack (REHSACK)
+
+    Use with [PkgSrc](http://www.pkgsrc.org/), and many really good idea ([MooX::Cmd](https://metacpan.org/pod/MooX::Cmd), [MooX::ConfigFromFile](https://metacpan.org/pod/MooX::ConfigFromFile), and more to come I'm sure)
+
+- All contributors
+
+    For improving and add more feature to MooX::Options
 
 # BUGS
 
@@ -362,11 +423,11 @@ feature.
 
 # AUTHOR
 
-celogeek <me@celogeek.com>
+celogeek &lt;me@celogeek.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by celogeek <me@celogeek.com>.
+This software is copyright (c) 2013 by celogeek &lt;me@celogeek.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
