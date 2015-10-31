@@ -40,8 +40,9 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 
     package testSkipOpt;
     use Moo;
-    use MooX::Options skip_options => [qw/multi/],
-      flavour                      => [qw( pass_through )];
+    use MooX::Options
+        skip_options => [qw/multi/],
+        flavour      => [qw( pass_through )];
     with 'myRole';
     1;
 }
@@ -60,7 +61,9 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
     trap {
         $opt->options_usage;
     };
-    ok( $trap->stdout =~ /\-\-multi:\n\s+multi\sthreading\smode/x,
+    like(
+        $trap->stdout,
+        qr/\-\-multi\s+multi\sthreading\smode/x,
         "usage method is properly set"
     );
 }
@@ -78,7 +81,9 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
     trap {
         $opt->options_usage;
     };
-    ok( $trap->stdout =~ /\-\-multi:\n\s+multi\sthreading\smode/x,
+    like(
+        $trap->stdout,
+        qr/\-\-multi\s+multi\sthreading\smode/x,
         "usage method is properly set"
     );
 }
@@ -91,8 +96,7 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
         $opt->options_usage;
     };
     ok( $trap->stdout !~ /\-\-multi\s+multi\sthreading\smode/x,
-        "usage method is properly set"
-    );
+        "usage method is properly set" );
 }
 
 done_testing;

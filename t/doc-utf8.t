@@ -25,8 +25,16 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 
 {
     my $opt = t->new_with_options;
+
     trap { $opt->options_usage };
-    ok $trap->stdout =~ /\s+\-t:\n\s+this\sis\sa\stest\swith\sutf8\s:\sça\smarche\shéhé\s\!/x, 'documentation work';
+    like $trap->stdout,
+        qr/\s+\-t\s+this\sis\sa\stest\swith\sutf8\s:\sça\smarche\shéhé\s\!/x,
+        'documentation work';
+
+    trap { $opt->options_help };
+    like $trap->stdout,
+        qr/\s+\-t:\n\s+this\sis\sa\stest\swith\sutf8\s:\sça\smarche\shéhé\s\!/x,
+        'documentation work';
 }
 
 done_testing;

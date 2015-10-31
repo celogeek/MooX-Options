@@ -102,22 +102,22 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 {
     my $opt = t1->new_with_options;
     trap { $opt->options_usage };
-    ok $trap->stdout =~ /first.+second.+third.+fourth/gms,
-      'order work w/ order attribute';
+    like $trap->stdout, qr/first.+second.+third.+fourth/ms,
+        'order work w/ order attribute';
 }
 
 {
     my $opt = t2->new_with_options;
     trap { $opt->options_usage };
-    ok $trap->stdout =~ /first.+fourth.+second.+third/gms,
-      'order work w/o order attribute';
+    like $trap->stdout, qr/first.+fourth.+second.+third/ms,
+        'order work w/o order attribute';
 }
 
 {
     my $opt = t3->new_with_options;
     trap { $opt->options_usage };
-    ok $trap->stdout =~ /fourth.+third.+first.+second/gms,
-      'order work w/ mixed mode';
+    like $trap->stdout, qr/fourth.+third.+first.+second/ms,
+        'order work w/ mixed mode';
 }
 
 done_testing;
