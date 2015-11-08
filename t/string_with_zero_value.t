@@ -1,7 +1,5 @@
 #!perl
-use strict;
-use warnings;
-use Test::More;
+use t::Test;
 
 package Foo;
 use Moo;

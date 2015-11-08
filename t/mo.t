@@ -1,8 +1,6 @@
 #!/usr/bin/env perl
 
-use strict;
-use warnings;
-use Test::More;
+use t::Test;
 use Test::Trap;
 use Carp;
 use FindBin qw/$RealBin/;

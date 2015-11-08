@@ -1,8 +1,6 @@
 #!perl
-use strict;
-use warnings;
+use t::Test;
 use Test::Trap;
-use Test::More;    # last test to print
 
 local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 

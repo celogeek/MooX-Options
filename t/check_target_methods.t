@@ -1,7 +1,5 @@
 #!perl
-use strict;
-use warnings;
-use Test::More;
+use t::Test;
 
 {
 
@@ -19,6 +17,7 @@ my $test = t->new_with_options;
 my %ignore_methods;
 @ignore_methods{
     qw/
+        Test::
         AUTOLOAD
         BEGIN
         BUILD

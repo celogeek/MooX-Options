@@ -1,3 +1,7 @@
+4.020  2015-11-08 17:33:34 GMT
+    * Feature #487 : Translate using Locale::TextDomain (sschober)
+      fix LC_ALL in tests
+
 4.019  2015-10-31 16:01:55 GMT
     * Bug #496 : Handle multiple autosplit options correctly (Celogeek San)
     * Feature #489 : add compact help (Celogeek San)

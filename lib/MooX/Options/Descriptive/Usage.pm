@@ -2,6 +2,8 @@ package MooX::Options::Descriptive::Usage;
 
 # ABSTRACT: Usage class
 
+## no critic (ProhibitExcessComplexity)
+
 =head1 DESCRIPTION
 
 Usage class to display the error message.
@@ -167,7 +169,7 @@ sub _get_line_fold {
   return Text::LineFold->new( ColMax => $columns - 4 );
 }
 
-=method option_text
+=method option_help
 
 Return the help message for your options
 

@@ -1,14 +1,6 @@
 #!/usr/bin/env perl
-use strict;
-use warnings;
-use Test::More;
+use t::Test;
 use Carp;
-
-use POSIX qw(setlocale LC_ALL);
-
-BEGIN {
-  setlocale LC_ALL, 'C';
-}
 
 local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 

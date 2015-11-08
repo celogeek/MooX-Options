@@ -1,6 +1,5 @@
-use strict;
-use warnings;
-use Test::More;
+#!perl
+use t::Test;
 use FindBin qw/ $Bin /;
 use lib "$Bin/lib";
 
