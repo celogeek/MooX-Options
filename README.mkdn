@@ -4,7 +4,7 @@ MooX::Options - Explicit Options eXtension for Object Class
 
 # VERSION
 
-version 4.019
+version 4.020
 
 # DESCRIPTION
 
@@ -69,6 +69,12 @@ The usage message :
 The manual :
 
     perl myTool.pl --man
+
+# METHODS
+
+## croak
+
+Call Carp::croak dynamically
 
 # IMPORTED METHODS
 
