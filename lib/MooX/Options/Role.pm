@@ -3,6 +3,7 @@ package MooX::Options::Role;
 # ABSTRACT: role that is apply to your object
 use strict;
 use warnings;
+## no critic (ProhibitExcessComplexity)
 
 # VERSION
 
@@ -85,7 +86,6 @@ sub _options_prepare_descriptive {
     return \@options, \%has_to_split, \%all_options;
 }
 
-## no critic (ProhibitExcessComplexity)
 sub _options_fix_argv {
     my ( $option_data, $has_to_split, $all_options ) = @_;
 
@@ -179,7 +179,6 @@ sub _options_fix_argv {
 
     return @new_argv;
 }
-## use critic
 
 sub _expand_autorange {
     my ($arg_value) = @_;
@@ -382,7 +381,6 @@ sub parse_options {
 
     return %cmdline_params;
 }
-## use critic
 
 =method options_usage
 

@@ -1,5 +1,5 @@
 #!perl
-use Test::More;
+use t::Test;
 
 {
 

@@ -254,6 +254,11 @@ sub _validate_and_filter_options {
     return %cmdline_options;
 }
 
+=method croak
+
+Call Carp::croak dynamically
+
+=cut
 sub croak {
     require Carp;
     goto &Carp::croak;

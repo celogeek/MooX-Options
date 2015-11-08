@@ -1,14 +1,6 @@
 #!perl
-use strict;
-use warnings;
-use Test::More;
+use t::Test;
 use Test::Trap;
-
-use POSIX qw(setlocale LC_ALL);
-
-BEGIN {
-  setlocale LC_ALL, 'C';
-}
 
 {
 
