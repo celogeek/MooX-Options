@@ -1,3 +1,7 @@
+4.021  2015-11-11 16:42:01 GMT
+    * Feature #487 : Translate using Locale::TextDomain (sschober)
+      add setlocale for linux system
+
 4.020  2015-11-08 17:33:34 GMT
     * Feature #487 : Translate using Locale::TextDomain (sschober)
       fix LC_ALL in tests
