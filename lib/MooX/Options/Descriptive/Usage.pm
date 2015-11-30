@@ -190,7 +190,6 @@ sub option_help {
         if ( $opt->{desc} eq 'spacer' ) {
             push @message, $options_config{spacer} x ( $lf->config('ColMax') - 4 );
             push @message, "";
-            push @message, "";
             next;
         }
         my ( $short, $format ) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
@@ -207,7 +206,6 @@ sub option_help {
         my $opt_data = $options_data{ $opt->{name} };
         $opt_data = {} if !defined $opt_data;
         push @message, $lf->fold( "    ", "        ", defined $opt_data->{long_doc} ? $opt_data->{long_doc} : $opt->{desc} );
-        push @message, "";
     }
 
     return join("\n", $self->leader_text, join( "\n    ", "", @message ), $self->sub_commands_text);
