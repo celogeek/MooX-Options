@@ -43,6 +43,11 @@ subtest "split" => sub {
         is_deeply( $t->split, [1], "split one arg" );
     }
     {
+        local @ARGV = ('--split=0');
+        my $t = t->new_with_options();
+        is_deeply( $t->split, [0], "split one arg with value 0" );
+    }
+    {
         local @ARGV = ( '--split=1', '--split=2' );
         my $t = t->new_with_options();
         is_deeply( $t->split, [ 1, 2 ], "split two arg" );
@@ -402,6 +407,11 @@ subtest "json format" => sub {
 
 subtest "range_complexe_str" => sub {
     note "range on complexe str";
+    {
+        local @ARGV = ('--range_str=0');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, ['0'], 'range one arg with value 0' );
+    }
     {
         local @ARGV = ('--range_str=1,2,4');
         my $t = rg_str->new_with_options();

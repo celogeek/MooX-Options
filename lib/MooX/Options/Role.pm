@@ -143,7 +143,7 @@ sub _options_fix_argv {
         $arg_name .= $arg_name_without_dash;
 
         if ( my $rec = $has_to_split->{$arg_name_without_dash} ) {
-            if ( $arg_values = shift @ARGV ) {
+            if ( defined( $arg_values = shift @ARGV ) ) {
                 my $autorange
                     = defined $original_long_option
                     && exists $option_data->{$original_long_option}
