@@ -5,6 +5,11 @@ use Carp;
 use FindBin qw/$RealBin/;
 use Try::Tiny;
 
+use utf8; #This breaks things
+
+binmode STDERR, :encoding(UTF-8);
+binmode STDOUT, :encoding(UTF-8);
+
 local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 
 {
