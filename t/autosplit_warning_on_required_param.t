@@ -24,7 +24,7 @@ use Test::Trap;
 {
     local @ARGV = ('--treq');
     trap { my $opt = t->new_with_options(); };
-    like $trap->stderr,   qr/treq is missing/,      'stdout ok';
+    like $trap->stderr,   qr/^Option treq requires an argument/, 'stdout ok';
     unlike $trap->stderr, qr/Use of uninitialized/, 'stderr ok';
 }
 

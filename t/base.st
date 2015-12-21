@@ -78,6 +78,29 @@ subtest "split" => sub {
     done_testing();
 };
 
+subtest "missing arg value" => sub {
+    note "missing arg value";
+    {
+        local @ARGV = ( '--needs_value' );
+        trap { t->new_with_options() };
+        is( $trap->exit, 1, "missing arg value, exit 1" );
+        like( $trap->stderr, qr/^Option needs_value requires an argument/, "error message ok for string arg" );
+    }
+    {
+        local @ARGV = ( '--split' );
+        trap { t->new_with_options() };
+        is( $trap->exit, 1, "missing arg value, exit 1" );
+        like( $trap->stderr, qr/^Option split requires an argument/, "error message ok for arg with autosplit" );
+    }
+    {
+        local @ARGV = ( '--range' );
+        trap { t->new_with_options() };
+        is( $trap->exit, 1, "missing arg value, exit 1" );
+        like( $trap->stderr, qr/^Option range requires an argument/, "error message ok for range arg" );
+    }
+    done_testing();
+};
+
 subtest "test required" => sub {
     note "test required";
 

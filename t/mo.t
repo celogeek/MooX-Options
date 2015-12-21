@@ -27,6 +27,7 @@ BEGIN {
     option 'split'   => ( is => 'ro', format => 'i@', autosplit => ',' );
     option 'has_default' => ( is => 'ro', default => sub {'foo'} );
     option 'range' => ( is => 'ro', format => 'i@', autorange => 1 );
+    option 'needs_value' => ( is => 'ro', format => 's' );
 
     1;
 }

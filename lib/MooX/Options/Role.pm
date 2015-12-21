@@ -142,24 +142,24 @@ sub _options_fix_argv {
 
         $arg_name .= $arg_name_without_dash;
 
-        if ( my $rec = $has_to_split->{$arg_name_without_dash} ) {
-            if ( defined( $arg_values = shift @ARGV ) ) {
-                my $autorange
-                    = defined $original_long_option
-                    && exists $option_data->{$original_long_option}
-                    && $option_data->{$original_long_option}{autorange};
-                foreach my $record ( $rec->records($arg_values) ) {
+        if ( my $rec = $has_to_split->{$arg_name_without_dash}
+            and defined( $arg_values = shift @ARGV ) )
+        {
+            my $autorange
+                = defined $original_long_option
+                && exists $option_data->{$original_long_option}
+                && $option_data->{$original_long_option}{autorange};
+            foreach my $record ( $rec->records($arg_values) ) {
 
-                    #remove the quoted if exist to chain
-                    $record =~ s/^['"]|['"]$//gx;
-                    if ($autorange) {
-                        push @new_argv,
-                            map { $arg_name => $_ }
-                            _expand_autorange($record);
-                    }
-                    else {
-                        push @new_argv, $arg_name, $record;
-                    }
+                #remove the quoted if exist to chain
+                $record =~ s/^['"]|['"]$//gx;
+                if ($autorange) {
+                    push @new_argv,
+                        map { $arg_name => $_ }
+                        _expand_autorange($record);
+                }
+                else {
+                    push @new_argv, $arg_name, $record;
                 }
             }
         }
@@ -170,7 +170,8 @@ sub _options_fix_argv {
                 && ( my $opt_data = $option_data->{$original_long_option} ) )
             {
                 if ( $opt_data->{format} ) {
-                    push @new_argv, shift @ARGV;
+                    push @new_argv, shift @ARGV
+                        if defined $ARGV[0];
                 }
             }
         }
