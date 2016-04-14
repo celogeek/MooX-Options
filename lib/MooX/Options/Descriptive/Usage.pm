@@ -16,7 +16,6 @@ use strict;
 use warnings;
 
 # VERSION
-use feature 'say', 'state';
 use Getopt::Long::Descriptive;
 use Scalar::Util qw/blessed/;
 use Locale::TextDomain 'MooX-Options';
