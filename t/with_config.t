@@ -1,7 +1,6 @@
 #!perl
 use t::Test;
 use Test::Trap;
-use feature 'say';
 
 local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 
