@@ -17,16 +17,23 @@ my $test = t->new_with_options;
 my %ignore_methods;
 @ignore_methods{
     qw/
-        Test::
+        TEST::
         AUTOLOAD
         BEGIN
         BUILD
         BUILDARGS
         DEMOLISH
         DOES
+        AFTER
+        BEFORE
+        EXTENDS
+        HAS
         ISA
+        CAN
         __ANON__
         DESTROY
+        WITH
+        AROUND
         /
 } = ();
 
@@ -34,7 +41,7 @@ my @methods;
 {
     no strict 'refs';
     @methods = sort { $a cmp $b }
-        grep { !exists $ignore_methods{$_} } keys %{ ref($test) . "::" };
+        grep { !exists $ignore_methods{uc($_)} } keys %{ ref($test) . "::" };
 }
 
 is_deeply(
@@ -44,13 +51,6 @@ is_deeply(
             _options_data
             _options_prog_name
             _options_sub_commands
-            after
-            around
-            before
-            can
-            does
-            extends
-            has
             new
             new_with_options
             option
@@ -60,7 +60,6 @@ is_deeply(
             options_usage
             parse_options
             t
-            with
             /
     ],
     'methods ok'
