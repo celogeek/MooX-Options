@@ -1,3 +1,5 @@
+    * Bug #513 : remove perl 5.10 deps (Celogeek San)
+
 4.022  2015-11-30 11:56:47 GMT
     * Bug #501 : Remove useless space (Celogeek San)
 
