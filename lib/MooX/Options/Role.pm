@@ -263,7 +263,7 @@ sub new_with_options {
     if ( $@ =~ /^Attribute\s\((.*?)\)\sis\srequired/x ) {
         print STDERR "$1 is missing\n";
     }
-    elsif ( $@ =~ /^Missing\srequired\sarguments:\s(.*)\sat\s\(/x ) {
+    elsif ( $@ =~ /^Missing\srequired\sarguments:\s(.*)\sat\s/x ) {
         my @missing_required = split /,\s/x, $1;
         print STDERR
             join( "\n", ( map { $_ . " is missing" } @missing_required ),
