@@ -4,7 +4,7 @@ MooX::Options - Explicit Options eXtension for Object Class
 
 # VERSION
 
-version 4.022
+version 4.023
 
 # DESCRIPTION
 
@@ -33,13 +33,12 @@ In myOptions.pm :
 
 In myTool.pl :
 
-    use feature 'say';
     use myOptions;
     use Path::Class;
 
     my $opt = myOptions->new_with_options;
 
-    say "Content of the file : ",
+    print "Content of the file : ",
          file($opt->show_this_file)->slurp;
 
 To use it :
@@ -398,11 +397,11 @@ Use the dzil command to update the pot and merge into the po files.
 
 # THANKS
 
-- Matt S. Trout (mst) &lt;mst@shadowcat.co.uk>
+- Matt S. Trout (mst) <mst@shadowcat.co.uk>
 
     For his patience and advice.
 
-- Tomas Doran (t0m) &lt;bobtfish@bobtfish.net>
+- Tomas Doran (t0m) <bobtfish@bobtfish.net>
 
     To help me release the new version, and using it :)
 
@@ -429,11 +428,11 @@ feature.
 
 # AUTHOR
 
-celogeek &lt;me@celogeek.com>
+celogeek <me@celogeek.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by celogeek &lt;me@celogeek.com>.
+This software is copyright (c) 2013 by celogeek <me@celogeek.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

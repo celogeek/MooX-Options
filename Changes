@@ -1,3 +1,4 @@
+4.023  2016-07-12 22:19:00 GMT
     * Bug Github #55 : Fix error reporting on missing required arguments with Moo 2.002002. (intrigeri)
     * Bug #513 : remove perl 5.10 deps (Celogeek San)
 
