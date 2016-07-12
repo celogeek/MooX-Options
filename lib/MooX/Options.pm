@@ -29,13 +29,12 @@ In myOptions.pm :
 
 In myTool.pl :
 
-  use feature 'say';
   use myOptions;
   use Path::Class;
 
   my $opt = myOptions->new_with_options;
 
-  say "Content of the file : ",
+  print "Content of the file : ",
        file($opt->show_this_file)->slurp;
 
 To use it :
