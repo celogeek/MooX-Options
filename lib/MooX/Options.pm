@@ -114,6 +114,7 @@ sub import {
         ## no critic (ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval, ValuesAndExpressions::ProhibitImplicitNewlines)
         eval '{
         package ' . $target . ';
+        use mro ();
 
             sub _options_data {
                 my ( $class, @meta ) = @_;
