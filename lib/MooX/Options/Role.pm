@@ -245,7 +245,14 @@ sub new_with_options {
     if ( ref( my $command_commands = $params{command_commands} ) eq 'HASH' ) {
         $class->can('around')->(
             _options_sub_commands => sub {
-                return [ sort keys %$command_commands ];
+                return [
+                    ## no critic (BuiltinFunctions::RequireBlockMap)
+                    map +{
+                        name    => $_,
+                        command => $command_commands->{$_},
+                    },
+                    sort keys %$command_commands
+                ];
             }
         );
     }
