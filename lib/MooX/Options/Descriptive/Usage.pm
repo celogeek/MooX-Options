@@ -96,7 +96,7 @@ sub sub_commands_text {
       $sub_commands = $sub_commands_options;
     }
     return if !@$sub_commands;
-    return "", __("SUB COMMANDS AVAILABLE: ") . join(', ', @$sub_commands), "";
+    return "", __("SUB COMMANDS AVAILABLE: ") . join(', ', map $_->{name}, @$sub_commands), "";
 }
 
 =method text
@@ -282,7 +282,14 @@ sub option_pod {
         push @man, "=head1 AVAILABLE SUB COMMANDS";
         push @man, "=over";
         for my $sub_command (@$sub_commands) {
-            push @man, ( "=item B<" . $sub_command . "> :", $prog_name . " " . $sub_command ." [-h] [" . __("long options ...") ."]");
+            if ($sub_command->{command}->can("_options_config")
+              && defined(my $desc = { $sub_command->{command}->_options_config }->{description})) {
+              push @man, "=item B<" . $sub_command->{name} . "> : " . $desc;
+            } else {
+              push @man, "=item B<" . $sub_command->{name} . "> :";
+            }
+
+            push @man, $prog_name . " " . $sub_command->{name} ." [-h] [" . __("long options ...") ."]";
         }
         push @man, "=back";
     }
