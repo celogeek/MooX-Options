@@ -133,8 +133,11 @@ sub import {
             ) if $name eq $ban;
         }
 
-        $has->( $name => _filter_attributes(%attributes) );
+        my %_moo_attrs = _filter_attributes(%attributes);
+        $has->( $name => %_moo_attrs ) if %_moo_attrs;
 
+        ## no critic (RegularExpressions::RequireExtendedFormatting)
+        $name =~ s/^\+//;    # one enhances an attribute being an option
         $options_data->{$name}
             = { _validate_and_filter_options(%attributes) };
 
