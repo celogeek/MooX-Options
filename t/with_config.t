@@ -16,30 +16,36 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
     1;
 }
 
-my $t = MyTestWithConfig->new_with_options();
-is $t->p1, 1, 'p1 fetch from config';
-is_deeply $t->p2, [ 1, 2, 3 ], '... and also p2';
-ok $t->can('config_prefix'), '... config prefix defined';
-ok $t->can('config_dirs'),   '... config dirs defined';
-ok $t->can('config_files'),  '... config files defined';
+SKIP: {
+    my $t = trap { MyTestWithConfig->new_with_options() };
+    isa_ok($t, "MyTestWithConfig") or skip "MyTestWithConfig Instantiation failure", 4;
+    is $t->p1, 1, 'p1 fetch from config';
+    is_deeply $t->p2, [ 1, 2, 3 ], '... and also p2';
+    ok $t->can('config_prefix'), '... config prefix defined';
+    ok $t->can('config_dirs'),   '... config dirs defined';
+    ok $t->can('config_files'),  '... config files defined';
+}
 
-{
+SKIP: {
     local @ARGV = ( '--config_prefix', 'with_config_2.t' );
-    my $t = MyTestWithConfig->new_with_options();
+    my $t = trap { MyTestWithConfig->new_with_options() };
+    isa_ok($t, "MyTestWithConfig") or skip "MyTestWithConfig Instantiation failure", 2;
     is $t->p1, 2, 'p1 fetch from config';
     is_deeply $t->p2, [ 3, 4, 5 ], '... and also p2';
 }
 
-{
+SKIP: {
     local @ARGV = ( '--p1', '2' );
-    my $t = MyTestWithConfig->new_with_options();
+    my $t = trap { MyTestWithConfig->new_with_options() };
+    isa_ok($t, "MyTestWithConfig") or skip "MyTestWithConfig Instantiation failure", 2;
     is $t->p1, 2, 'p1 fetch from cmdline';
     is_deeply $t->p2, [ 1, 2, 3 ], '... and p2 from config';
 }
 
-{
+SKIP: {
     local @ARGV = ( '--p1', '2' );
-    my $t = MyTestWithConfig->new_with_options( p1 => 3 );
+    my $t = trap { MyTestWithConfig->new_with_options( p1 => 3 ) };
+    isa_ok($t, "MyTestWithConfig") or skip "MyTestWithConfig Instantiation failure", 2;
     is $t->p1, 3, 'p1 fetch from params';
     is_deeply $t->p2, [ 1, 2, 3 ], '... and p2 from config';
 }

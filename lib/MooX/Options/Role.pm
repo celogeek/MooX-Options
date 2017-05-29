@@ -1,11 +1,15 @@
 package MooX::Options::Role;
 
-# ABSTRACT: role that is apply to your object
 use strict;
-use warnings;
+use warnings FATAL => 'all';
+
 ## no critic (ProhibitExcessComplexity)
 
-# VERSION
+our $VERSION = "4.023";
+
+=head1 NAME
+
+MooX::Options::Role - role that is apply to your object
 
 =head1 USAGE
 
@@ -165,6 +169,7 @@ sub _options_fix_argv {
         }
         else {
             push @new_argv, $arg_name;
+
             # if option has an argument, we keep the argument untouched
             if ( defined $original_long_option
                 && ( my $opt_data = $option_data->{$original_long_option} ) )
@@ -204,7 +209,11 @@ use Moo::Role;
 
 requires qw/_options_data _options_config/;
 
-=method new_with_options
+=head1 METHODS
+
+These methods will be composed into your class
+
+=head2 new_with_options
 
 Same as new but parse ARGV with L<Getopt::Long::Descriptive>
 
@@ -243,7 +252,7 @@ sub new_with_options {
 
     my %cmdline_params = $class->parse_options(%params);
 
-    if ($cmdline_params{h}) {
+    if ( $cmdline_params{h} ) {
         return $class->options_usage( $params{h}, $cmdline_params{h} );
     }
     if ( $cmdline_params{help} ) {
@@ -282,7 +291,7 @@ sub new_with_options {
     return $class->options_usage( 1, $cmdline_params{h} );
 }
 
-=method parse_options
+=head2 parse_options
 
 Parse your options, call L<Getopt::Long::Descriptive> and convert the result for the "new" method.
 
@@ -314,16 +323,17 @@ sub parse_options {
 
     # create usage str
     my $usage_str = $options_config{usage_string};
-    $usage_str = __x("USAGE: {prog_name} %o", prog_name => $prog_name ) if !defined $usage_str;
+    $usage_str = __x( "USAGE: {prog_name} %o", prog_name => $prog_name )
+        if !defined $usage_str;
 
     my ( $opt, $usage ) = describe_options(
         ($usage_str),
         @$options,
         [],
-        [ 'usage',  __"show a short help message"],
-        [ 'h', __"show a compact help message" ],
-        [ 'help', __"show a long help message"],
-        [ 'man',    __"show the manual" ],
+        [ 'usage', __ "show a short help message" ],
+        [ 'h',     __ "show a compact help message" ],
+        [ 'help',  __ "show a long help message" ],
+        [ 'man',   __ "show the manual" ],
         ,
         @flavour
     );
@@ -382,7 +392,7 @@ sub parse_options {
     return %cmdline_params;
 }
 
-=method options_usage
+=head2 options_usage
 
 Display help message.
 
@@ -417,7 +427,7 @@ sub options_usage {
     return;
 }
 
-=method options_help
+=head2 options_help
 
 Display long usage message
 
@@ -443,7 +453,7 @@ sub options_help {
     return;
 }
 
-=method options_short_usage
+=head2 options_short_usage
 
 Display quick usage message, with only the list of options
 
@@ -469,7 +479,7 @@ sub options_short_usage {
     return;
 }
 
-=method options_man
+=head2 options_man
 
 Display a pod like a manual
 
@@ -512,5 +522,47 @@ sub _options_sub_commands {
 }
 
 ### PRIVATE NEED TO BE EXPORTED
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc MooX::ConfigFromFile
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-ConfigFromFile>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/MooX-ConfigFromFile>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/MooX-ConfigFromFile>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/MooX-ConfigFromFile/>
+
+=back
+
+=head1 AUTHOR
+
+celogeek <me@celogeek.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by celogeek <me@celogeek.com>.
+
+This software is copyright (c) 2017 by Jens Rehsack.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=cut
 
 1;
