@@ -13,9 +13,6 @@ This class will override the usage_class method, to customize the output of the 
 
 =cut
 
-use strict;
-use warnings;
-
 our $VERSION = "4.023";
 
 use Getopt::Long 2.43;

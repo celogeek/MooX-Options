@@ -17,9 +17,6 @@ This class use the full size of your terminal
 
 ## no critic (ProhibitExcessComplexity)
 
-use strict;
-use warnings;
-
 our $VERSION = "4.023";
 
 use Getopt::Long::Descriptive;

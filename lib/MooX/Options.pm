@@ -49,7 +49,6 @@ sub import {
 
     if (@target_isa) {    #only in the main class, not a role
 
-        use warnings FATAL => 'redefine';
         ## no critic (ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval, ValuesAndExpressions::ProhibitImplicitNewlines)
         eval '{
         package ' . $target . ';
@@ -66,7 +65,6 @@ sub import {
 
         1;
         }';
-        use warnings FATAL => qw/void/;
 
         croak($@) if $@;
 
