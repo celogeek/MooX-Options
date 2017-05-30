@@ -6,7 +6,6 @@ use warnings FATAL => 'all';
 our $VERSION = "4.023";
 
 use Carp ('croak');
-use Locale::TextDomain 'MooX-Options';
 
 my @OPTIONS_ATTRIBUTES
     = qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
@@ -32,11 +31,8 @@ sub import {
     my $target = caller;
     for my $needed_methods (qw/with around has/) {
         next if $target->can($needed_methods);
-        croak(
-            __x("Can't find the method <{needed_methods}> in <{target}> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.",
-                'needed_methods' => $needed_methods,
-                'target'         => $target
-            )
+        croak(    "Can't find the method <$needed_methods> in <$target>!\n"
+                . "Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options."
         );
     }
 
@@ -81,8 +77,7 @@ sub import {
     else {
         if ( $options_config->{with_config_from_file} ) {
             croak(
-                __( "Please, don\'t use the option <with_config_from_file> into a role."
-                )
+                "Please, don't use the option <with_config_from_file> into a role."
             );
         }
     }
@@ -126,9 +121,7 @@ sub import {
         my ( $name, %attributes ) = @_;
         for my $ban (@banish_keywords) {
             croak(
-                __x("You cannot use an option with the name '{ban}', it is implied by MooX::Options",
-                    ban => $ban
-                )
+                "You cannot use an option with the name '$ban', it is implied by MooX::Options"
             ) if $name eq $ban;
         }
 
@@ -190,8 +183,7 @@ sub _validate_and_filter_options {
         && substr( $cmdline_options{format}, -1 ) ne '@';
 
     croak(
-        __( "Negativable params is not usable with non boolean value, don't pass format to use it !"
-        )
+        "Negativable params is not usable with non boolean value, don't pass format to use it !"
         )
         if $cmdline_options{negativable} && defined $cmdline_options{format};
 

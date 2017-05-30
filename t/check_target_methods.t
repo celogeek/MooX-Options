@@ -47,7 +47,10 @@ my @methods;
 is_deeply(
     \@methods,
     [   qw/
-            _options_config
+            __
+	    __n
+	    __p
+	    _options_config
             _options_data
             _options_prog_name
             _options_sub_commands

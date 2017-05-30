@@ -21,72 +21,60 @@ our $VERSION = "4.023";
 
 use Getopt::Long::Descriptive;
 use Scalar::Util qw/blessed/;
-use Locale::TextDomain 'MooX-Options';
 
-my %format_doc = (
-    's'  => __("String"),
-    's@' => __("[Strings]"),
-    'i'  => __("Int"),
-    'i@' => __("[Ints]"),
-    'o'  => __("Ext. Int"),
-    'o@' => __("[Ext. Ints]"),
-    'f'  => __("Real"),
-    'f@' => __("[Reals]"),
-);
+use Moo;
+with "MooX::Locale::Passthrough";
 
-sub _format_long_doc {
-    my $format          = shift;
-    my %format_long_doc = (
-        's'  => __("String"),
-        's@' => __("Array of Strings"),
-        'i'  => __("Integer"),
-        'i@' => __("Array of Integers"),
-        'o'  => __("Extended Integer"),
-        'o@' => __("Array of extended integers"),
-        'f'  => __("Real number"),
-        'f@' => __("Array of real numbers"),
-    );
-    return $format_long_doc{$format};
+has format_doc => ( is => "lazy" );
+
+## no critic (Subroutines::RequireFinalReturn, Subroutines::ProhibitUnusedPrivateSubroutines)
+
+sub _build_format_doc {
+    my $self = shift;
+    +{  's'  => $self->__("String"),
+        's@' => $self->__("[Strings]"),
+        'i'  => $self->__("Int"),
+        'i@' => $self->__("[Ints]"),
+        'o'  => $self->__("Ext. Int"),
+        'o@' => $self->__("[Ext. Ints]"),
+        'f'  => $self->__("Real"),
+        'f@' => $self->__("[Reals]"),
+    };
 }
 
-=head1 METHODS
+has format_doc_long => ( is => "lazy" );
 
-=head2 new
-
-The object is create with L<MooX::Options::Descriptive>.
-
-Valid option is :
-
-=over
-
-=item leader_text
-
-Text that appear on top of your message
-
-=item options
-
-The options spec of your message
-
-=back
-
-=cut
-
-sub new {
-    my ( $class, $args ) = @_;
-
-    my %self;
-    @self{qw/options leader_text/} = @$args{qw/options leader_text/};
-
-    return bless \%self => $class;
+sub _build_format_doc_long {
+    my $self = shift;
+    +{  's'  => $self->__("String"),
+        's@' => $self->__("Array of Strings"),
+        'i'  => $self->__("Integer"),
+        'i@' => $self->__("Array of Integers"),
+        'o'  => $self->__("Extended Integer"),
+        'o@' => $self->__("Array of extended integers"),
+        'f'  => $self->__("Real number"),
+        'f@' => $self->__("Array of real numbers"),
+    };
 }
+
+=head1 ATTRIBUTES
+
+Following attributes are present and behave as GLD::Usage describe them.
 
 =head2 leader_text
 
-Return the leader_text.
+Text that appear on top of your message
+
+=head2 options
+
+The options spec of your message
 
 =cut
 
-sub leader_text { return shift->{leader_text} }
+has leader_text => ( is => "ro" );
+has options     => ( is => "ro" );
+
+=head1 METHODS
 
 =head2 sub_commands_text
 
@@ -106,7 +94,8 @@ sub sub_commands_text {
         $sub_commands = $sub_commands_options;
     }
     return if !@$sub_commands;
-    return "", __("SUB COMMANDS AVAILABLE: ") . join( ', ', @$sub_commands ),
+    return "",
+        $self->__("SUB COMMANDS AVAILABLE: ") . join( ', ', @$sub_commands ),
         "";
 }
 
@@ -124,7 +113,7 @@ sub text {
         = defined $self->{target}
         ? $self->{target}->_options_config
         : ( spacer => " " );
-    my $getopt_options = $self->{options};
+    my $getopt_options = $self->options;
 
     my $lf = _get_line_fold();
 
@@ -139,7 +128,7 @@ sub text {
         }
         my ( $short, $format ) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
         my $format_doc_str;
-        $format_doc_str = $format_doc{$format} if defined $format;
+        $format_doc_str = $self->format_doc->{$format} if defined $format;
         $format_doc_str = 'JSON'
             if defined $options_data{ $opt->{name} }{json};
 
@@ -205,7 +194,7 @@ sub option_help {
         = defined $self->{target}
         ? $self->{target}->_options_config
         : ( spacer => " " );
-    my $getopt_options = $self->{options};
+    my $getopt_options = $self->options;
     my @message;
     my $lf = _get_line_fold();
     for my $opt (@$getopt_options) {
@@ -217,7 +206,7 @@ sub option_help {
         }
         my ( $short, $format ) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
         my $format_doc_str;
-        $format_doc_str = $format_doc{$format} if defined $format;
+        $format_doc_str = $self->format_doc->{$format} if defined $format;
         $format_doc_str = 'JSON'
             if defined $options_data{ $opt->{name} }{json};
         push @message,
@@ -282,7 +271,7 @@ sub option_pod {
     push @man,
         (
         "=head1 SYNOPSIS",
-        $prog_name . " [-h] [" . __("long options ...") . "]"
+        $prog_name . " [-h] [" . $self->__("long options ...") . "]"
         );
 
     if ( defined( my $synopsis = $options_config{synopsis} ) ) {
@@ -292,7 +281,7 @@ sub option_pod {
     push @man, ( "=head1 OPTIONS", "=over" );
 
     my $spacer_escape = "E<" . ord( $options_config{spacer} ) . ">";
-    for my $opt ( @{ $self->{options} } ) {
+    for my $opt ( @{ $self->options } ) {
         if ( $opt->{desc} eq 'spacer' ) {
             push @man, "=back";
             push @man, $spacer_escape x 40;
@@ -301,7 +290,8 @@ sub option_pod {
         }
         my ( $short, $format ) = $opt->{spec} =~ /(?:\|(\w))?(?:=(.*?))?$/x;
         my $format_doc_str;
-        $format_doc_str = _format_long_doc($format) if defined $format;
+        $format_doc_str = $self->format_doc_long->{$format}
+            if defined $format;
         $format_doc_str = 'JSON'
             if defined $options_data{ $opt->{name} }{json};
 
@@ -332,7 +322,7 @@ sub option_pod {
                 $prog_name . " "
                     . $sub_command
                     . " [-h] ["
-                    . __("long options ...") . "]"
+                    . $self->__("long options ...") . "]"
                 );
         }
         push @man, "=back";
@@ -362,7 +352,7 @@ sub option_short_usage {
     my ($self) = @_;
     my %options_data
         = defined $self->{target} ? $self->{target}->_options_data : ();
-    my $getopt_options = $self->{options};
+    my $getopt_options = $self->options;
 
     my $prog_name = $self->{prog_name};
     $prog_name = Getopt::Long::Descriptive::prog_name if !defined $prog_name;
@@ -375,7 +365,7 @@ sub option_short_usage {
         }
         my ($format) = $opt->{spec} =~ /(?:\|\w)?(?:=(.*?))?$/x;
         my $format_doc_str;
-        $format_doc_str = $format_doc{$format} if defined $format;
+        $format_doc_str = $self->format_doc->{$format} if defined $format;
         $format_doc_str = 'JSON'
             if defined $options_data{ $opt->{name} }{json};
         push @message,

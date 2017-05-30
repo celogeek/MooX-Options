@@ -19,7 +19,6 @@ Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrad
 
 use MooX::Options::Descriptive;
 use Scalar::Util qw/blessed/;
-use Locale::TextDomain 'MooX-Options';
 
 ### PRIVATE
 
@@ -206,6 +205,7 @@ sub _expand_autorange {
 ### PRIVATE
 
 use Moo::Role;
+with "MooX::Locale::Passthrough";
 
 requires qw/_options_data _options_config/;
 
@@ -323,17 +323,17 @@ sub parse_options {
 
     # create usage str
     my $usage_str = $options_config{usage_string};
-    $usage_str = __x( "USAGE: {prog_name} %o", prog_name => $prog_name )
+    $usage_str = sprintf( $class->__("USAGE: %s %%o"), $prog_name )
         if !defined $usage_str;
 
     my ( $opt, $usage ) = describe_options(
         ($usage_str),
         @$options,
         [],
-        [ 'usage', __ "show a short help message" ],
-        [ 'h',     __ "show a compact help message" ],
-        [ 'help',  __ "show a long help message" ],
-        [ 'man',   __ "show the manual" ],
+        [ 'usage', $class->__("show a short help message") ],
+        [ 'h',     $class->__("show a compact help message") ],
+        [ 'help',  $class->__("show a long help message") ],
+        [ 'man',   $class->__("show the manual") ],
         ,
         @flavour
     );

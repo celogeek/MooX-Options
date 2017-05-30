@@ -89,7 +89,8 @@ __EOF__
 __EOF__
         ;
     like $@,
-        qr/^\QCan't find the method <with> in <MissingWith> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/,
+        qr/^\QCan't find the method <with> in <MissingWith>!
+Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/,
         'missing with';
 }
 
@@ -104,7 +105,8 @@ __EOF__
 __EOF__
         ;
     like $@,
-        qr/^\QCan't find the method <around> in <MissingAround> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/,
+        qr/^\QCan't find the method <around> in <MissingAround>!
+Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/,
         'missing with';
 }
 
@@ -120,7 +122,8 @@ __EOF__
 __EOF__
         ;
     like $@,
-        qr/^\QCan't find the method <has> in <MissingHas> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/,
+        qr/^\QCan't find the method <has> in <MissingHas>!
+Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/,
         'missing with';
 }
 

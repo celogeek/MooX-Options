@@ -6,11 +6,8 @@ use 5.008001;
 use ExtUtils::MakeMaker;
 
 my %RUN_DEPS = (
-    "Config::Any"           => 0,
-    "File::Find::Rule"      => "0.30",
-    "FindBin"               => 0,
-    "Moo"                   => "1.003",
-    "MooX::File::ConfigDir" => "0.002",
+    "Moo"                       => "1.003",
+    "MooX::Locale::Passthrough" => 0,
 );
 
 my %CONFIGURE_DEPS = ( 'ExtUtils::MakeMaker' => 0, );
@@ -64,14 +61,11 @@ WriteMakefile1(
             test      => {
                 requires => {%TEST_DEPS},
                 suggests => {
-                    'MooX::Cmd'     => '0.012',
-                    'MooX::Options' => '4.001'
+                    'MooX::Cmd'            => '0.012',
+                    'MooX::ConfigFromFile' => 0,
                 }
             },
-            runtime => {
-                requires => { %RUN_DEPS, perl => '5.8.1', },
-                suggests => { "Hash::Merge" => 0, }
-            },
+            runtime => { requires => { %RUN_DEPS, perl => '5.8.1', } },
         },
     },
     NAME               => 'MooX::Options',
