@@ -127,4 +127,20 @@ Ensure to load a Role::Tiny compatible module like Moo or Moose before using Moo
         'missing with';
 }
 
+{
+    eval <<__EOF__
+    {
+        package IllegalShortEnding;
+        use Moo;
+        use MooX::Options;
+        option 'legal' => (is => 'rw', short => 'l!');
+        1;
+    }
+    IllegalShortEnding->new_with_options;
+__EOF__
+        ;
+    like $@, qr/^cmdline\sargument\s'legal|l!'\sshould\send\swith\sa\sword\scharacter/x, 'illegal cmdline name';
+    ok( !t->can('new_with_options'), 't has crash' );
+}
+
 done_testing;

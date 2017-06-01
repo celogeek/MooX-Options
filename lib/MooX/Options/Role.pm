@@ -26,6 +26,10 @@ use Scalar::Util qw/blessed/;
 sub _option_name {
     my ( $name, %data ) = @_;
     my $cmdline_name = join( '|', grep {defined} ( $name, $data{short} ) );
+    ## no critic (RegularExpressions::RequireExtendedFormatting)
+    $cmdline_name =~ m/[^\w]$/
+        and croak
+        "cmdline argument '$cmdline_name' should end with a word character";
     $cmdline_name .= '+' if $data{repeatable} && !defined $data{format};
     $cmdline_name .= '!' if $data{negativable};
     $cmdline_name .= '!' if $data{negatable};
