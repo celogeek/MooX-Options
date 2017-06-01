@@ -17,6 +17,7 @@ Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrad
 
 =cut
 
+use Carp qw/croak/;
 use MooX::Options::Descriptive;
 use Scalar::Util qw/blessed/;
 
@@ -27,6 +28,7 @@ sub _option_name {
     my $cmdline_name = join( '|', grep {defined} ( $name, $data{short} ) );
     $cmdline_name .= '+' if $data{repeatable} && !defined $data{format};
     $cmdline_name .= '!' if $data{negativable};
+    $cmdline_name .= '!' if $data{negatable};
     $cmdline_name .= '=' . $data{format} if defined $data{format};
     return $cmdline_name;
 }
@@ -133,8 +135,10 @@ sub _options_fix_argv {
         my $arg_name = $dash;
 
         if ( defined $negative && defined $original_long_option ) {
-            if ( exists $option_data->{$original_long_option}
-                && $option_data->{$original_long_option}{negativable} )
+            if (exists $option_data->{$original_long_option}
+                && (   $option_data->{$original_long_option}{negativable}
+                    or $option_data->{$original_long_option}{negatable} )
+                )
             {
                 $arg_name .= 'no-';
             }

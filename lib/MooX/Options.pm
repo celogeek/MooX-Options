@@ -8,7 +8,7 @@ our $VERSION = "4.023";
 use Carp ('croak');
 
 my @OPTIONS_ATTRIBUTES
-    = qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
+    = qw/format short repeatable negativable negatable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
 
 sub import {
     my ( undef, @import ) = @_;
@@ -169,6 +169,7 @@ sub _validate_and_filter_options {
         delete $options{autosplit};
         delete $options{autorange};
         delete $options{negativable};
+        delete $options{negatable};
         $options{json}   = 1;
         $options{format} = 's';
     }
@@ -185,7 +186,8 @@ sub _validate_and_filter_options {
     croak(
         "Negativable params is not usable with non boolean value, don't pass format to use it !"
         )
-        if $cmdline_options{negativable} && defined $cmdline_options{format};
+        if ( $cmdline_options{negativable} or $cmdline_options{negatable} )
+        and defined $cmdline_options{format};
 
     return %cmdline_options;
 }
@@ -453,14 +455,16 @@ You can also use the json format
 
   myTool --hash='{"a":1,"b":2}' # hash = { a => 1, b => 2 }
 
-=head2 negativable
+=head2 negatable
 
 It adds the negative version for the option.
 
-  option 'verbose' => (is => 'ro', negativable => 1);
+  option 'verbose' => (is => 'ro', negatable => 1);
 
   myTool --verbose    # verbose = 1
   myTool --no-verbose # verbose = 0
+
+The former name of this flag, negativable, is discouraged - since it's not a word.
 
 =head2 repeatable
 

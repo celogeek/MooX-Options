@@ -26,8 +26,8 @@ subtest "args value" => sub {
     done_testing();
 };
 
-subtest "negativable" => sub {
-    note "negativable";
+subtest "negatable" => sub {
+    note "negatable";
     local @ARGV = ( '--empty', '--no-empty' );
     my $t = t->new_with_options();
     is( $t->empty, 0, "empty is well defined" );

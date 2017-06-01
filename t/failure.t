@@ -11,7 +11,7 @@ eval <<__EOF__
 
     option fail => (
         is => 'rw',
-        negativable => 1,
+        negatable => 1,
         format => 'i',
     );
 
@@ -20,7 +20,7 @@ __EOF__
     ;
 like $@,
     qr/^Negativable\sparams\sis\snot\susable\swith\snon\sboolean\svalue,\sdon't\spass\sformat\sto\suse\sit\s\!/x,
-    "negativable and format are incompatible";
+    "negatable and format are incompatible";
 
 for my $ban (
     qw/help man usage option new_with_options parse_options options_usage _options_data _options_config/
