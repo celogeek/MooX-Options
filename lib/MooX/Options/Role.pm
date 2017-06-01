@@ -18,6 +18,7 @@ Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrad
 =cut
 
 use Carp qw/croak/;
+use Module::Runtime qw(use_module);
 use MooX::Options::Descriptive;
 use Scalar::Util qw/blessed/;
 
@@ -64,16 +65,22 @@ sub _options_prepare_descriptive {
         push @options, [] if $data{spacer_after};
 
         push @{ $all_options{$name} }, $name;
+        croak
+            "There is already an option '$data{short}' - can't use it to shorten $name"
+            if $data{short} and exists $options_data->{ $data{short} };
+        push @{ $all_options{ $data{short} } }, $name
+            if $data{short} and not defined $all_options{ $data{short} };
         for ( my $i = 1; $i <= length($name); $i++ ) {
             my $long_short = substr( $name, 0, $i );
             push @{ $all_options{$long_short} }, $name
-                if !exists $options_data->{$long_short};
+                unless exists $options_data->{$long_short}
+                or defined $all_options{$long_short};
         }
 
         if ( defined $data{autosplit} ) {
             if ( !$data_record_loaded ) {
-                require Data::Record;
-                require Regexp::Common;
+                use_module("Data::Record");
+                use_module("Regexp::Common");
                 Regexp::Common->import;
                 $data_record_loaded = 1;
             }
@@ -82,13 +89,6 @@ sub _options_prepare_descriptive {
                     unless => $Regexp::Common::RE{quoted}
                 }
             );
-            if ( my $short = $data{short} ) {
-                $has_to_split{$short} = $has_to_split{ ${name} };
-            }
-            for ( my $i = 1; $i <= length($name); $i++ ) {
-                my $long_short = substr( $name, 0, $i );
-                $has_to_split{$long_short} = $has_to_split{ ${name} };
-            }
         }
     }
 
@@ -153,40 +153,41 @@ sub _options_fix_argv {
 
         $arg_name .= $arg_name_without_dash;
 
-        if ( my $rec = $has_to_split->{$arg_name_without_dash} ) {
-            if ( $arg_values = shift @ARGV ) {
-                my $autorange
-                    = defined $original_long_option
-                    && exists $option_data->{$original_long_option}
-                    && $option_data->{$original_long_option}{autorange};
-                foreach my $record ( $rec->records($arg_values) ) {
+        if (   defined $original_long_option
+            && ( my $opt_data = $option_data->{$original_long_option} )
+            && ( defined( my $arg_value = shift @ARGV ) ) )
+        {
+            my $autorange
+                = defined $original_long_option
+                && exists $option_data->{$original_long_option}
+                && $option_data->{$original_long_option}{autorange};
 
-                    #remove the quoted if exist to chain
-                    $record =~ s/^['"]|['"]$//gx;
-                    if ($autorange) {
-                        push @new_argv,
-                            map { $arg_name => $_ }
-                            _expand_autorange($record);
-                    }
-                    else {
-                        push @new_argv, $arg_name, $record;
-                    }
+            my $argv_processor = sub {
+
+                #remove the quoted if exist to chain
+                $_[0] =~ s/^['"]|['"]$//gx;
+                if ($autorange) {
+                    push @new_argv,
+                        map { $arg_name => $_ } _expand_autorange( $_[0] );
                 }
+                else {
+                    push @new_argv, $arg_name, $_[0];
+                }
+
+            };
+
+            if ( my $rec = $has_to_split->{$original_long_option} ) {
+                foreach my $record ( $rec->records($arg_value) ) {
+                    $argv_processor->($record);
+                }
+            }
+            else {
+                $argv_processor->($arg_value);
             }
         }
         else {
             push @new_argv, $arg_name;
-
-            # if option has an argument, we keep the argument untouched
-            if ( defined $original_long_option
-                && ( my $opt_data = $option_data->{$original_long_option} ) )
-            {
-                if ( $opt_data->{format} ) {
-                    push @new_argv, shift @ARGV;
-                }
-            }
         }
-
     }
 
     return @new_argv;
@@ -283,8 +284,8 @@ sub new_with_options {
     elsif ( $@ =~ /^Missing\srequired\sarguments:\s(.*)\sat\s/x ) {
         my @missing_required = split /,\s/x, $1;
         print STDERR
-            join( "\n", ( map { $_ . " is missing" } @missing_required ),
-            '' );
+            join( "\n",
+            ( map { $_ . " is missing" } @missing_required ), '' );
     }
     elsif ( $@ =~ /^(.*?)\srequired/x ) {
         print STDERR "$1 is missing\n";
@@ -306,6 +307,8 @@ Parse your options, call L<Getopt::Long::Descriptive> and convert the result for
 It is use by "new_with_options".
 
 =cut
+
+my $decode_json;
 
 sub parse_options {
     my ( $class, %params ) = @_;
@@ -362,10 +365,20 @@ sub parse_options {
             my $val = $opt->$name();
             if ( defined $val ) {
                 if ( $data{json} ) {
-                    require JSON::MaybeXS;
+                    defined $decode_json
+                        or $decode_json = eval {
+                        use_module("JSON::MaybeXS");
+                        JSON::MaybeXS->can("decode_json");
+                        };
+                    defined $decode_json
+                        or $decode_json = eval {
+                        use_module("JSON::PP");
+                        JSON::PP->can("decode_json");
+                        };
+                    ## no critic (ErrorHandling::RequireCarping)
+                    $@ and die $@;
                     if (!eval {
-                            $cmdline_params{$name}
-                                = JSON::MaybeXS::decode_json($val);
+                            $cmdline_params{$name} = $decode_json->($val);
                             1;
                         }
                         )
@@ -502,13 +515,13 @@ sub options_man {
         $usage = $cmdline_params{man};
     }
 
-    require Path::Class;
-    Path::Class->VERSION(0.32);
-    my $man_file = Path::Class::file( Path::Class::tempdir( CLEANUP => 1 ),
+    use_module( "Path::Class", "0.32" );
+    my $man_file
+        = Path::Class::file( Path::Class::tempdir( CLEANUP => 1 ),
         'help.pod' );
     $man_file->spew( iomode => '>:encoding(UTF-8)', $usage->option_pod );
 
-    require Pod::Usage;
+    use_module("Pod::Usage");
     Pod::Usage::pod2usage(
         -verbose => 2,
         -input   => $man_file->stringify,

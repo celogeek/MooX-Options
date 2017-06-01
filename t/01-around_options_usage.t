@@ -34,7 +34,7 @@ my @messages;
 
 trap { t->new_with_options( h => 1 ) };
 @messages = split( /\n/, $trap->stdout );
-is $messages[0],   'This is a pre message',  'Pre message ok';
+is $messages[0],   'This is a pre message',  'Pre message ok' or diag(explain($trap));
 like $messages[1], qr{^USAGE},               'Usage ok';
 is $messages[-1],  'This is a post message', 'Post message ok';
 

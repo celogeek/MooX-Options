@@ -1,6 +1,12 @@
 #!perl
 use t::Test;
 
+BEGIN
+{
+    use Module::Runtime qw(use_module);
+    eval { use_module("Data::Record"); use_module("Regexp::Common"); } or plan skip_all => "This test needs Data::Record and Regexp::Common";
+}
+
 {
 
     package TestMultipleSplitOptions;

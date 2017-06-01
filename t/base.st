@@ -1,3 +1,4 @@
+use Module::Runtime qw(use_module);
 local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 
 my @params = qw/bool counter empty/;
@@ -47,12 +48,14 @@ subtest "split" => sub {
         my $t = t->new_with_options();
         is_deeply( $t->split, [ 1, 2 ], "split two arg" );
     }
-    {
+    SKIP: {
+        eval { use_module("Data::Record"); use_module("Regexp::Common"); } or skip "This test needs Data::Record and Regexp::Common", 1;
         local @ARGV = ('--split=1,2');
         my $t = t->new_with_options();
         is_deeply( $t->split, [ 1, 2 ], "split one arg autosplit" );
     }
-    {
+    SKIP: {
+        eval { use_module("Data::Record"); use_module("Regexp::Common"); } or skip "This test needs Data::Record and Regexp::Common", 1;
         local @ARGV = ( '--split=1', '--split=2', '--split=3,4' );
         my $t = t->new_with_options();
         is_deeply(
@@ -61,7 +64,8 @@ subtest "split" => sub {
             "split three arg with autosplit"
         );
     }
-    {
+    SKIP: {
+        eval { use_module("Data::Record"); use_module("Regexp::Common"); } or skip "This test needs Data::Record and Regexp::Common", 1;
         local @ARGV = ( '--split', '1', '--split', '2', '--split', '3,4' );
         my $t = t->new_with_options();
         is_deeply(
@@ -124,7 +128,7 @@ subtest "test short help" => sub {
         is( $trap->exit, 0, "help, exit 0" );
         ok( $trap->stdout !~ /^str_req is missing/, "str_reg is missing" );
         like $trap->stdout,
-            qr{\QUSAGE: m\E\w+\Q.t [ --str_req=String ]  |  [ --usage ] [ -h ] [ --help ] [ --man ]\E},
+            qr{USAGE:\s\d{2}\-m\w+\Q.t [ --str_req=String ]  |  [ --usage ] [ -h ] [ --help ] [ --man ]\E},
             'usage message ok';
     }
     done_testing();
@@ -147,6 +151,7 @@ subtest "value override" => sub {
 
 subtest "split_complexe_str" => sub {
     note "split on complexe str";
+    eval { use_module("Data::Record"); use_module("Regexp::Common"); } or plan skip_all => "This test needs Data::Record and Regexp::Common";
     {
         local @ARGV = ("--split_str=a,b,c");
         my $t = sp_str->new_with_options();
@@ -192,6 +197,7 @@ subtest "split_complexe_str" => sub {
 
 subtest "split_complexe_str_short" => sub {
     note "split on complexe str short";
+    eval { use_module("Data::Record"); use_module("Regexp::Common"); } or plan skip_all => "This test needs Data::Record and Regexp::Common";
     {
         local @ARGV = ("-z=a");
         my $t = sp_str_short->new_with_options();
@@ -217,6 +223,7 @@ subtest "split_complexe_str_short" => sub {
 
 subtest "split_str_shorter_name" => sub {
     note "shorter long split";
+    eval { use_module("Data::Record"); use_module("Regexp::Common"); } or plan skip_all => "This test needs Data::Record and Regexp::Common";
     {
         local @ARGV = ("--split_st=a,b,c");
         my $t = sp_str->new_with_options();
@@ -268,11 +275,14 @@ subtest "test usage" => sub {
         qr/help\s+show a long help message/,
         'help is present'
     );
-    like(
-        $trap->stderr,
-        qr/split_str=\[Strings\]\s+no doc for split_str/,
-        'attr no doc is present'
-    );
+    SKIP: {
+        eval { use_module("Data::Record"); use_module("Regexp::Common"); } or skip "This test needs Data::Record and Regexp::Common", 1;
+        like(
+            $trap->stderr,
+            qr/split_str=\[Strings\]\s+no doc for split_str/,
+            'attr no doc is present'
+        );
+    }
 };
 
 subtest "test short usage" => sub {
@@ -281,9 +291,12 @@ subtest "test short usage" => sub {
     my @r = trap { $s->options_short_usage(127) };
 
     is( $trap->exit, 127, 'exit code is correct' );
-    like $trap->stderr,
-        qr{\QUSAGE: m\E\w+\Q.t [ --split_conflict_str1=[Strings] ] [ --split_conflict_str2=[Strings] ] [ --split_str=[Strings] ]  |  [ --usage ] [ -h ] [ --help ] [ --man ]\E},
-        'short message ok';
+    SKIP: {
+        eval { use_module("Data::Record"); use_module("Regexp::Common"); } or skip "This test needs Data::Record and Regexp::Common", 1;
+        like $trap->stderr,
+            qr{USAGE:\s\d{2}\-m\w+\Q.t [ --split_conflict_str1=[Strings] ] [ --split_conflict_str2=[Strings] ] [ --split_str=[Strings] ]  |  [ --usage ] [ -h ] [ --help ] [ --man ]\E},
+            'short message ok';
+    }
 };
 
 subtest "doc usage" => sub {
@@ -403,73 +416,87 @@ subtest "json format" => sub {
 subtest "range_complexe_str" => sub {
     note "range on complexe str";
     {
-        local @ARGV = ('--range_str=1,2,4');
+        local @ARGV = ('--range_str=1', '--range_str=2', '--range_str=4');
         my $t = rg_str->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 4/], 'str1 req is ok' );
     }
     {
-        local @ARGV = ('--range-str=1,2,4..');
+        local @ARGV = ('--range-str=1', '--range-str=2', '--range-str=4');
         my $t = rg_str->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 4/], 'str2 req is ok' );
     }
-
     {
-        local @ARGV = ('--range_str=1,2,4..6');
+        local @ARGV = ('--range_str=1', '--range_str=2', '--range_str=4..6');
         my $t = rg_str->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 4 5 6/], 'str3 req is ok' );
     }
     {
-        local @ARGV = ('--range-str=1,2,4..6');
+        local @ARGV = ('--range-str=1', '--range-str=2', '--range-str=4..6');
         my $t = rg_str->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 4 5 6/], 'str4 req is ok' );
     }
     {
-        local @ARGV = ('--range_str=1,2,4..');
+        local @ARGV = ('--range_str=1', '--range_str=2', '--range_str=4..');
         my $t = rg_str->new_with_options();
-        is_deeply( $t->range_str, [qw/1 2 4/], 'str req5 is ok' );
+        is_deeply( $t->range_str, [qw/1 2 4/], 'str5 req is ok' );
     }
     {
-        local @ARGV = ('--range-str=1,2,4..');
+        local @ARGV = ('--range-str=1', '--range-str=2', '--range-str=4..');
         my $t = rg_str->new_with_options();
-        is_deeply( $t->range_str, [qw/1 2 4/], 'str req6 is ok' );
+        is_deeply( $t->range_str, [qw/1 2 4/], 'str6 req is ok' );
     }
     {
-        local @ARGV = ("--range_str=1,2,4..7,10");
+        local @ARGV = ('--range_str=1', '--range_str=2', '--range_str=4..7', '--range_str=10');
         my $t = rg_str->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 4 5 6 7 10/], 'str7 req is ok' );
     }
     {
-        local @ARGV = ("--range-str=1,2,4..7,10");
+        local @ARGV = ('--range-str=1', '--range-str=2', '--range-str=4..7', '--range-str=10');
         my $t = rg_str->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 4 5 6 7 10/], 'str8 req is ok' );
     }
     {
-        local @ARGV = ('--range_str=1..3,10..12,20..');
+        local @ARGV = ('--range_str=1..3', '--range_str=10..12', '--range_str=20..');
         my $t = rg_str->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 3 10 11 12 20/], 'str9 req is ok' );
     }
     {
+        local @ARGV = ('--range_str=1..3', '--range_str=10..12', '--range_str=20..');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 3 10 11 12 20/], 'str10 req is ok' );
+    }
+    SKIP: {
+        eval { use_module("Data::Record"); use_module("Regexp::Common"); } or skip "This test needs Data::Record and Regexp::Common", 1;
+        local @ARGV = ('--range_str=1..3,10..12,20..');
+        my $t = rg_str->new_with_options();
+        is_deeply( $t->range_str, [qw/1 2 3 10 11 12 20/],
+            'str11 req is ok' );
+    }
+    SKIP: {
+        eval { use_module("Data::Record"); use_module("Regexp::Common"); } or skip "This test needs Data::Record and Regexp::Common", 1;
         local @ARGV = ('--range-str=1..3,10..12,20..');
         my $t = rg_str->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 3 10 11 12 20/],
-            'str10 req is ok' );
+            'str12 req is ok' );
     }
-    {
+    SKIP: {
+        eval { use_module("Data::Record"); use_module("Regexp::Common"); } or skip "This test needs Data::Record and Regexp::Common", 1;
         local @ARGV = ('--range_str=1,"2,3",4,"foo bar"');
         my $t = rg_str->new_with_options();
         is_deeply(
             $t->range_str,
             [ 1, "2,3", 4, "foo bar" ],
-            'str11 req is ok'
+            'str13 req is ok'
         );
     }
-    {
+    SKIP: {
+        eval { use_module("Data::Record"); use_module("Regexp::Common"); } or skip "This test needs Data::Record and Regexp::Common", 1;
         local @ARGV = ('--range-str=1,"2,3",4,"a,2,c"');
         my $t = rg_str->new_with_options();
         is_deeply(
             $t->range_str,
             [ 1, "2,3", 4, "a,2,c" ],
-            'str12 req is ok'
+            'str14 req is ok'
         );
     }
     done_testing();
@@ -483,7 +510,7 @@ subtest "range_complexe_str_short" => sub {
         is_deeply( $t->range_str, [qw/1/], 'str1 req is ok' );
     }
     {
-        local @ARGV = ("-r=1,2,4");
+        local @ARGV = ("-r=1", "-r=2", "-r=4");
         my $t = rg_str_short->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 4/], 'str2 req is ok' );
     }
@@ -498,22 +525,22 @@ subtest "range_complexe_str_short" => sub {
         is_deeply( $t->range_str, [qw/1 2 3 4/], 'str4 req is ok' );
     }
     {
-        local @ARGV = ("-r=1,2,4..7,10");
+        local @ARGV = ("-r=1", "-r=2", "-r=4..7", "-r=10");
         my $t = rg_str_short->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 4 5 6 7 10/], 'str5 req is ok' );
     }
     {
-        local @ARGV = ( '-r', '1..3,10..12,20..' );
+        local @ARGV = ( '-r', '1..3', '-r=10..12', '-r=20..' );
         my $t = rg_str_short->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 3 10 11 12 20/], 'str6 req is ok' );
     }
     {
-        local @ARGV = ('-r=1,"2,3",4');
+        local @ARGV = ('-r=1', '-r="2,3"', '-r=4');
         my $t = rg_str_short->new_with_options();
         is_deeply( $t->range_str, [ '1', "2,3", '4' ], 'str7 req is ok' );
     }
     {
-        local @ARGV = ( '-r', '1,"2,3",4..7' );
+        local @ARGV = ( '-r', '1', '-r', '"2,3"', '-r', '4..7' );
         my $t = rg_str_short->new_with_options();
         is_deeply( $t->range_str, [ 1, "2,3", 4, 5, 6, 7 ],
             'str8 req is ok' );
@@ -524,12 +551,12 @@ subtest "range_complexe_str_short" => sub {
 subtest "range_str_shorter_name" => sub {
     note "shorter long range";
     {
-        local @ARGV = ("--range_st=1,2,4..6");
+        local @ARGV = ("--range_st=1", "--rs", "2", "--range_s=4..6");
         my $t = rg_str->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 4 5 6/], 'str1 req is ok' );
     }
     {
-        local @ARGV = ("--range-st=1,2,4..6,7");
+        local @ARGV = ("--range-st=1", "--rs=2", "--range_s", "4..6", "--rs", "7");
         my $t = rg_str->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 4 5 6 7/], 'str2 req is ok' );
     }

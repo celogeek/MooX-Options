@@ -6,12 +6,12 @@ use Carp;
 use FindBin qw/$RealBin/;
 use Try::Tiny;
 
+my @autosplit;
+
 BEGIN {
-    eval 'use Mo 0.36';
-    if ($@) {
-        plan skip_all => 'Need Mo (0.36) for this test';
-        exit 0;
-    }
+    use Module::Runtime qw(use_module);
+    eval {use_module("Mo", "0.36")} or plan skip_all => 'Need Mo (0.36) for this test';
+    eval { use_module("Data::Record"); use_module("Regexp::Common"); } and @autosplit = (autosplit => ',');
 }
 
 {
@@ -24,7 +24,7 @@ BEGIN {
     option 'bool'    => ( is => 'ro' );
     option 'counter' => ( is => 'ro', repeatable => 1 );
     option 'empty'   => ( is => 'ro', negatable => 1 );
-    option 'split'   => ( is => 'ro', format => 'i@', autosplit => ',' );
+    option 'split'   => ( is => 'ro', format => 'i@', @autosplit );
     option 'has_default' => ( is => 'ro', default => sub {'foo'} );
     option 'range' => ( is => 'ro', format => 'i@', autorange => 1 );
 
@@ -68,11 +68,11 @@ BEGIN {
     use Mo;
     use MooX::Options;
 
-    option 'split_str' => ( is => 'ro', format => 's', autosplit => "," );
+    option 'split_str' => ( is => 'ro', format => 's', @autosplit );
     option 'split_conflict_str1' =>
-        ( is => 'ro', format => 's', autosplit => "," );
+        ( is => 'ro', format => 's', @autosplit );
     option 'split_conflict_str2' =>
-        ( is => 'ro', format => 's', autosplit => "," );
+        ( is => 'ro', format => 's', @autosplit );
 
     1;
 }
@@ -94,7 +94,7 @@ BEGIN {
     use MooX::Options;
 
     option 'split_str' =>
-        ( is => 'ro', format => 's', autosplit => ",", short => 'z' );
+        ( is => 'ro', format => 's', @autosplit, short => 'z' );
 
     1;
 }
@@ -290,7 +290,7 @@ BEGIN {
     use Mo;
     use MooX::Options;
 
-    option 'range_str' => ( is => 'ro', format => 's', autorange => 1 );
+    option 'range_str' => ( is => 'ro', format => 's', autorange => 1, short => 'rs' );
     option 'range_conflict_str1' =>
         ( is => 'ro', format => 's', autorange => 1 );
     option 'range_conflict_str2' =>
@@ -333,7 +333,8 @@ BEGIN {
 
 subtest "Mo" => sub {
     note "Test Mo";
-    require $RealBin . '/base.st';
+    do $RealBin . '/base.st';
+    $@ and diag $@;
 };
 
 done_testing;

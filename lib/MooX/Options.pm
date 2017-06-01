@@ -6,6 +6,7 @@ use warnings FATAL => 'all';
 our $VERSION = "4.023";
 
 use Carp ('croak');
+use Module::Runtime qw(use_module);
 
 my @OPTIONS_ATTRIBUTES
     = qw/format short repeatable negativable negatable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
@@ -159,8 +160,6 @@ sub _validate_and_filter_options {
     my (%options) = @_;
     $options{doc} = $options{documentation} if !defined $options{doc};
     $options{order} = 0 if !defined $options{order};
-    $options{autosplit} = ','
-        if !defined $options{autosplit} && $options{autorange};
 
     if ( $options{json}
         || ( defined $options{format} && $options{format} eq 'json' ) )
@@ -174,10 +173,18 @@ sub _validate_and_filter_options {
         $options{format} = 's';
     }
 
+    if ( $options{autorange} and not defined $options{autosplit} ) {
+
+# XXX maybe we should warn here since a previously beloved feature isn't enabled automatically
+        eval { use_module("Data::Record"); use_module("Regexp::Common"); }
+            and $options{autosplit} = ',';
+    }
+
     my %cmdline_options = map { ( $_ => $options{$_} ) }
         grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
 
-    $cmdline_options{repeatable} = 1 if $cmdline_options{autosplit};
+    $cmdline_options{repeatable} = 1
+        if $cmdline_options{autosplit} or $cmdline_options{autorange};
     $cmdline_options{format} .= "@"
         if $cmdline_options{repeatable}
         && defined $cmdline_options{format}

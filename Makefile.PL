@@ -6,8 +6,16 @@ use 5.008001;
 use ExtUtils::MakeMaker;
 
 my %RUN_DEPS = (
+    "Getopt::Long"              => "2.43",
+    "Getopt::Long::Descriptive" => "0.099",
+    "Import::Into"              => 0,
+    "Module::Runtime"           => 0,
     "Moo"                       => "1.003",
     "MooX::Locale::Passthrough" => 0,
+    "Path::Class"               => "0.32",
+    "Pod::Usage"                => 0,
+    "Role::Tiny"                => 0,
+    "Text::LineFold"            => 0,
 );
 
 my %CONFIGURE_DEPS = ( 'ExtUtils::MakeMaker' => 0, );
@@ -15,69 +23,80 @@ my %CONFIGURE_DEPS = ( 'ExtUtils::MakeMaker' => 0, );
 my %BUILD_DEPS = ();
 
 my %TEST_DEPS = (
-    'Cwd'            => 0,
-    'File::Basename' => 0,
-    'File::Spec'     => 0,
-    'Hash::Merge'    => 0,
-    'JSON'           => 0,
-    'Test::More'     => 0.90,
+    "Test::More" => 0.90,
+    "Test::Trap" => 0,
 );
 
 WriteMakefile1(
-    MIN_PERL_VERSION => '5.008001',
+    MIN_PERL_VERSION => "5.008001",
     META_ADD         => {
-        'meta-spec' => { version => 2 },
+        "meta-spec" => { version => 2 },
         resources   => {
-            homepage   => 'https://metacpan.org/celogeek/MooX-Options',
+            homepage   => "https://metacpan.org/celogeek/MooX-Options",
             repository => {
-                url  => 'https://github.com:celogeek/MooX-Options.git',
-                web  => 'https://github.com/celogeek/MooX-Options',
-                type => 'git',
+                url  => "https://github.com:celogeek/MooX-Options.git",
+                web  => "https://github.com/celogeek/MooX-Options",
+                type => "git",
             },
             bugtracker => {
                 web =>
-                    'http://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Options',
+                    "http://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Options",
                 mailto => 'bug-MooX-Options@rt.cpan.org',
             },
-            license => 'http://dev.perl.org/licenses/',
+            license => "http://dev.perl.org/licenses/",
         },
         prereqs => {
             develop => {
                 requires => {
-                    'Test::CPAN::Changes'                 => 0,
-                    'Test::CheckManifest'                 => 0,
-                    'Module::CPANTS::Analyse'             => '0.96',
-                    'Test::Kwalitee'                      => 0,
-                    'Test::Perl::Critic'                  => 0,
-                    'Test::PerlTidy'                      => 0,
-                    'Test::Pod'                           => 0,
-                    'Test::Pod::Coverage'                 => 0,
-                    'Test::Pod::Spelling::CommonMistakes' => 0,
-                    'Test::Spelling'                      => 0,
+                    "Test::CPAN::Changes"                 => 0,
+                    "Test::CheckManifest"                 => 0,
+                    "Module::CPANTS::Analyse"             => "0.96",
+                    "Test::Kwalitee"                      => 0,
+                    "Test::Perl::Critic"                  => 0,
+                    "Test::PerlTidy"                      => 0,
+                    "Test::Pod"                           => 0,
+                    "Test::Pod::Coverage"                 => 0,
+                    "Test::Pod::Spelling::CommonMistakes" => 0,
+                    "Test::Spelling"                      => 0,
                 },
             },
             configure => { requires => {%CONFIGURE_DEPS}, },
             build     => { requires => {%BUILD_DEPS} },
             test      => {
-                requires => {%TEST_DEPS},
+                requires   => {%TEST_DEPS},
+                recommends => {
+                    "Data::Record"   => 0,
+                    "JSON::MaybeXS"  => 0,
+                    "Regexp::Common" => 0,
+                },
                 suggests => {
-                    'MooX::Cmd'            => '0.012',
-                    'MooX::ConfigFromFile' => 0,
+                    "Mo"                   => "0.36",
+                    "MooX::Cmd"            => "0.012",
+                    "MooX::ConfigFromFile" => 0,
+                    "Moose"                => 0,
                 }
             },
-            runtime => { requires => { %RUN_DEPS, perl => '5.8.1', } },
+            runtime => {
+                requires   => { %RUN_DEPS, perl => "5.8.1", },
+                recommends => {
+                    "Data::Record"   => 0,
+                    "JSON::MaybeXS"  => 0,
+                    "Regexp::Common" => 0,
+                },
+            },
         },
     },
-    NAME               => 'MooX::Options',
-    VERSION_FROM       => 'lib/MooX/Options.pm',
-    ABSTRACT_FROM      => 'lib/MooX/Options.pm',
-    LICENSE            => 'perl',
-    AUTHOR             => q{Jens Rehsack <rehsack@cpan.org>},
+    NAME          => "MooX::Options",
+    VERSION_FROM  => "lib/MooX/Options.pm",
+    ABSTRACT_FROM => "lib/MooX/Options.pm",
+    LICENSE       => "perl",
+    AUTHOR =>
+        [ q{celogeek <me@celogeek.com>}, q{Jens Rehsack <rehsack@cpan.org>} ],
     PREREQ_PM          => \%RUN_DEPS,
     CONFIGURE_REQUIRES => \%CONFIGURE_DEPS,
     BUILD_REQUIRES     => \%BUILD_DEPS,
     TEST_REQUIRES      => \%TEST_DEPS,
-    test               => { TESTS => 't/*.t xt/*.t' },
+    test               => { TESTS => "t/*.t xt/*.t" },
 );
 
 sub WriteMakefile1
@@ -108,7 +127,7 @@ sub WriteMakefile1
     delete $params{MIN_PERL_VERSION}      if ( $eumm_version < 6.48 );
     delete $params{META_MERGE}            if ( $eumm_version < 6.46 );
     delete $params{META_ADD}{prereqs}     if ( $eumm_version < 6.58 );
-    delete $params{META_ADD}{'meta-spec'} if ( $eumm_version < 6.58 );
+    delete $params{META_ADD}{"meta-spec"} if ( $eumm_version < 6.58 );
     delete $params{META_ADD}              if ( $eumm_version < 6.46 );
     delete $params{LICENSE}               if ( $eumm_version < 6.31 );
     delete $params{AUTHOR}                if ( $] < 5.005 );

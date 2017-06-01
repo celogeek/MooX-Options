@@ -2,6 +2,12 @@
 use t::Test;
 use Test::Trap;
 
+BEGIN
+{
+    use Module::Runtime qw(use_module);
+    eval { use_module("Data::Record"); use_module("Regexp::Common"); } or plan skip_all => "This test needs Data::Record and Regexp::Common";
+}
+
 {
 
     package t;
@@ -24,7 +30,7 @@ use Test::Trap;
 {
     local @ARGV = ('--treq');
     trap { my $opt = t->new_with_options(); };
-    like $trap->stderr,   qr/treq is missing/,      'stdout ok';
+    like $trap->stderr,   qr/Option treq requires an argument/,      'stdout ok';
     unlike $trap->stderr, qr/Use of uninitialized/, 'stderr ok';
 }
 

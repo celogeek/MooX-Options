@@ -3,6 +3,11 @@ use t::Test;
 use Test::Trap;
 
 local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
+BEGIN
+{
+    use Module::Runtime qw(use_module);
+    eval { use_module("MooX::ConfigFromFile::Role") } or plan skip_all => "This test needs MooX::ConfigFromFile";
+}
 
 {
 
@@ -27,7 +32,7 @@ SKIP: {
 }
 
 SKIP: {
-    local @ARGV = ( '--config_prefix', 'with_config_2.t' );
+    local @ARGV = ( '--config_prefix', '25-with_config_2.t' );
     my $t = trap { MyTestWithConfig->new_with_options() };
     isa_ok($t, "MyTestWithConfig") or skip "MyTestWithConfig Instantiation failure", 2;
     is $t->p1, 2, 'p1 fetch from config';

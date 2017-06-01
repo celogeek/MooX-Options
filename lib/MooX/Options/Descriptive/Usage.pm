@@ -20,7 +20,9 @@ This class use the full size of your terminal
 our $VERSION = "4.023";
 
 use Getopt::Long::Descriptive;
+use Module::Runtime qw(use_module);
 use Scalar::Util qw/blessed/;
+use Text::LineFold ();
 
 use Moo;
 with "MooX::Locale::Passthrough";
@@ -172,11 +174,10 @@ sub text {
 sub _get_line_fold {
     my $columns = $ENV{TEST_FORCE_COLUMN_SIZE}
         || eval {
-        require Term::Size::Any;
+        use_module("Term::Size::Any");
         [ Term::Size::Any::chars() ]->[0];
         } || 80;
 
-    require Text::LineFold;
     return Text::LineFold->new( ColMax => $columns - 4 );
 }
 
