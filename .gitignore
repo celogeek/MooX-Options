@@ -9,3 +9,9 @@
 MooX-Options-*
 xt/perltidy.rc
 *.LOG
+MANIFEST
+MYMETA.*
+Makefile
+blib/
+cover_db/
+pm_to_blib
