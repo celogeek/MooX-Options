@@ -2,19 +2,6 @@
 
 MooX::Options - Explicit Options eXtension for Object Class
 
-# VERSION
-
-version 4.023
-
-# DESCRIPTION
-
-Create a command line tool with your [Mo](https://metacpan.org/pod/Mo), [Moo](https://metacpan.org/pod/Moo), [Moose](https://metacpan.org/pod/Moose) objects.
-
-Everything is explicit. You have an `option` keyword to replace the usual `has` to explicitly use your attribute into the command line.
-
-The `option` keyword takes additional parameters and uses [Getopt::Long::Descriptive](https://metacpan.org/pod/Getopt::Long::Descriptive)
-to generate a command line tool.
-
 # SYNOPSIS
 
 In myOptions.pm :
@@ -69,11 +56,129 @@ The manual :
 
     perl myTool.pl --man
 
-# METHODS
+# DESCRIPTION
 
-## croak
+Create a command line tool with your [Mo](https://metacpan.org/pod/Mo), [Moo](https://metacpan.org/pod/Moo), [Moose](https://metacpan.org/pod/Moose) objects.
 
-Call Carp::croak dynamically
+Everything is explicit. You have an `option` keyword to replace the usual `has` to explicitly use your attribute into the command line.
+
+The `option` keyword takes additional parameters and uses [Getopt::Long::Descriptive](https://metacpan.org/pod/Getopt::Long::Descriptive)
+to generate a command line tool.
+
+# IMPORTANT CHANGES IN 4.100
+
+## Enhancing existing attributes
+
+One can now convert an existing attribute into an option for obvious reasons.
+
+    package CommonRole;
+
+    use Moo::Role;
+
+    has attr => (is => "ro", ...);
+
+    sub common_logic { ... }
+
+    1;
+
+    package Suitable::Cmd::CLI;
+
+    use Moo;
+    use MooX::Cmd;
+    use MooX::Options;
+
+    with "CommonRole";
+
+    option '+attr' => (format => 's', repeatable => 1);
+
+    sub execute { shift->common_logic }
+
+    1;
+
+    package Suitable::Web::Request::Handler;
+
+    use Moo;
+
+    with "CommonRole";
+
+    sub all_suits { shift->common_logic }
+
+    1;
+
+    package Suitable::Web;
+
+    use Dancer2;
+    use Suitable::Web::Request::Handler;
+
+    set serializer => "JSON";
+
+    get '/suits' => sub {
+        $my $reqh = Suitable::Web::Request::Handler->new( attr => config->{suit_attr} );
+        $reqh->all_suits;
+    };
+
+    dance;
+
+    1;
+
+Of course there more ways to to it, [Jedi](https://metacpan.org/pod/Jedi) or [Catalyst](https://metacpan.org/pod/Catalyst) shall be fine, either.
+
+## Rename negativable into negatable
+
+Since users stated that `negativable` is not a reasonable word, the flag is
+renamed into negatable. Those who will 2020 continue use negativable might
+or might not be warned about soon depreciation.
+
+## Replace Locale::TextDomain by MooX::Locale::Passthrough
+
+[Locale::TextDomain](https://metacpan.org/pod/Locale::TextDomain) is broken (technically and functionally) and causes a
+lot of people to avoid `MooX::Options` or hack around. Both is unintened.
+
+So introduce [MooX::Locale::Passthrough](https://metacpan.org/pod/MooX::Locale::Passthrough) to allow any vendor to add reasonable
+localization, eg. by composing [MooX::Locale::TextDomain::OO](https://metacpan.org/pod/MooX::Locale::TextDomain::OO) into it's
+solution and initialize the localization in a reasonable way.
+
+## Make lazy loaded features optional
+
+Since some features aren't used on a regular basis, their dependencies have
+been downgraded to `recommended` or `suggested`. The optional features are:
+
+- autosplit
+
+    This feature allowes one to split option arguments at a defined character and
+    always return an array (implicit flag `repeatable`).
+
+        option "search_path" => ( is => "ro", required => 1, autosplit => ":", format => "s" );
+
+    However, this feature requires following modules are provided:
+
+    - [Data::Record](https://metacpan.org/pod/Data::Record)
+    - [Regexp::Common](https://metacpan.org/pod/Regexp::Common)
+
+- json format
+
+    This feature allowes one to invoke a script like
+
+        $ my-tool --json-attr '{ "gem": "sapphire", "color": "blue" }'
+
+    It might be a reasonable enhancement to _handles_.
+
+    Handling JSON formatted arguments requires any of those modules
+    are loded:
+
+    - [JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS)
+    - [JSON::PP](https://metacpan.org/pod/JSON::PP) (in Core since 5.14).
+
+## Decouple autorange and autosplit
+
+Until 4.023, any option which had autorange enabled got autosplit enabled, too.
+Since autosplit might not work correctly and for a reasonable amount of users
+the fact of
+
+    $ my-tool --range 1..5
+
+is all they desire, autosplit will enabled only when the dependencies of
+autosplit are fulfilled.
 
 # IMPORTED METHODS
 
@@ -165,7 +270,7 @@ This parameter will give the command line an higher priority.
 
 ## with\_config\_from\_file
 
-This parameter will load [MooX::ConfigFromFile](https://metacpan.org/pod/MooX::ConfigFromFile) in your module. 
+This parameter will load [MooX::Options](https://metacpan.org/pod/MooX::Options) in your module. 
 The config option will be used between the command line and parameters.
 
 myTool :
@@ -257,14 +362,16 @@ You can also use the json format
 
     myTool --hash='{"a":1,"b":2}' # hash = { a => 1, b => 2 }
 
-## negativable
+## negatable
 
 It adds the negative version for the option.
 
-    option 'verbose' => (is => 'ro', negativable => 1);
+    option 'verbose' => (is => 'ro', negatable => 1);
 
     myTool --verbose    # verbose = 1
     myTool --no-verbose # verbose = 0
+
+The former name of this flag, negativable, is discouraged - since it's not a word.
 
 ## repeatable
 
@@ -285,6 +392,7 @@ For repeatable option, you can add the autosplit feature with your specific para
     
     myTool --test=1 --test=2 # test = (1, 2)
     myTool --test=1,2,3      # test = (1, 2, 3)
+    
 
 It will also handle quoted params with the autosplit.
 
@@ -302,6 +410,7 @@ allows you to pass number ranges instead of passing each individual number.
     myTool --test=1 --test=2 # test = (1, 2)
     myTool --test=1,2,3      # test = (1, 2, 3)
     myTool --test=1,2,3..6   # test = (1, 2, 3, 4, 5, 6)
+    
 
 It will also handle quoted params like `autosplit`, and will not rangify them.
 
@@ -397,11 +506,11 @@ Use the dzil command to update the pot and merge into the po files.
 
 # THANKS
 
-- Matt S. Trout (mst) <mst@shadowcat.co.uk>
+- Matt S. Trout (mst) &lt;mst@shadowcat.co.uk>
 
     For his patience and advice.
 
-- Tomas Doran (t0m) <bobtfish@bobtfish.net>
+- Tomas Doran (t0m) &lt;bobtfish@bobtfish.net>
 
     To help me release the new version, and using it :)
 
@@ -411,28 +520,44 @@ Use the dzil command to update the pot and merge into the po files.
 
 - Jens Rehsack (REHSACK)
 
-    Use with [PkgSrc](http://www.pkgsrc.org/), and many really good idea ([MooX::Cmd](https://metacpan.org/pod/MooX::Cmd), [MooX::ConfigFromFile](https://metacpan.org/pod/MooX::ConfigFromFile), and more to come I'm sure)
+    Use with [PkgSrc](http://www.pkgsrc.org/), and many really good idea ([MooX::Cmd](https://metacpan.org/pod/MooX::Cmd), [MooX::Options](https://metacpan.org/pod/MooX::Options), and more to come I'm sure)
 
 - All contributors
 
     For improving and add more feature to MooX::Options
 
-# BUGS
+# SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-https://github.com/celogeek/MooX-Options/issues
+You can find documentation for this module with the perldoc command.
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+    perldoc MooX::Options
+
+You can also look for information at:
+
+- RT: CPAN's request tracker (report bugs here)
+
+    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-Options](http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-Options)
+
+- AnnoCPAN: Annotated CPAN documentation
+
+    [http://annocpan.org/dist/MooX-Options](http://annocpan.org/dist/MooX-Options)
+
+- CPAN Ratings
+
+    [http://cpanratings.perl.org/d/MooX-Options](http://cpanratings.perl.org/d/MooX-Options)
+
+- Search CPAN
+
+    [http://search.cpan.org/dist/MooX-Options/](http://search.cpan.org/dist/MooX-Options/)
 
 # AUTHOR
 
-celogeek <me@celogeek.com>
+celogeek &lt;me@celogeek.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by celogeek <me@celogeek.com>.
+This software is copyright (c) 2013 by celogeek &lt;me@celogeek.com>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This software is copyright (c) 2017 by Jens Rehsack.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
