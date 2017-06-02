@@ -25,6 +25,9 @@ BEGIN {
     option 'bool'        => ( is => 'ro' );
     option 'counter'     => ( is => 'ro', repeatable => 1 );
     option 'empty'       => ( is => 'ro', negatable => 1 );
+    option 'verbose'     => ( is => 'ro', negativable => 1 );
+    option 'used'        => ( is => 'ro' );
+    option 'unused'      => ( is => 'ro', short => 'no_used' );
     option 'split'       => ( is => 'ro', format => 'i@', @autosplit );
     option 'has_default' => ( is => 'ro', default => sub {'foo'} );
     option 'range'       => ( is => 'ro', format => 'i@', autorange => 1 );
@@ -163,8 +166,13 @@ BEGIN {
     use Moo;
     use MooX::Options;
 
-    option 'range_str' =>
-        ( is => 'ro', format => 's', autorange => 1, short => 'rs' );
+    option 'range_str' => (
+        is        => 'ro',
+        format    => 's',
+        autorange => 1,
+        short     => 'rs',
+        @autosplit
+    );
     option 'range_conflict_str1' =>
         ( is => 'ro', format => 's', autorange => 1 );
     option 'range_conflict_str2' =>

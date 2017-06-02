@@ -2,12 +2,13 @@
 use strict;
 use warnings all => 'FATAL';
 use Test::More;
+use Test::Trap;
 use Carp;
 
 local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 
 eval <<__EOF__
-    package FailureNegativableWithFormat;
+    package FailureNegatableWithFormat;
     use Moo;
     use MooX::Options;
 
@@ -21,7 +22,25 @@ eval <<__EOF__
 __EOF__
     ;
 like $@,
-    qr/^Negativable\sparams\sis\snot\susable\swith\snon\sboolean\svalue,\sdon't\spass\sformat\sto\suse\sit\s\!/x,
+    qr/^Negatable\sparams\sis\snot\susable\swith\snon\sboolean\svalue,\sdon't\spass\sformat\sto\suse\sit\s\!/x,
+    "negatable and format are incompatible";
+
+eval <<__EOF__
+    package FailureNegativableWithFormat;
+    use Moo;
+    use MooX::Options;
+
+    option fail => (
+        is => 'rw',
+        negativable => 1,
+        format => 'i',
+    );
+
+    1;
+__EOF__
+    ;
+like $@,
+    qr/^Negatable\sparams\sis\snot\susable\swith\snon\sboolean\svalue,\sdon't\spass\sformat\sto\suse\sit\s\!/x,
     "negatable and format are incompatible";
 
 for my $ban (
@@ -140,8 +159,59 @@ __EOF__
         ;
     like $@,
         qr/^cmdline\sargument\s'legal|l!'\sshould\send\swith\sa\sword\scharacter/x,
-        'illegal cmdline name';
-    ok( !t->can('new_with_options'), 't has crash' );
+        'illegal short trailing char causes reasonable failure';
 }
+
+{
+    eval <<__EOF__
+    {
+        package ShortOptionConflict;
+        use Moo;
+        use MooX::Options;
+	option 'l' => (is => 'rw');
+        option 'legal' => (is => 'rw', short => 'l');
+        1;
+    }
+    ShortOptionConflict->new_with_options;
+__EOF__
+        ;
+    like $@,
+        qr/^There\sis\salready\san\soption\s'l'\s\-\scan't\suse\sit\sto\sshorten\s'legal'/x,
+        'short conflict with existing option';
+}
+
+{
+    eval <<__EOF__
+    {
+        package ShortShortConflict;
+        use Moo;
+        use MooX::Options;
+	option 'list' => (is => 'rw', short => 'l');
+        option 'legal' => (is => 'rw');
+        1;
+    }
+    ShortShortConflict->new_with_options;
+__EOF__
+        ;
+    like $@,
+        qr/^There\sis\salready\san\sabbreviation\s'l'\s\-\scan't\suse\sit\sto\sshorten\s'list'/x,
+        'short conflict with previous option abbreviation';
+}
+
+trap {
+    eval <<__EOF__
+    {
+        package NonNegatableNegated;
+        use Moo;
+        use MooX::Options;
+        option 'legal' => (is => 'rw');
+        1;
+    }
+    local \@ARGV = ('--no-legal');
+    NonNegatableNegated->new_with_options;
+__EOF__
+        ;
+};
+like $trap->stderr, qr/^Unknown\soption:\sno_legal/x, 'Unexisting negation';
 
 done_testing;

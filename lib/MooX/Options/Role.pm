@@ -66,10 +66,14 @@ sub _options_prepare_descriptive {
 
         push @{ $all_options{$name} }, $name;
         croak
-            "There is already an option '$data{short}' - can't use it to shorten $name"
+            "There is already an option '$data{short}' - can't use it to shorten '$name'"
             if $data{short} and exists $options_data->{ $data{short} };
+        croak
+            "There is already an abbreviation '$data{short}' - can't use it to shorten '$name'"
+            if $data{short} and defined $all_options{ $data{short} };
         push @{ $all_options{ $data{short} } }, $name
-            if $data{short} and not defined $all_options{ $data{short} };
+            if $data{short};
+
         for ( my $i = 1; $i <= length($name); $i++ ) {
             my $long_short = substr( $name, 0, $i );
             push @{ $all_options{$long_short} }, $name
@@ -128,40 +132,29 @@ sub _options_fix_argv {
 
         my $original_long_option = $all_options->{$arg_name_without_dash};
         if ( defined $original_long_option ) {
-            if ( @$original_long_option == 1 ) {
-                $original_long_option = $original_long_option->[0];
-            }
-            else {
-                $original_long_option = undef;
-            }
+            ## no critic (ErrorHandling::RequireCarping)
+            # uncoverable branch false
+            @$original_long_option == 1
+                or die
+                "Internal error, duplicate map for abbreviation detected!";
+            $original_long_option = $original_long_option->[0];
         }
 
         my $arg_name = $dash;
 
         if ( defined $negative && defined $original_long_option ) {
-            if (exists $option_data->{$original_long_option}
-                && (   $option_data->{$original_long_option}{negativable}
-                    or $option_data->{$original_long_option}{negatable} )
-                )
-            {
-                $arg_name .= 'no-';
-            }
-            else {
-                $arg_name .= 'no_';
-            }
+            $arg_name .=
+                $option_data->{$original_long_option}{negatable}
+                ? 'no-'
+                : 'no_';
         }
 
         $arg_name .= $arg_name_without_dash;
 
-        if (   defined $original_long_option
-            && ( my $opt_data = $option_data->{$original_long_option} )
+        if ( defined $original_long_option
             && ( defined( my $arg_value = shift @ARGV ) ) )
         {
-            my $autorange
-                = defined $original_long_option
-                && exists $option_data->{$original_long_option}
-                && $option_data->{$original_long_option}{autorange};
-
+            my $autorange = $option_data->{$original_long_option}{autorange};
             my $argv_processor = sub {
 
                 #remove the quoted if exist to chain
@@ -200,11 +193,9 @@ sub _expand_autorange {
     my ( $left_figure, $autorange_found, $right_figure )
         = $arg_value =~ /^(\d*)(\.\.)(\d*)$/x;
     if ($autorange_found) {
-        $left_figure = $right_figure
-            if !defined $left_figure || !length($left_figure);
-        $right_figure = $left_figure
-            if !defined $right_figure || !length($right_figure);
-        if ( defined $left_figure && defined $right_figure ) {
+        $left_figure  = $right_figure unless length($left_figure);
+        $right_figure = $left_figure  unless length($right_figure);
+        if ( length $left_figure && length $right_figure ) {
             push @expanded_arg_value, $left_figure .. $right_figure;
         }
     }

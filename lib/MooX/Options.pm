@@ -9,7 +9,7 @@ use Carp ('croak');
 use Module::Runtime qw(use_module);
 
 my @OPTIONS_ATTRIBUTES
-    = qw/format short repeatable negativable negatable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
+    = qw/format short repeatable negatable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
 
 sub import {
     my ( undef, @import ) = @_;
@@ -149,9 +149,10 @@ sub import {
     return;
 }
 
+my %filter_key = map { $_ => 1 } ( @OPTIONS_ATTRIBUTES, 'negativable' );
+
 sub _filter_attributes {
     my %attributes = @_;
-    my %filter_key = map { $_ => 1 } @OPTIONS_ATTRIBUTES;
     return map { ( $_ => $attributes{$_} ) }
         grep { !exists $filter_key{$_} } keys %attributes;
 }
@@ -180,6 +181,9 @@ sub _validate_and_filter_options {
             and $options{autosplit} = ',';
     }
 
+    exists $options{negativable}
+        and $options{negatable} = delete $options{negativable};
+
     my %cmdline_options = map { ( $_ => $options{$_} ) }
         grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
 
@@ -191,9 +195,9 @@ sub _validate_and_filter_options {
         && substr( $cmdline_options{format}, -1 ) ne '@';
 
     croak(
-        "Negativable params is not usable with non boolean value, don't pass format to use it !"
+        "Negatable params is not usable with non boolean value, don't pass format to use it !"
         )
-        if ( $cmdline_options{negativable} or $cmdline_options{negatable} )
+        if ( $cmdline_options{negatable} )
         and defined $cmdline_options{format};
 
     return %cmdline_options;
