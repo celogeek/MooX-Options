@@ -211,15 +211,6 @@ __END__
 
 MooX::Options - Explicit Options eXtension for Object Class
 
-=head1 DESCRIPTION
-
-Create a command line tool with your L<Mo>, L<Moo>, L<Moose> objects.
-
-Everything is explicit. You have an C<option> keyword to replace the usual C<has> to explicitly use your attribute into the command line.
-
-The C<option> keyword takes additional parameters and uses L<Getopt::Long::Descriptive>
-to generate a command line tool.
-
 =head1 SYNOPSIS
 
 In myOptions.pm :
@@ -274,7 +265,151 @@ The manual :
 
   perl myTool.pl --man
 
-=cut
+=head1 DESCRIPTION
+
+Create a command line tool with your L<Mo>, L<Moo>, L<Moose> objects.
+
+Everything is explicit. You have an C<option> keyword to replace the usual C<has> to explicitly use your attribute into the command line.
+
+The C<option> keyword takes additional parameters and uses L<Getopt::Long::Descriptive>
+to generate a command line tool.
+
+=head1 IMPORTANT CHANGES IN 4.100
+
+=head2 Enhancing existing attributes
+
+One can now convert an existing attribute into an option for obvious reasons.
+
+  package CommonRole;
+
+  use Moo::Role;
+
+  has attr => (is => "ro", ...);
+
+  sub common_logic { ... }
+
+  1;
+
+  package Suitable::Cmd::CLI;
+
+  use Moo;
+  use MooX::Cmd;
+  use MooX::Options;
+
+  with "CommonRole";
+
+  option '+attr' => (format => 's', repeatable => 1);
+
+  sub execute { shift->common_logic }
+
+  1;
+
+  package Suitable::Web::Request::Handler;
+
+  use Moo;
+
+  with "CommonRole";
+
+  sub all_suits { shift->common_logic }
+
+  1;
+
+  package Suitable::Web;
+
+  use Dancer2;
+  use Suitable::Web::Request::Handler;
+
+  set serializer => "JSON";
+
+  get '/suits' => sub {
+      $my $reqh = Suitable::Web::Request::Handler->new( attr => config->{suit_attr} );
+      $reqh->all_suits;
+  };
+
+  dance;
+
+  1;
+
+Of course there more ways to to it, L<Jedi> or L<Catalyst> shall be fine, either.
+
+=head2 Rename negativable into negatable
+
+Since users stated that C<negativable> is not a reasonable word, the flag is
+renamed into negatable. Those who will 2020 continue use negativable might
+or might not be warned about soon depreciation.
+
+=head2 Replace Locale::TextDomain by MooX::Locale::Passthrough
+
+L<Locale::TextDomain> is broken (technically and functionally) and causes a
+lot of people to avoid C<MooX::Options> or hack around. Both is unintened.
+
+So introduce L<MooX::Locale::Passthrough> to allow any vendor to add reasonable
+localization, eg. by composing L<MooX::Locale::TextDomain::OO> into it's
+solution and initialize the localization in a reasonable way.
+
+=head2 Make lazy loaded features optional
+
+Since some features aren't used on a regular basis, their dependencies have
+been downgraded to C<recommended> or C<suggested>. The optional features are:
+
+=over 4
+
+=item autosplit
+
+This feature allowes one to split option arguments at a defined character and
+always return an array (implicit flag C<repeatable>).
+
+  option "search_path" => ( is => "ro", required => 1, autosplit => ":", format => "s" );
+
+However, this feature requires following modules are provided:
+
+=over 4
+
+=item *
+
+L<Data::Record>
+
+=item *
+
+L<Regexp::Common>
+
+=back
+
+=item json format
+
+This feature allowes one to invoke a script like
+
+  $ my-tool --json-attr '{ "gem": "sapphire", "color": "blue" }'
+
+It might be a reasonable enhancement to I<handles>.
+
+Handling JSON formatted arguments requires any of those modules
+are loded:
+
+=over 4
+
+=item *
+
+L<JSON::MaybeXS>
+
+=item *
+
+L<JSON::PP> (in Core since 5.14).
+
+=back
+
+=back
+
+=head2 Decouple autorange and autosplit
+
+Until 4.023, any option which had autorange enabled got autosplit enabled, too.
+Since autosplit might not work correctly and for a reasonable amount of users
+the fact of
+
+  $ my-tool --range 1..5
+
+is all they desire, autosplit will enabled only when the dependencies of
+autosplit are fulfilled.
 
 =head1 IMPORTED METHODS
 
