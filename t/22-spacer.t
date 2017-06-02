@@ -1,5 +1,7 @@
 #!perl
-use t::Test;
+use strict;
+use warnings all => 'FATAL';
+use Test::More;
 use Test::Trap;
 use Carp;
 use FindBin qw/$RealBin/;
@@ -25,11 +27,11 @@ my @usages;
 
 trap { $opt->options_usage };
 @usages = grep {/\-[abc]\s+|\+/} split( /\n/, $trap->stdout );
-like $usages[0], qr/a/,  'a is first';
+like $usages[0], qr/a/,   'a is first';
 like $usages[1], qr/\++/, 'then the spacer';
-like $usages[2], qr/b/,  'b is next';
+like $usages[2], qr/b/,   'b is next';
 like $usages[3], qr/\++/, 'then the spacer';
-like $usages[4], qr/c/,  'c is last';
+like $usages[4], qr/c/,   'c is last';
 
 trap { $opt->options_help };
 @usages = grep {/[abc]:|\+/} split( /\n/, $trap->stdout );
@@ -38,6 +40,5 @@ like $usages[1], qr/\++/, 'then the spacer';
 like $usages[2], qr/b:/,  'b is next';
 like $usages[3], qr/\++/, 'then the spacer';
 like $usages[4], qr/c:/,  'c is last';
-
 
 done_testing;

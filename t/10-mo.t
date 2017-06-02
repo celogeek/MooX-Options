@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
 
-use t::Test;
+use strict;
+use warnings all => 'FATAL';
+use Test::More;
 use Test::Trap;
 use Carp;
 use FindBin qw/$RealBin/;
@@ -10,8 +12,10 @@ my @autosplit;
 
 BEGIN {
     use Module::Runtime qw(use_module);
-    eval {use_module("Mo", "0.36")} or plan skip_all => 'Need Mo (0.36) for this test';
-    eval { use_module("Data::Record"); use_module("Regexp::Common"); } and @autosplit = (autosplit => ',');
+    eval { use_module( "Mo", "0.36" ) }
+        or plan skip_all => 'Need Mo (0.36) for this test';
+    eval { use_module("Data::Record"); use_module("Regexp::Common"); }
+        and @autosplit = ( autosplit => ',' );
 }
 
 {
@@ -21,12 +25,12 @@ BEGIN {
     use Mo 'default';
     use MooX::Options;
 
-    option 'bool'    => ( is => 'ro' );
-    option 'counter' => ( is => 'ro', repeatable => 1 );
-    option 'empty'   => ( is => 'ro', negatable => 1 );
-    option 'split'   => ( is => 'ro', format => 'i@', @autosplit );
+    option 'bool'        => ( is => 'ro' );
+    option 'counter'     => ( is => 'ro', repeatable => 1 );
+    option 'empty'       => ( is => 'ro', negatable => 1 );
+    option 'split'       => ( is => 'ro', format => 'i@', @autosplit );
     option 'has_default' => ( is => 'ro', default => sub {'foo'} );
-    option 'range' => ( is => 'ro', format => 'i@', autorange => 1 );
+    option 'range'       => ( is => 'ro', format => 'i@', autorange => 1 );
 
     1;
 }
@@ -68,11 +72,9 @@ BEGIN {
     use Mo;
     use MooX::Options;
 
-    option 'split_str' => ( is => 'ro', format => 's', @autosplit );
-    option 'split_conflict_str1' =>
-        ( is => 'ro', format => 's', @autosplit );
-    option 'split_conflict_str2' =>
-        ( is => 'ro', format => 's', @autosplit );
+    option 'split_str'           => ( is => 'ro', format => 's', @autosplit );
+    option 'split_conflict_str1' => ( is => 'ro', format => 's', @autosplit );
+    option 'split_conflict_str2' => ( is => 'ro', format => 's', @autosplit );
 
     1;
 }
@@ -290,7 +292,8 @@ BEGIN {
     use Mo;
     use MooX::Options;
 
-    option 'range_str' => ( is => 'ro', format => 's', autorange => 1, short => 'rs' );
+    option 'range_str' =>
+        ( is => 'ro', format => 's', autorange => 1, short => 'rs' );
     option 'range_conflict_str1' =>
         ( is => 'ro', format => 's', autorange => 1 );
     option 'range_conflict_str2' =>

@@ -1,5 +1,7 @@
 #!perl
-use t::Test;
+use strict;
+use warnings all => 'FATAL';
+use Test::More;
 
 {
 
@@ -41,16 +43,17 @@ my @methods;
 {
     no strict 'refs';
     @methods = sort { $a cmp $b }
-        grep { !exists $ignore_methods{uc($_)} } keys %{ ref($test) . "::" };
+        grep { !exists $ignore_methods{ uc($_) } }
+        keys %{ ref($test) . "::" };
 }
 
 is_deeply(
     \@methods,
     [   qw/
             __
-	    __n
-	    __p
-	    _options_config
+            __n
+            __p
+            _options_config
             _options_data
             _options_prog_name
             _options_sub_commands

@@ -1,5 +1,7 @@
 #!perl
-use t::Test;
+use strict;
+use warnings all => 'FATAL';
+use Test::More;
 
 local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 

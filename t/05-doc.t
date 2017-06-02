@@ -1,5 +1,7 @@
 #!perl
-use t::Test;
+use strict;
+use warnings all => 'FATAL';
+use Test::More;
 use Test::Trap;
 use Carp;
 use FindBin qw/$RealBin/;
@@ -40,7 +42,9 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 
     package t2;
     use Moo;
-    use t::Test;
+    use strict;
+    use warnings all => 'FATAL';
+    use Test::More;
 
     sub filter_opt {
         my ( $attr, %opt ) = @_;
@@ -65,8 +69,7 @@ local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 {
     my $opt = t->new_with_options;
     trap { $opt->options_usage };
-    like $trap->stdout, qr/\s+\-t\s+this\sis\sa\stest/x,
-        'documentation work';
+    like $trap->stdout, qr/\s+\-t\s+this\sis\sa\stest/x, 'documentation work';
     trap { $opt->options_help };
     like $trap->stdout, qr/\s+\-t:\n\s+this\sis\sa\stest/x,
         'documentation work';

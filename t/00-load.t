@@ -9,9 +9,12 @@ use Test::More;
 use Moo;
 
 use_ok('MooX::Options') or BAIL_OUT("Couldn't load MooX::Options");
-use_ok('MooX::Options::Role') or BAIL_OUT("Couldn't load MooX::Options::Role");
-use_ok('MooX::Options::Descriptive') or BAIL_OUT("Couldn't load MooX::Options::Descriptive");
-use_ok('MooX::Options::Descriptive::Usage') or BAIL_OUT("Couldn't load MooX::Options::Descriptive::Usage");
+use_ok('MooX::Options::Role')
+    or BAIL_OUT("Couldn't load MooX::Options::Role");
+use_ok('MooX::Options::Descriptive')
+    or BAIL_OUT("Couldn't load MooX::Options::Descriptive");
+use_ok('MooX::Options::Descriptive::Usage')
+    or BAIL_OUT("Couldn't load MooX::Options::Descriptive::Usage");
 
 diag("Testing MooX::Options $MooX::Options::VERSION, Perl $], $^X");
 

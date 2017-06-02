@@ -1,12 +1,15 @@
 #!perl
-use t::Test;
+use strict;
+use warnings all => 'FATAL';
+use Test::More;
 use Test::Trap;
 
 local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
-BEGIN
-{
+
+BEGIN {
     use Module::Runtime qw(use_module);
-    eval { use_module("MooX::ConfigFromFile::Role") } or plan skip_all => "This test needs MooX::ConfigFromFile";
+    eval { use_module("MooX::ConfigFromFile::Role") }
+        or plan skip_all => "This test needs MooX::ConfigFromFile";
 }
 
 {
@@ -23,7 +26,8 @@ BEGIN
 
 SKIP: {
     my $t = trap { MyTestWithConfig->new_with_options() };
-    isa_ok($t, "MyTestWithConfig") or skip "MyTestWithConfig Instantiation failure", 4;
+    isa_ok( $t, "MyTestWithConfig" )
+        or skip "MyTestWithConfig Instantiation failure", 4;
     is $t->p1, 1, 'p1 fetch from config';
     is_deeply $t->p2, [ 1, 2, 3 ], '... and also p2';
     ok $t->can('config_prefix'), '... config prefix defined';
@@ -34,7 +38,8 @@ SKIP: {
 SKIP: {
     local @ARGV = ( '--config_prefix', '25-with_config_2.t' );
     my $t = trap { MyTestWithConfig->new_with_options() };
-    isa_ok($t, "MyTestWithConfig") or skip "MyTestWithConfig Instantiation failure", 2;
+    isa_ok( $t, "MyTestWithConfig" )
+        or skip "MyTestWithConfig Instantiation failure", 2;
     is $t->p1, 2, 'p1 fetch from config';
     is_deeply $t->p2, [ 3, 4, 5 ], '... and also p2';
 }
@@ -42,7 +47,8 @@ SKIP: {
 SKIP: {
     local @ARGV = ( '--p1', '2' );
     my $t = trap { MyTestWithConfig->new_with_options() };
-    isa_ok($t, "MyTestWithConfig") or skip "MyTestWithConfig Instantiation failure", 2;
+    isa_ok( $t, "MyTestWithConfig" )
+        or skip "MyTestWithConfig Instantiation failure", 2;
     is $t->p1, 2, 'p1 fetch from cmdline';
     is_deeply $t->p2, [ 1, 2, 3 ], '... and p2 from config';
 }
@@ -50,7 +56,8 @@ SKIP: {
 SKIP: {
     local @ARGV = ( '--p1', '2' );
     my $t = trap { MyTestWithConfig->new_with_options( p1 => 3 ) };
-    isa_ok($t, "MyTestWithConfig") or skip "MyTestWithConfig Instantiation failure", 2;
+    isa_ok( $t, "MyTestWithConfig" )
+        or skip "MyTestWithConfig Instantiation failure", 2;
     is $t->p1, 3, 'p1 fetch from params';
     is_deeply $t->p2, [ 1, 2, 3 ], '... and p2 from config';
 }

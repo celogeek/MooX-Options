@@ -1,11 +1,13 @@
 #!perl
-use t::Test;
+use strict;
+use warnings all => 'FATAL';
+use Test::More;
 use Test::Trap;
 
-BEGIN
-{
+BEGIN {
     use Module::Runtime qw(use_module);
-    eval { use_module("Data::Record"); use_module("Regexp::Common"); } or plan skip_all => "This test needs Data::Record and Regexp::Common";
+    eval { use_module("Data::Record"); use_module("Regexp::Common"); }
+        or plan skip_all => "This test needs Data::Record and Regexp::Common";
 }
 
 {
@@ -30,8 +32,8 @@ BEGIN
 {
     local @ARGV = ('--treq');
     trap { my $opt = t->new_with_options(); };
-    like $trap->stderr,   qr/Option treq requires an argument/,      'stdout ok';
-    unlike $trap->stderr, qr/Use of uninitialized/, 'stderr ok';
+    like $trap->stderr,   qr/Option treq requires an argument/, 'stdout ok';
+    unlike $trap->stderr, qr/Use of uninitialized/,             'stderr ok';
 }
 
 done_testing;

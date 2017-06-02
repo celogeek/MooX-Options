@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
-use t::Test;
+use strict;
+use warnings all => 'FATAL';
+use Test::More;
 use Carp;
 
 local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
@@ -88,8 +90,7 @@ __EOF__
     }
 __EOF__
         ;
-    like $@,
-        qr/^\QCan't find the method <with> in <MissingWith>!
+    like $@, qr/^\QCan't find the method <with> in <MissingWith>!
 Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/,
         'missing with';
 }
@@ -104,8 +105,7 @@ Ensure to load a Role::Tiny compatible module like Moo or Moose before using Moo
     }
 __EOF__
         ;
-    like $@,
-        qr/^\QCan't find the method <around> in <MissingAround>!
+    like $@, qr/^\QCan't find the method <around> in <MissingAround>!
 Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/,
         'missing with';
 }
@@ -121,8 +121,7 @@ Ensure to load a Role::Tiny compatible module like Moo or Moose before using Moo
     }
 __EOF__
         ;
-    like $@,
-        qr/^\QCan't find the method <has> in <MissingHas>!
+    like $@, qr/^\QCan't find the method <has> in <MissingHas>!
 Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.\E/,
         'missing with';
 }
@@ -139,7 +138,9 @@ Ensure to load a Role::Tiny compatible module like Moo or Moose before using Moo
     IllegalShortEnding->new_with_options;
 __EOF__
         ;
-    like $@, qr/^cmdline\sargument\s'legal|l!'\sshould\send\swith\sa\sword\scharacter/x, 'illegal cmdline name';
+    like $@,
+        qr/^cmdline\sargument\s'legal|l!'\sshould\send\swith\sa\sword\scharacter/x,
+        'illegal cmdline name';
     ok( !t->can('new_with_options'), 't has crash' );
 }
 

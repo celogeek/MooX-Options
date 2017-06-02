@@ -1,5 +1,7 @@
 #!perl
-use t::Test;
+use strict;
+use warnings all => 'FATAL';
+use Test::More;
 
 package Foo;
 use Moo;

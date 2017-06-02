@@ -1,8 +1,12 @@
 #!perl
 
-use t::Test;
+use strict;
+use warnings all => 'FATAL';
+use Test::More;
 use Test::Trap;
+
 use Carp;
+use File::Spec;
 use FindBin qw/$RealBin/;
 
 BEGIN {
@@ -13,19 +17,22 @@ BEGIN {
     }
 }
 
-use t::lib::MooXCmdTest;
+use lib File::Spec->catdir( $RealBin, qw(lib) );
+use MooXCmdTest;
 
 trap {
     local @ARGV = ('-h');
-    t::lib::MooXCmdTest->new_with_cmd;
+    MooXCmdTest->new_with_cmd;
 };
 
-like $trap->stdout, qr{USAGE:\s\d{2}\Q-moox-cmd.t [-h]\E}, 'base command help ok';
+like $trap->stdout, qr{USAGE:\s\d{2}\Q-moox-cmd.t [-h]\E},
+    'base command help ok'
+    or diag( explain($trap) );
 like $trap->stdout, qr{\QSUB COMMANDS AVAILABLE: test1, test3\E},
     'sub base command help ok';
 
 trap {
-    t::lib::MooXCmdTest->new->options_man( undef, *STDOUT );
+    MooXCmdTest->new->options_man( undef, *STDOUT );
 };
 
 like $trap->stdout, qr{NAME\s+\d{2}\-\Qmoox-cmd.t\E}, 'pod name ok';
@@ -39,38 +46,40 @@ like $trap->stdout, qr{AUTHORS\s+\QCelogeek <me\E\@\Qcelogeek.com>\E},
 
 trap {
     local @ARGV = ( 'test1', '-h' );
-    t::lib::MooXCmdTest->new_with_cmd();
+    MooXCmdTest->new_with_cmd();
 };
 
 like $trap->stdout, qr{USAGE:\s\d{2}\Q-moox-cmd.t test1 [-h]\E},
-    'subcommand 1 help ok';
+    'subcommand 1 help ok'
+    or diag( explain($trap) );
 like $trap->stdout, qr{\QSUB COMMANDS AVAILABLE: test2\E},
     'sub subcommand 1 help ok';
 
 trap {
     local @ARGV = ( 'test1', '-h' );
-    t::lib::MooXCmdTest->new_with_options( command_chain => [] );
+    MooXCmdTest->new_with_options( command_chain => [] );
 };
 
-like $trap->stdout, qr{USAGE:\s\d{2}\Q-moox-cmd.t [-h]\E}, 'no subcommand pass';
+like $trap->stdout, qr{USAGE:\s\d{2}\Q-moox-cmd.t [-h]\E},
+    'no subcommand pass';
 
 trap {
     local @ARGV = ( 'test1', '-h' );
-    t::lib::MooXCmdTest->new_with_options( command_chain => [123] );
+    MooXCmdTest->new_with_options( command_chain => [123] );
 };
 
 like $trap->stdout, qr{USAGE:\s\d{2}\Q-moox-cmd.t [-h]\E}, 'no ref params';
 
 trap {
     local @ARGV = ( 'test1', '-h' );
-    t::lib::MooXCmdTest->new_with_options( command_chain => [ {} ] );
+    MooXCmdTest->new_with_options( command_chain => [ {} ] );
 };
 
 like $trap->stdout, qr{USAGE:\s\d{2}\Q-moox-cmd.t [-h]\E}, 'bad ref';
 
 trap {
     local @ARGV = ( 'test1', '-h' );
-    t::lib::MooXCmdTest->new_with_options(
+    MooXCmdTest->new_with_options(
         command_chain => [ bless {}, 'MooX::Cmd' ] );
 };
 
@@ -78,17 +87,16 @@ like $trap->stdout, qr{USAGE:\s\d{2}\Q-moox-cmd.t [-h]\E}, 'bad ref';
 
 trap {
     local @ARGV = ( 'test1', '-h' );
-    t::lib::MooXCmdTest->new_with_options(
-        command_chain => [ t::lib::MooXCmdTest->new ] );
+    MooXCmdTest->new_with_options( command_chain => [ MooXCmdTest->new ] );
 };
 
-like $trap->stdout, qr{USAGE:\s\d{2}\Q-moox-cmd.t [-h]\E}, 'no command_name filled';
+like $trap->stdout, qr{USAGE:\s\d{2}\Q-moox-cmd.t [-h]\E},
+    'no command_name filled';
 
 trap {
     local @ARGV = ( 'test1', '-h' );
-    t::lib::MooXCmdTest->new_with_options(
-        command_chain =>
-            [ t::lib::MooXCmdTest->new( command_name => 'mySub' ) ],
+    MooXCmdTest->new_with_options(
+        command_chain => [ MooXCmdTest->new( command_name => 'mySub' ) ],
         command_commands => { a => 1, b => 2 }
     );
 };
@@ -100,10 +108,11 @@ like $trap->stdout, qr{\QSUB COMMANDS AVAILABLE: a, b\E},
 
 trap {
     local @ARGV = ( 'test1', 'test2', '-h' );
-    t::lib::MooXCmdTest->new_with_cmd;
+    MooXCmdTest->new_with_cmd;
 };
 
 like $trap->stdout, qr{USAGE:\s\d{2}\Q-moox-cmd.t test1 test2 [-h]\E},
-    'subcommand 2 ok';
+    'subcommand 2 ok'
+    or diag( explain($trap) );
 
 done_testing;
