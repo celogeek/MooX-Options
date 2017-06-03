@@ -1,15 +1,215 @@
 package MooX::Options;
 
-# ABSTRACT: Explicit Options eXtension for Object Class
+use strict;
+use warnings FATAL => 'all';
 
-=head1 DESCRIPTION
+our $VERSION = "4.099_001";
 
-Create a command line tool with your L<Mo>, L<Moo>, L<Moose> objects.
+use Carp ('croak');
+use Module::Runtime qw(use_module);
 
-Everything is explicit. You have an C<option> keyword to replace the usual C<has> to explicitly use your attribute into the command line.
+my @OPTIONS_ATTRIBUTES
+    = qw/format short repeatable negatable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
 
-The C<option> keyword takes additional parameters and uses L<Getopt::Long::Descriptive>
-to generate a command line tool.
+sub import {
+    my ( undef, @import ) = @_;
+    my $options_config = {
+        protect_argv          => 1,
+        flavour               => [],
+        skip_options          => [],
+        prefer_commandline    => 0,
+        with_config_from_file => 0,
+        usage_string          => undef,
+
+        #long description (manual)
+        description => undef,
+        authors     => [],
+        synopsis    => undef,
+        spacer      => " ",
+        @import
+    };
+
+    my $target = caller;
+    for my $needed_methods (qw/with around has/) {
+        next if $target->can($needed_methods);
+        croak(    "Can't find the method <$needed_methods> in <$target>!\n"
+                . "Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options."
+        );
+    }
+
+    my $with   = $target->can('with');
+    my $around = $target->can('around');
+    my $has    = $target->can('has');
+
+    my @target_isa;
+    { no strict 'refs'; @target_isa = @{"${target}::ISA"} };
+
+    if (@target_isa) {    #only in the main class, not a role
+
+        ## no critic (ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval, ValuesAndExpressions::ProhibitImplicitNewlines)
+        eval '{
+        package ' . $target . ';
+        use mro ();
+
+            sub _options_data {
+                my ( $class, @meta ) = @_;
+                return $class->maybe::next::method(@meta);
+            }
+
+            sub _options_config {
+                my ( $class, @params ) = @_;
+                return $class->maybe::next::method(@params);
+            }
+
+        1;
+        }';
+
+        croak($@) if $@;
+
+        $around->(
+            _options_config => sub {
+                my ( $orig, $self ) = ( shift, shift );
+                return $self->$orig(@_), %$options_config;
+            }
+        );
+
+        ## use critic
+    }
+    else {
+        if ( $options_config->{with_config_from_file} ) {
+            croak(
+                "Please, don't use the option <with_config_from_file> into a role."
+            );
+        }
+    }
+
+    my $options_data = {};
+    if ( $options_config->{with_config_from_file} ) {
+        $options_data->{config_prefix} = {
+            format => 's',
+            doc    => 'config prefix',
+            order  => 0,
+        };
+        $options_data->{config_files} = {
+            format => 's@',
+            doc    => 'config files',
+            order  => 0,
+        };
+    }
+
+    my $apply_modifiers = sub {
+        return if $target->can('new_with_options');
+        $with->('MooX::Options::Role');
+        if ( $options_config->{with_config_from_file} ) {
+            $with->('MooX::ConfigFromFile::Role');
+        }
+
+        $around->(
+            _options_data => sub {
+                my ( $orig, $self ) = ( shift, shift );
+                return ( $self->$orig(@_), %$options_data );
+            }
+        );
+    };
+
+    my @banish_keywords
+        = qw/h help man usage option new_with_options parse_options options_usage _options_data _options_config/;
+    if ( $options_config->{with_config_from_file} ) {
+        push @banish_keywords, qw/config_files config_prefix config_dirs/;
+    }
+
+    my $option = sub {
+        my ( $name, %attributes ) = @_;
+        for my $ban (@banish_keywords) {
+            croak(
+                "You cannot use an option with the name '$ban', it is implied by MooX::Options"
+            ) if $name eq $ban;
+        }
+
+        my %_moo_attrs = _filter_attributes(%attributes);
+        $has->( $name => %_moo_attrs ) if %_moo_attrs;
+
+        ## no critic (RegularExpressions::RequireExtendedFormatting)
+        $name =~ s/^\+//;    # one enhances an attribute being an option
+        $options_data->{$name}
+            = { _validate_and_filter_options(%attributes) };
+
+        $apply_modifiers->();
+        return;
+    };
+
+    if ( my $info = $Role::Tiny::INFO{$target} ) {
+        $info->{not_methods}{$option} = $option;
+    }
+
+    { no strict 'refs'; *{"${target}::option"} = $option; }
+
+    $apply_modifiers->();
+
+    return;
+}
+
+my %filter_key = map { $_ => 1 } ( @OPTIONS_ATTRIBUTES, 'negativable' );
+
+sub _filter_attributes {
+    my %attributes = @_;
+    return map { ( $_ => $attributes{$_} ) }
+        grep { !exists $filter_key{$_} } keys %attributes;
+}
+
+sub _validate_and_filter_options {
+    my (%options) = @_;
+    $options{doc} = $options{documentation} if !defined $options{doc};
+    $options{order} = 0 if !defined $options{order};
+
+    if ( $options{json}
+        || ( defined $options{format} && $options{format} eq 'json' ) )
+    {
+        delete $options{repeatable};
+        delete $options{autosplit};
+        delete $options{autorange};
+        delete $options{negativable};
+        delete $options{negatable};
+        $options{json}   = 1;
+        $options{format} = 's';
+    }
+
+    if ( $options{autorange} and not defined $options{autosplit} ) {
+
+# XXX maybe we should warn here since a previously beloved feature isn't enabled automatically
+        eval { use_module("Data::Record"); use_module("Regexp::Common"); }
+            and $options{autosplit} = ',';
+    }
+
+    exists $options{negativable}
+        and $options{negatable} = delete $options{negativable};
+
+    my %cmdline_options = map { ( $_ => $options{$_} ) }
+        grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
+
+    $cmdline_options{repeatable} = 1
+        if $cmdline_options{autosplit} or $cmdline_options{autorange};
+    $cmdline_options{format} .= "@"
+        if $cmdline_options{repeatable}
+        && defined $cmdline_options{format}
+        && substr( $cmdline_options{format}, -1 ) ne '@';
+
+    croak(
+        "Negatable params is not usable with non boolean value, don't pass format to use it !"
+        )
+        if ( $cmdline_options{negatable} )
+        and defined $cmdline_options{format};
+
+    return %cmdline_options;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+MooX::Options - Explicit Options eXtension for Object Class
 
 =head1 SYNOPSIS
 
@@ -65,207 +265,151 @@ The manual :
 
   perl myTool.pl --man
 
-=cut
+=head1 DESCRIPTION
 
-use strict;
-use warnings;
+Create a command line tool with your L<Mo>, L<Moo>, L<Moose> objects.
 
-# VERSION
+Everything is explicit. You have an C<option> keyword to replace the usual C<has> to explicitly use your attribute into the command line.
 
-use Locale::TextDomain 'MooX-Options';
+The C<option> keyword takes additional parameters and uses L<Getopt::Long::Descriptive>
+to generate a command line tool.
 
-my @OPTIONS_ATTRIBUTES
-    = qw/format short repeatable negativable autosplit autorange doc long_doc order json hidden spacer_before spacer_after/;
+=head1 IMPORTANT CHANGES IN 4.100
 
-sub import {
-    my ( undef, @import ) = @_;
-    my $options_config = {
-        protect_argv          => 1,
-        flavour               => [],
-        skip_options          => [],
-        prefer_commandline    => 0,
-        with_config_from_file => 0,
-        usage_string          => undef,
+=head2 Enhancing existing attributes
 
-        #long description (manual)
-        description => undef,
-        authors     => [],
-        synopsis    => undef,
-        spacer      => " ",
-        @import
-    };
+One can now convert an existing attribute into an option for obvious reasons.
 
-    my $target = caller;
-    for my $needed_methods (qw/with around has/) {
-        next if $target->can($needed_methods);
-        croak( __x("Can't find the method <{needed_methods}> in <{target}> ! Ensure to load a Role::Tiny compatible module like Moo or Moose before using MooX::Options.", 'needed_methods' => $needed_methods, 'target' => $target) );
-    }
+  package CommonRole;
 
-    my $with   = $target->can('with');
-    my $around = $target->can('around');
-    my $has    = $target->can('has');
+  use Moo::Role;
 
-    my @target_isa;
-    { no strict 'refs'; @target_isa = @{"${target}::ISA"} };
+  has attr => (is => "ro", ...);
 
-    if (@target_isa) {    #only in the main class, not a role
+  sub common_logic { ... }
 
-        use warnings FATAL => 'redefine';
-        ## no critic (ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval, ValuesAndExpressions::ProhibitImplicitNewlines)
-        eval '{
-        package ' . $target . ';
+  1;
 
-            sub _options_data {
-                my ( $class, @meta ) = @_;
-                return $class->maybe::next::method(@meta);
-            }
+  package Suitable::Cmd::CLI;
 
-            sub _options_config {
-                my ( $class, @params ) = @_;
-                return $class->maybe::next::method(@params);
-            }
+  use Moo;
+  use MooX::Cmd;
+  use MooX::Options;
 
-        1;
-        }';
-        use warnings FATAL => qw/void/;
+  with "CommonRole";
 
-        croak($@) if $@;
+  option '+attr' => (format => 's', repeatable => 1);
 
-        $around->(
-            _options_config => sub {
-                my ( $orig, $self ) = ( shift, shift );
-                return $self->$orig(@_), %$options_config;
-            }
-        );
+  sub execute { shift->common_logic }
 
-        ## use critic
-    }
-    else {
-        if ( $options_config->{with_config_from_file} ) {
-            croak(
-              __("Please, don\'t use the option <with_config_from_file> into a role.")
-            );
-        }
-    }
+  1;
 
-    my $options_data = {};
-    if ( $options_config->{with_config_from_file} ) {
-        $options_data->{config_prefix} = {
-            format => 's',
-            doc    => 'config prefix',
-            order  => 0,
-        };
-        $options_data->{config_files} = {
-            format => 's@',
-            doc    => 'config files',
-            order  => 0,
-        };
-    }
+  package Suitable::Web::Request::Handler;
 
-    my $apply_modifiers = sub {
-        return if $target->can('new_with_options');
-        $with->('MooX::Options::Role');
-        if ( $options_config->{with_config_from_file} ) {
-            $with->('MooX::ConfigFromFile::Role');
-        }
+  use Moo;
 
-        $around->(
-            _options_data => sub {
-                my ( $orig, $self ) = ( shift, shift );
-                return ( $self->$orig(@_), %$options_data );
-            }
-        );
-    };
+  with "CommonRole";
 
-    my @banish_keywords
-        = qw/h help man usage option new_with_options parse_options options_usage _options_data _options_config/;
-    if ( $options_config->{with_config_from_file} ) {
-        push @banish_keywords, qw/config_files config_prefix config_dirs/;
-    }
+  sub all_suits { shift->common_logic }
 
-    my $option = sub {
-        my ( $name, %attributes ) = @_;
-        for my $ban (@banish_keywords) {
-            croak(
-              __x("You cannot use an option with the name '{ban}', it is implied by MooX::Options", ban => $ban)
-            ) if $name eq $ban;
-        }
+  1;
 
-        $has->( $name => _filter_attributes(%attributes) );
+  package Suitable::Web;
 
-        $options_data->{$name}
-            = { _validate_and_filter_options(%attributes) };
+  use Dancer2;
+  use Suitable::Web::Request::Handler;
 
-        $apply_modifiers->();
-        return;
-    };
+  set serializer => "JSON";
 
-    if ( my $info = $Role::Tiny::INFO{$target} ) {
-        $info->{not_methods}{$option} = $option;
-    }
+  get '/suits' => sub {
+      $my $reqh = Suitable::Web::Request::Handler->new( attr => config->{suit_attr} );
+      $reqh->all_suits;
+  };
 
-    { no strict 'refs'; *{"${target}::option"} = $option; }
+  dance;
 
-    $apply_modifiers->();
+  1;
 
-    return;
-}
+Of course there more ways to to it, L<Jedi> or L<Catalyst> shall be fine, either.
 
-sub _filter_attributes {
-    my %attributes = @_;
-    my %filter_key = map { $_ => 1 } @OPTIONS_ATTRIBUTES;
-    return map { ( $_ => $attributes{$_} ) }
-        grep { !exists $filter_key{$_} } keys %attributes;
-}
+=head2 Rename negativable into negatable
 
-sub _validate_and_filter_options {
-    my (%options) = @_;
-    $options{doc} = $options{documentation} if !defined $options{doc};
-    $options{order} = 0 if !defined $options{order};
-    $options{autosplit} = ','
-        if !defined $options{autosplit} && $options{autorange};
+Since users stated that C<negativable> is not a reasonable word, the flag is
+renamed into negatable. Those who will 2020 continue use negativable might
+or might not be warned about soon depreciation.
 
-    if ( $options{json}
-        || ( defined $options{format} && $options{format} eq 'json' ) )
-    {
-        delete $options{repeatable};
-        delete $options{autosplit};
-        delete $options{autorange};
-        delete $options{negativable};
-        $options{json}   = 1;
-        $options{format} = 's';
-    }
+=head2 Replace Locale::TextDomain by MooX::Locale::Passthrough
 
-    my %cmdline_options = map { ( $_ => $options{$_} ) }
-        grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
+L<Locale::TextDomain> is broken (technically and functionally) and causes a
+lot of people to avoid C<MooX::Options> or hack around. Both is unintened.
 
-    $cmdline_options{repeatable} = 1 if $cmdline_options{autosplit};
-    $cmdline_options{format} .= "@"
-        if $cmdline_options{repeatable}
-        && defined $cmdline_options{format}
-        && substr( $cmdline_options{format}, -1 ) ne '@';
+So introduce L<MooX::Locale::Passthrough> to allow any vendor to add reasonable
+localization, eg. by composing L<MooX::Locale::TextDomain::OO> into it's
+solution and initialize the localization in a reasonable way.
 
-    croak(
-        __("Negativable params is not usable with non boolean value, don't pass format to use it !")
-        )
-        if $cmdline_options{negativable} && defined $cmdline_options{format};
+=head2 Make lazy loaded features optional
 
-    return %cmdline_options;
-}
+Since some features aren't used on a regular basis, their dependencies have
+been downgraded to C<recommended> or C<suggested>. The optional features are:
 
-=method croak
+=over 4
 
-Call Carp::croak dynamically
+=item autosplit
 
-=cut
-sub croak {
-    require Carp;
-    goto &Carp::croak;
-}
+This feature allowes one to split option arguments at a defined character and
+always return an array (implicit flag C<repeatable>).
 
-1;
+  option "search_path" => ( is => "ro", required => 1, autosplit => ":", format => "s" );
 
-__END__
+However, this feature requires following modules are provided:
+
+=over 4
+
+=item *
+
+L<Data::Record>
+
+=item *
+
+L<Regexp::Common>
+
+=back
+
+=item json format
+
+This feature allowes one to invoke a script like
+
+  $ my-tool --json-attr '{ "gem": "sapphire", "color": "blue" }'
+
+It might be a reasonable enhancement to I<handles>.
+
+Handling JSON formatted arguments requires any of those modules
+are loded:
+
+=over 4
+
+=item *
+
+L<JSON::MaybeXS>
+
+=item *
+
+L<JSON::PP> (in Core since 5.14).
+
+=back
+
+=back
+
+=head2 Decouple autorange and autosplit
+
+Until 4.023, any option which had autorange enabled got autosplit enabled, too.
+Since autosplit might not work correctly and for a reasonable amount of users
+the fact of
+
+  $ my-tool --range 1..5
+
+is all they desire, autosplit will enabled only when the dependencies of
+autosplit are fulfilled.
 
 =head1 IMPORTED METHODS
 
@@ -357,7 +501,7 @@ This parameter will give the command line an higher priority.
 
 =head2 with_config_from_file
 
-This parameter will load L<MooX::ConfigFromFile> in your module. 
+This parameter will load L<MooX::Options> in your module. 
 The config option will be used between the command line and parameters.
 
 myTool :
@@ -457,14 +601,16 @@ You can also use the json format
 
   myTool --hash='{"a":1,"b":2}' # hash = { a => 1, b => 2 }
 
-=head2 negativable
+=head2 negatable
 
 It adds the negative version for the option.
 
-  option 'verbose' => (is => 'ro', negativable => 1);
+  option 'verbose' => (is => 'ro', negatable => 1);
 
   myTool --verbose    # verbose = 1
   myTool --no-verbose # verbose = 0
+
+The former name of this flag, negativable, is discouraged - since it's not a word.
 
 =head2 repeatable
 
@@ -631,10 +777,52 @@ to use it a lot in L<DuckDuckGo|http://duckduckgo.com> (go to see L<MooX> module
 
 =item * Jens Rehsack (REHSACK)
 
-Use with L<PkgSrc|http://www.pkgsrc.org/>, and many really good idea (L<MooX::Cmd>, L<MooX::ConfigFromFile>, and more to come I'm sure)
+Use with L<PkgSrc|http://www.pkgsrc.org/>, and many really good idea (L<MooX::Cmd>, L<MooX::Options>, and more to come I'm sure)
 
 =item * All contributors
 
 For improving and add more feature to MooX::Options
 
 =back
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc MooX::Options
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-Options>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/MooX-Options>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/MooX-Options>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/MooX-Options/>
+
+=back
+
+=head1 AUTHOR
+
+celogeek <me@celogeek.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by celogeek <me@celogeek.com>.
+
+This software is copyright (c) 2017 by Jens Rehsack.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=cut

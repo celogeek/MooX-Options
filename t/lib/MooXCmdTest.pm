@@ -1,4 +1,8 @@
-package t::lib::MooXCmdTest;
+package MooXCmdTest;
+
+use strict;
+use warnings all => 'FATAL';
+
 use Moo;
 use MooX::Cmd;
 use MooX::Options
