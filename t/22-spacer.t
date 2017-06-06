@@ -3,9 +3,6 @@ use strict;
 use warnings all => 'FATAL';
 use Test::More;
 use Test::Trap;
-use Carp;
-use FindBin qw/$RealBin/;
-use Try::Tiny;
 
 local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 
