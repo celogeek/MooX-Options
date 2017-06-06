@@ -32,7 +32,7 @@ WriteMakefile1(
         resources   => {
             homepage   => "https://metacpan.org/celogeek/MooX-Options",
             repository => {
-                url  => "https://github.com:celogeek/MooX-Options.git",
+                url  => "https://github.com/celogeek/MooX-Options.git",
                 web  => "https://github.com/celogeek/MooX-Options",
                 type => "git",
             },
