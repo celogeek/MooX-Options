@@ -1,5 +1,6 @@
-# PODNAME: MooX::Options::Manual::MooXCmd
-# ABSTRACT: Manage your tools with MooX::Cmd
+=head1 NAME
+
+MooX::Options::Manual::MooXCmd - Manage your tools with MooX::Cmd
 
 =head1 DESCRIPTION
 
@@ -18,3 +19,17 @@ the subcommands.
 L<MooX::Options>
 
 L<MooX::Cmd>
+
+=head1 AUTHOR
+
+celogeek <me@celogeek.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by celogeek <me@celogeek.com>.
+
+This software is copyright (c) 2017 by Jens Rehsack.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=cut
