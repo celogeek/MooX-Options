@@ -5,7 +5,9 @@ MooX::Options::Manual::NamespaceClean - Use namespace::clean with MooX::Options
 =head1 DESCRIPTION
 
 L<MooX::Options> export private methods to keep track of all your options.
-You need to keep some of them to make it work.
+You need to keep some of them to make it work. In addition to the advises
+of L<Moo|Moo/CLEANING UP IMPORTS>, some of the imported methods needs to
+be visible ...
 
 =head1 USAGE
 
@@ -13,6 +15,8 @@ You need to keep some of them to make it work.
   use namespace::clean -except => [qw/_options_data _options_config/];
 
 =head1 SEE ALSO
+
+L<Moo/CLEANING UP IMPORTS>
 
 L<MooX::Options>
 
