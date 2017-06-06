@@ -325,7 +325,8 @@ sub parse_options {
 
     # create usage str
     my $usage_str = $options_config{usage_string};
-    $usage_str = sprintf( $class->__("USAGE: %s %%o"), $prog_name )
+    $usage_str = sprintf( $class->__("USAGE: %s %s"),
+        $prog_name, " [-h] [" . $class->__("long options ...") . "]" )
         if !defined $usage_str;
 
     my ( $opt, $usage ) = describe_options(

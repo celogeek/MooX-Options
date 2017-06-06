@@ -13,7 +13,6 @@ my %RUN_DEPS = (
     "MooX::Locale::Passthrough" => 0,
     "Path::Class"               => "0.32",
     "Pod::Usage"                => 0,
-    "Role::Tiny"                => 0,
     "Text::LineFold"            => 0,
 );
 
@@ -69,10 +68,11 @@ WriteMakefile1(
                     "Regexp::Common" => 0,
                 },
                 suggests => {
-                    "Mo"                   => "0.36",
-                    "MooX::Cmd"            => "0.012",
-                    "MooX::ConfigFromFile" => 0,
-                    "Moose"                => 0,
+                    "Mo"                           => "0.36",
+                    "MooX::Cmd"                    => "0.012",
+                    "MooX::ConfigFromFile"         => 0,
+                    "Moose"                        => 0,
+                    "MooX::Locale::TextDomain::OO" => 0,
                 }
             },
             runtime => {

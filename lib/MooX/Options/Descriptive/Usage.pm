@@ -223,8 +223,8 @@ sub option_help {
             "    ",
             "        ",
             defined $opt_data->{long_doc}
-            ? $opt_data->{long_doc}
-            : $opt->{desc}
+            ? $self->__( $opt_data->{long_doc} )
+            : $self->__( $opt->{desc} )
             );
     }
 

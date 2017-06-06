@@ -14,12 +14,13 @@ my @OPTIONS_ATTRIBUTES
 sub import {
     my ( undef, @import ) = @_;
     my $options_config = {
-        protect_argv          => 1,
-        flavour               => [],
-        skip_options          => [],
-        prefer_commandline    => 0,
-        with_config_from_file => 0,
-        usage_string          => undef,
+        protect_argv              => 1,
+        flavour                   => [],
+        skip_options              => [],
+        prefer_commandline        => 0,
+        with_config_from_file     => 0,
+        with_locale_textdomain_oo => 0,
+        usage_string              => undef,
 
         #long description (manual)
         description => undef,
@@ -102,6 +103,13 @@ sub import {
         $with->('MooX::Options::Role');
         if ( $options_config->{with_config_from_file} ) {
             $with->('MooX::ConfigFromFile::Role');
+        }
+        if ( $options_config->{with_locale_textdomain_oo} ) {
+            $with->('MooX::Locale::TextDomain::OO');
+            use_module("MooX::Options::Descriptive::Usage");
+            MooX::Options::Descriptive::Usage->can("localizer")
+                or MooX::Options::Descriptive::Usage->can("with")
+                ->("MooX::Locale::TextDomain::OO");
         }
 
         $around->(
@@ -511,6 +519,17 @@ myTool :
 In /etc/myTool.json
 
   {"test" : 1}
+
+=head2 with_locale_textdomain_oo
+
+This Parameter will load L<MooX::Locale::TextDomain::OO> into your module as
+well as into L<MooX::Options::Descriptive::Usage>.
+
+No further action is taken, no language is chosen - everything keep in
+control.
+
+Please read L<Locale::TextDomain::OO> carefully how to enable the desired
+translation setup accordingly.
 
 =head1 usage_string
 
