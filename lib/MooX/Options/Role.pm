@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 
 ## no critic (ProhibitExcessComplexity)
 
-our $VERSION = "4.099_001";
+our $VERSION = "4.099_002";
 
 =head1 NAME
 
