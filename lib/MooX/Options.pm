@@ -3,7 +3,7 @@ package MooX::Options;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = "4.099_002";
+our $VERSION = "4.099_003";
 
 use Carp ('croak');
 use Module::Runtime qw(use_module);

@@ -1,5 +1,8 @@
 Revision history for MooX-Options
 
+4.099_003  2017-06-12
+    * use MRO::Compat instead of mro for Perls bevor v5.9.5
+
 4.099_002  2017-06-06
     * fix some broken documentation due move from Dist::Zilla to
       ExtUtils::MakeMaker
