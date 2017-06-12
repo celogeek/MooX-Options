@@ -8,6 +8,7 @@ use ExtUtils::MakeMaker;
 my %RUN_DEPS = (
     "Getopt::Long"              => "2.43",
     "Getopt::Long::Descriptive" => "0.099",
+    "MRO::Compat"               => 0,
     "Module::Runtime"           => 0,
     "Moo"                       => "1.003",
     "MooX::Locale::Passthrough" => 0,
