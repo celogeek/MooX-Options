@@ -1,6 +1,6 @@
 ---
 install:
-  - cpanm --notest --skip-satisfied App::mymeta_requires
+  - cpanm --notest App::mymeta_requires
   - perl Makefile.PL
   - make manifest
   - mymeta-requires --runtime --build --test --configure --develop --recommends --suggests | cpanm --notest
