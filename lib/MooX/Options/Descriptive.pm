@@ -13,7 +13,7 @@ This class will override the usage_class method, to customize the output of the 
 
 =cut
 
-our $VERSION = "4.099_003";
+our $VERSION = "4.100";
 
 use Getopt::Long 2.43;
 use Getopt::Long::Descriptive 0.099;

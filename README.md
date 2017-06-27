@@ -281,6 +281,17 @@ In /etc/myTool.json
 
     {"test" : 1}
 
+## with\_locale\_textdomain\_oo
+
+This Parameter will load [MooX::Locale::TextDomain::OO](https://metacpan.org/pod/MooX::Locale::TextDomain::OO) into your module as
+well as into [MooX::Options::Descriptive::Usage](https://metacpan.org/pod/MooX::Options::Descriptive::Usage).
+
+No further action is taken, no language is chosen - everything keep in
+control.
+
+Please read [Locale::TextDomain::OO](https://metacpan.org/pod/Locale::TextDomain::OO) carefully how to enable the desired
+translation setup accordingly.
+
 # usage\_string
 
 This parameter is passed to Getopt::Long::Descriptive::describe\_options() as
