@@ -29,8 +29,9 @@ my %TEST_DEPS = (
 WriteMakefile1(
     MIN_PERL_VERSION => "5.008001",
     META_ADD         => {
-        "meta-spec" => { version => 2 },
-        resources   => {
+        "meta-spec"    => { version => 2 },
+        dynamic_config => 0,
+        resources      => {
             homepage   => "https://metacpan.org/celogeek/MooX-Options",
             repository => {
                 url  => "https://github.com/celogeek/MooX-Options.git",
