@@ -2,7 +2,7 @@ package MooX::Options;
 
 use strictures 2;
 
-our $VERSION = "4.100";
+our $VERSION = "4.101";
 
 use Carp ('croak');
 use Module::Runtime qw(use_module);

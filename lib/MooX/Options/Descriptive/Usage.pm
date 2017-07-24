@@ -16,7 +16,7 @@ This class use the full size of your terminal
 
 ## no critic (ProhibitExcessComplexity)
 
-our $VERSION = "4.100";
+our $VERSION = "4.101";
 
 use Getopt::Long::Descriptive;
 use Module::Runtime qw(use_module);

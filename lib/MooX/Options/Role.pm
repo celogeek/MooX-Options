@@ -4,7 +4,7 @@ use strictures 2;
 
 ## no critic (ProhibitExcessComplexity)
 
-our $VERSION = "4.100";
+our $VERSION = "4.101";
 
 =head1 NAME
 
