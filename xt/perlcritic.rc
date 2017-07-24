@@ -18,3 +18,7 @@ add_packages = Text::WrapI18N
 allow=_options_sub_commands
 [ControlStructures::ProhibitCascadingIfElse]
 max_elsif = 10
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = strictures Moo
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = strictures Moo

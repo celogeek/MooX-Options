@@ -1,7 +1,6 @@
 package MooX::Options;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 2;
 
 our $VERSION = "4.100";
 
@@ -48,7 +47,7 @@ sub import {
     if (@target_isa) {    #only in the main class, not a role
 
         ## no critic (ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval, ValuesAndExpressions::ProhibitImplicitNewlines)
-        eval '{
+        eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . '{
         package ' . $target . ';
         use MRO::Compat ();
 

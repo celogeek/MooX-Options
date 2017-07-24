@@ -11,6 +11,7 @@ my %RUN_DEPS = (
     "MRO::Compat"               => 0,
     "Module::Runtime"           => 0,
     "Moo"                       => "1.003",
+    "strictures"                => 2,
     "MooX::Locale::Passthrough" => 0,
     "Path::Class"               => "0.32",
     "Pod::Usage"                => 0,

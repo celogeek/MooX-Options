@@ -1,7 +1,6 @@
 package MooX::Options::Descriptive::Usage;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 2;
 
 =head1 NAME
 

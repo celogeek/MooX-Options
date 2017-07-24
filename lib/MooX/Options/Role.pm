@@ -1,7 +1,6 @@
 package MooX::Options::Role;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 2;
 
 ## no critic (ProhibitExcessComplexity)
 
