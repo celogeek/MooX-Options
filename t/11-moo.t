@@ -194,7 +194,7 @@ BEGIN {
 {
 
     package rg_str_short_common;
-    use Moose;
+    use Moo;
     use MooX::Options;
 
     option 'range_str' =>
