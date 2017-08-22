@@ -65,7 +65,7 @@ sub _options_prepare_descriptive {
 
         push @{ $all_options{$name} }, $name;
         if ( $data{short} ) {
-            my @shrt_list = split( "|", $data{short} );
+            my @shrt_list = split( m{ [|] }xms, $data{short} );
             foreach my $shrt (@shrt_list) {
                 croak
                     "There is already an option '$shrt' - can't use it to shorten '$name'"
