@@ -342,13 +342,25 @@ BEGIN {
 
 {
 
-    package rg_str_short_common;
+    package rg_str_short_commonRole;
+    use Moo::Role;
     use Mo;
     use MooX::Options;
 
     option 'range_str' =>
         ( is => 'ro', format => 's', autorange => 1, short => 'r' );
     option 'range_json' => ( is => 'ro', format => 'json', short => 'j' );
+
+    1;
+}
+
+{
+
+    package rg_str_short_common;
+    use Role::Tiny::With;
+    use Mo;
+
+    with 'rg_str_short_commonRole';
 
     1;
 }
