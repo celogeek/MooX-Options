@@ -2,7 +2,8 @@
 
 use strict;
 use warnings all => 'FATAL';
-use Test::More;
+use Test::More skip_all =>
+    "Mo isn't supported in a reasonable way since method modifiers are requires as well as adding private accessors.";
 use Test::Trap;
 use FindBin '$RealBin';
 
