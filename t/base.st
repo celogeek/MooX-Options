@@ -666,7 +666,7 @@ subtest "range_str_shorter_name" => sub {
 };
 
 subtest "range_str_short_with_overlapping_abbrev" => sub {
-    note "shorter but comon abbreviation";
+    note "shorter but common abbreviation";
     {
         local @ARGV = ( "-r", "1..4", "-j", "[ 1, 2, 3, 4 ]" );
         my $t = rg_str_short_common->new_with_options();
