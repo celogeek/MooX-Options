@@ -12,7 +12,7 @@ be visible ...
 =head1 USAGE
 
   use MooX::Options;
-  use namespace::clean -except => [qw/_options_data _options_config/];
+  use namespace::clean -except => [qw/_options_data _options_config __ __n __p/];
 
 =head1 SEE ALSO
 
